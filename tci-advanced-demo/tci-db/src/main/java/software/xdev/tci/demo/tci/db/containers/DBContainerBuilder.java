@@ -35,12 +35,12 @@ public final class DBContainerBuilder
 		final AdvancedImageFromDockerFile builder =
 			new AdvancedImageFromDockerFile("webapp-db", false)
 				.withLoggerForBuild(LOG_CONTAINER_BUILD)
-				.withBaseDirRelativeIgnoreFile(null)
-				.withAdditionalIgnoreLines(
+				.withPostGitIgnoreLines(
 					// Ignore everything
 					"**")
 				.withDockerFilePath(Paths.get("../tci-db/Dockerfile"))
-				.withBaseDir(Paths.get("../"));
+				.withBaseDir(Paths.get("../"))
+				.withBaseDirRelativeIgnoreFile(null);
 		
 		try
 		{

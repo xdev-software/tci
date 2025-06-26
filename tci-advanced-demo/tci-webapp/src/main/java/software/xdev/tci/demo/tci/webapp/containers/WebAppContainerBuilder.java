@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import software.xdev.testcontainers.imagebuilder.AdvancedImageFromDockerFile;
+import software.xdev.testcontainers.imagebuilder.compat.DockerfileCOPYParentsEmulator;
 
 
 @SuppressWarnings("PMD.MoreThanOneLogger")
@@ -35,14 +36,13 @@ public final class WebAppContainerBuilder
 		final AdvancedImageFromDockerFile builder =
 			new AdvancedImageFromDockerFile("webapp-it-local", false)
 				.withLoggerForBuild(LOG_CONTAINER_BUILD)
-				.withAdditionalIgnoreLines(
+				.withPostGitIgnoreLines(
 					// Ignore git-folder, as it will be provided in the Dockerfile
 					".git/**",
 					// Ignore other unused folders and extensions
-					".iml",
-					".cmd",
-					".md",
-					"target/**",
+					"*.iml",
+					"*.cmd",
+					"*.md",
 					".config/**",
 					".idea/**",
 					"_dev_infra/**",
@@ -55,11 +55,15 @@ public final class WebAppContainerBuilder
 					"*-it/src/**",
 					"**/src/test",
 					// Ignore resources that are just used for development
-					"webapp/src/main/resources-dev/**")
+					"webapp/src/main/resources-dev/**",
+					// Most files from these folders need to be ignored -> Down there for highest prio
+					"node_modules",
+					"target")
 				.withDockerFilePath(Paths.get("../tci-webapp/Dockerfile"))
 				.withBaseDir(Paths.get("../"))
 				// File is in root directory - we can't access it
-				.withBaseDirRelativeIgnoreFile(null);
+				.withBaseDirRelativeIgnoreFile(null)
+				.withDockerFileLinesModifier(new DockerfileCOPYParentsEmulator());
 		
 		try
 		{
