@@ -43,24 +43,21 @@ public final class WebAppContainerBuilder
 					"*.iml",
 					"*.cmd",
 					"*.md",
-					".config/**",
-					".idea/**",
 					"_dev_infra/**",
 					"_resource_metrics/**",
 					// Ignore other Dockerfiles (our required file will always be transferred)
 					"Dockerfile",
 					// Ignore not required test-modules that may have changed
 					// sources only - otherwise the parent pom doesn't find the resources
-					"tci-*/src/**",
-					"*-it/src/**",
-					"**/src/test",
+					"integration-tests/*/src/**",
+					"**/src/test/**",
 					// Ignore resources that are just used for development
 					"webapp/src/main/resources-dev/**",
 					// Most files from these folders need to be ignored -> Down there for highest prio
 					"node_modules",
 					"target")
-				.withDockerFilePath(Paths.get("../tci-webapp/Dockerfile"))
-				.withBaseDir(Paths.get("../"))
+				.withDockerFilePath(Paths.get("../../integration-tests/tci-webapp/Dockerfile"))
+				.withBaseDir(Paths.get("../../"))
 				// File is in root directory - we can't access it
 				.withBaseDirRelativeIgnoreFile(null)
 				.withDockerFileLinesModifier(new DockerfileCOPYParentsEmulator());
