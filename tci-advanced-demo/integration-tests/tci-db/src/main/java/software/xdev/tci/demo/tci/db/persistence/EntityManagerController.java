@@ -180,6 +180,7 @@ public class EntityManagerController implements AutoCloseable
 		Optional.ofNullable(connectionProviderClassName)
 			.ifPresent(p -> properties.put(JdbcSettings.CONNECTION_PROVIDER, connectionProviderClassName));
 		properties.putAll(DisableHibernateFormatMapper.properties());
+		properties.putAll(additionalConfig);
 		return new EntityManagerController(
 			new HibernatePersistenceProvider()
 				.createContainerEntityManagerFactory(
