@@ -12,6 +12,7 @@ import org.hibernate.boot.archive.scan.spi.ScanParameters;
 import org.hibernate.boot.archive.scan.spi.ScanResult;
 
 
+@SuppressWarnings("java:S6548")
 public class CachingStandardScanner extends StandardScanner
 {
 	private static CachingStandardScanner instance;

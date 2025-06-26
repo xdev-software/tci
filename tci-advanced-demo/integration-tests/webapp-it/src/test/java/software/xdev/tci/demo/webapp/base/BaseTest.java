@@ -194,19 +194,19 @@ abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 			return;
 		}
 		
-		final RemoteWebDriver remoteWebDriver = this.remoteWebDriver;
-		final BrowserTCI browserInfra = this.browserInfra;
+		final RemoteWebDriver fRemoteWebDriver = this.remoteWebDriver;
+		final BrowserTCI fBrowserInfra = this.browserInfra;
 		
 		REAP_CFS.add(CompletableFuture.runAsync(() -> {
 			try
 			{
-				if(remoteWebDriver != null && remoteWebDriver.getSessionId() != null)
+				if(fRemoteWebDriver != null && fRemoteWebDriver.getSessionId() != null)
 				{
 					LOG.info("Quiting remoteWebDriver");
-					remoteWebDriver.quit();
+					fRemoteWebDriver.quit();
 				}
 				
-				browserInfra.stop();
+				fBrowserInfra.stop();
 			}
 			catch(final Exception ex)
 			{
@@ -222,25 +222,25 @@ abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 	{
 		LOG.info("Shutting down");
 		
-		final WebAppTCI appInfra = this.appInfra;
-		final OIDCTCI oidcInfra = this.oidcInfra;
-		final DBTCI dbInfra = this.dbInfra;
+		final WebAppTCI fAppInfra = this.appInfra;
+		final OIDCTCI fOidcInfra = this.oidcInfra;
+		final DBTCI fDbInfra = this.dbInfra;
 		
-		final Network network = this.network;
+		final Network fNetwork = this.network;
 		
 		REAP_CFS.add(CompletableFuture.runAsync(() -> {
 			try
 			{
 				Stream.<Runnable>concat(
 						Stream.of(this::stopWebDriver),
-						Stream.of(appInfra, oidcInfra, dbInfra)
+						Stream.of(fAppInfra, fOidcInfra, fDbInfra)
 							.filter(Objects::nonNull)
 							.map(tci -> tci::stop))
 					.map(CompletableFuture::runAsync)
 					.toList() // collect so everything is getting executed async
 					.forEach(CompletableFuture::join);
 				
-				Optional.ofNullable(network).ifPresent(Network::close);
+				Optional.ofNullable(fNetwork).ifPresent(Network::close);
 			}
 			catch(final Exception ex)
 			{
