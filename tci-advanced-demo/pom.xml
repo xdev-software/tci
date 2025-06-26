@@ -27,15 +27,9 @@
 	<modules>
 		<module>entities</module>
 		<module>entities-metamodel</module>
+		<module>integration-tests</module>
 		<module>persistence</module>
-		<module>persistence-it</module>
-		<module>tci-db</module>
-		<module>tci-oidc</module>
-		<module>tci-selenium</module>
-		<module>tci-testcontainers</module>
-		<module>tci-webapp</module>
 		<module>webapp</module>
-		<module>webapp-it</module>
 	</modules>
 
 	<dependencyManagement>
@@ -60,51 +54,6 @@
 			</dependency>
 
 			<dependency>
-				<groupId>software.xdev.tci.demo</groupId>
-				<artifactId>tci-db</artifactId>
-				<version>1.2.1-SNAPSHOT</version>
-			</dependency>
-
-			<dependency>
-				<groupId>software.xdev.tci.demo</groupId>
-				<artifactId>tci-oidc</artifactId>
-				<version>1.2.1-SNAPSHOT</version>
-			</dependency>
-
-			<dependency>
-				<groupId>software.xdev.tci.demo</groupId>
-				<artifactId>tci-selenium</artifactId>
-				<version>1.2.1-SNAPSHOT</version>
-			</dependency>
-
-			<dependency>
-				<groupId>software.xdev.tci.demo</groupId>
-				<artifactId>tci-webapp</artifactId>
-				<version>1.2.1-SNAPSHOT</version>
-			</dependency>
-
-			<dependency>
-				<groupId>software.xdev.tci.demo</groupId>
-				<artifactId>tci-testcontainers</artifactId>
-				<version>1.2.1-SNAPSHOT</version>
-			</dependency>
-
-			<dependency>
-				<groupId>software.xdev</groupId>
-				<artifactId>tci-base</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-			<!-- Selenium -->
-			<dependency>
-				<groupId>org.seleniumhq.selenium</groupId>
-				<artifactId>selenium-dependencies-bom</artifactId>
-				<version>4.33.0</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency>
 				<groupId>software.xdev</groupId>
 				<artifactId>spring-security-advanced-authentication-ui</artifactId>
 				<version>2.1.0</version>
@@ -126,30 +75,6 @@
 				<scope>import</scope>
 			</dependency>
 
-			<!-- Test Containers -->
-			<dependency>
-				<groupId>software.xdev</groupId>
-				<artifactId>testcontainers-selenium</artifactId>
-				<version>1.2.3</version>
-			</dependency>
-			<dependency>
-				<groupId>software.xdev</groupId>
-				<artifactId>testcontainers-junit4-mock</artifactId>
-				<version>1.0.2</version>
-			</dependency>
-			<dependency>
-				<groupId>software.xdev</groupId>
-				<artifactId>testcontainers-advanced-imagebuilder</artifactId>
-				<version>2.0.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.testcontainers</groupId>
-				<artifactId>testcontainers-bom</artifactId>
-				<version>1.21.2</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
 			<!-- DB -->
 			<dependency>
 				<groupId>org.mariadb.jdbc</groupId>
@@ -167,13 +92,6 @@
 				<groupId>software.xdev</groupId>
 				<artifactId>flyway-core-slim</artifactId>
 				<version>1.1.0</version>
-			</dependency>
-
-			<!-- Utility for proxies in tests -->
-			<dependency>
-				<groupId>org.javassist</groupId>
-				<artifactId>javassist</artifactId>
-				<version>3.30.2-GA</version>
 			</dependency>
 
 			<!-- Spring Boot -->

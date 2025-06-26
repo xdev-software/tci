@@ -5,11 +5,11 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>software.xdev.tci.demo</groupId>
-		<artifactId>tci-advanced-demo</artifactId>
+		<groupId>software.xdev.tci.demo.it</groupId>
+		<artifactId>integration-tests</artifactId>
 		<version>1.2.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>persistence-it</artifactId>
+	<artifactId>webapp-it</artifactId>
 
 	<properties>
 		<!-- by default run no tests -->
@@ -18,17 +18,27 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>software.xdev.tci.demo</groupId>
-			<artifactId>persistence</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>software.xdev.tci.demo</groupId>
+			<groupId>software.xdev.tci.demo.it</groupId>
 			<artifactId>tci-db</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>software.xdev.tci.demo.it</groupId>
+			<artifactId>tci-oidc</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>software.xdev.tci.demo.it</groupId>
+			<artifactId>tci-selenium</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>software.xdev.tci.demo.it</groupId>
+			<artifactId>tci-webapp</artifactId>
+			<scope>test</scope>
+		</dependency>
 
+		<!-- Logging for tests -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
@@ -37,12 +47,6 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j2-impl</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.javassist</groupId>
-			<artifactId>javassist</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
