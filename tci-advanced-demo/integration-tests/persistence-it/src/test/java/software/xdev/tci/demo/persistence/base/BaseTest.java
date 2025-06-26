@@ -124,8 +124,8 @@ abstract class BaseTest
 		{
 			this.dbInfra.logDataBaseInfo();
 			
-			final DBTCI dbInfra = this.dbInfra;
-			REAP_CFS.add(CompletableFuture.runAsync(dbInfra::stop));
+			final DBTCI fDbInfra = this.dbInfra;
+			REAP_CFS.add(CompletableFuture.runAsync(fDbInfra::stop));
 			
 			this.dbInfra = null;
 		}
