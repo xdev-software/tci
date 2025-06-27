@@ -159,6 +159,7 @@ public class EntityManagerController implements AutoCloseable
 				.map(Class::getName)
 				.collect(Collectors.toSet());
 		}
+		persistenceUnitInfo.getManagedClassNames().addAll(cachedEntityClassNames);
 		try
 		{
 			Collections.list(EntityManagerController.class
