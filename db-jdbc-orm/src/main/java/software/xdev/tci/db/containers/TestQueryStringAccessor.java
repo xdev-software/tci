@@ -25,11 +25,24 @@ public final class TestQueryStringAccessor
 {
 	@SuppressWarnings("java:S3011")
 	public static String testQueryString(final JdbcDatabaseContainer<?> container)
-		throws NoSuchMethodException, InvocationTargetException, IllegalAccessException
+		throws InvocationTargetException, IllegalAccessException
 	{
-		final Method mGetTestQueryString = container.getClass().getDeclaredMethod("getTestQueryString");
-		mGetTestQueryString.setAccessible(true);
-		return (String)mGetTestQueryString.invoke(container);
+		Class<?> currentClass = container.getClass();
+		while(currentClass != null && !JdbcDatabaseContainer.class.equals(currentClass))
+		{
+			try
+			{
+				final Method mGetTestQueryString = currentClass.getDeclaredMethod("getTestQueryString");
+				mGetTestQueryString.setAccessible(true);
+				return (String)mGetTestQueryString.invoke(container);
+			}
+			catch(final NoSuchMethodException ignored)
+			{
+				// Skip
+			}
+			currentClass = currentClass.getSuperclass();
+		}
+		return null;
 	}
 	
 	private TestQueryStringAccessor()

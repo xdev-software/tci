@@ -21,6 +21,7 @@
 		<module>jul-to-slf4j</module>
 		<module>mockserver</module>
 		<module>oidc-server-mock</module>
+		<module>selenium</module>
 		<module>spring-dao-support</module>
 
 		<!-- Demo -->

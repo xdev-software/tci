@@ -8,8 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import software.xdev.tci.demo.tci.selenium.TestBrowser;
 import software.xdev.tci.demo.webapp.base.InfraPerCaseTest;
+import software.xdev.tci.selenium.TestBrowser;
 
 
 // These tests were written to show the advantages of PreStarting

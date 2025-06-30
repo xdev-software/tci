@@ -28,8 +28,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>software.xdev.tci.demo.it</groupId>
-			<artifactId>tci-selenium</artifactId>
+			<groupId>software.xdev.tci</groupId>
+			<artifactId>selenium</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

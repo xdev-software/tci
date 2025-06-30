@@ -29,7 +29,6 @@ import software.xdev.tci.demo.persistence.jpa.dao.BaseDAO;
 import software.xdev.tci.demo.persistence.jpa.dao.TransactionReflector;
 import software.xdev.tci.demo.tci.db.DBTCI;
 import software.xdev.tci.demo.tci.db.factory.DBTCIFactory;
-import software.xdev.tci.demo.tci.util.ContainerLoggingUtil;
 import software.xdev.tci.factory.registry.TCIFactoryRegistry;
 import software.xdev.tci.leakdetection.LeakDetectionAsyncReaper;
 import software.xdev.tci.tracing.TCITracer;
@@ -75,8 +74,6 @@ abstract class BaseTest
 	@BeforeAll
 	public static void setup()
 	{
-		ContainerLoggingUtil.redirectJULtoSLF4J();
-		
 		TCIFactoryRegistry.instance().warmUp();
 	}
 	

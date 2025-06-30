@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import software.xdev.tci.demo.tci.selenium.TestBrowser;
 import software.xdev.tci.demo.webapp.base.InfraPerCaseTest;
+import software.xdev.tci.selenium.TestBrowser;
 
 
 class LoginOIDCTest extends InfraPerCaseTest

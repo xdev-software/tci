@@ -1,4 +1,19 @@
-package software.xdev.tci.demo.tci.selenium.containers;
+/*
+ * Copyright © 2025 XDEV Software (https://xdev.software)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package software.xdev.tci.selenium.containers;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -20,13 +35,31 @@ public class SeleniumBrowserWebDriverContainer
 	public SeleniumBrowserWebDriverContainer(final Capabilities capabilities)
 	{
 		super(
-			capabilities,
-			Map.of(
+			capabilities, Map.of(
+				// Limit to the core (and most open source) browsers by distinct engines
+				// 1. Firefox uses Gecko
 				BrowserType.FIREFOX, FIREFOX_IMAGE,
-				// Chrome has no ARM64 image (Why Google?) -> Use chromium instead
+				// 2. Everything else is running Chromium/Blink
+				// Chrome has no ARM64 image (embarrassing) -> Use chromium instead
 				// https://github.com/SeleniumHQ/docker-selenium/discussions/2379
-				BrowserType.CHROME, DockerImageName.parse("selenium/standalone-chromium"))
-		);
+				BrowserType.CHROME, CHROMIUM_IMAGE
+				// 3. Safari/Webkit is N/A because Apple is doing Apple stuff
+				// https://github.com/SeleniumHQ/docker-selenium/issues/1635
+				// 4. IE/Trident/EdgeHTML is dead
+				// 5. Everything else is irrelevant
+			));
+	}
+	
+	public SeleniumBrowserWebDriverContainer(
+		final Capabilities capabilities,
+		final Map<String, DockerImageName> browserDockerImages)
+	{
+		super(capabilities, browserDockerImages);
+	}
+	
+	public SeleniumBrowserWebDriverContainer(final DockerImageName dockerImageName)
+	{
+		super(dockerImageName);
 	}
 	
 	@Override

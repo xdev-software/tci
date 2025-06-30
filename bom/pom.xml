@@ -75,6 +75,11 @@
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
+				<artifactId>selenium</artifactId>
+				<version>2.0.0-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>software.xdev.tci</groupId>
 				<artifactId>spring-dao-support</artifactId>
 				<version>2.0.0-SNAPSHOT</version>
 			</dependency>

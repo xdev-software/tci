@@ -10,9 +10,9 @@ import org.openqa.selenium.WebElement;
 import org.rnorth.ducttape.unreliables.Unreliables;
 
 import software.xdev.tci.demo.persistence.jpa.dao.ProductDAO;
-import software.xdev.tci.demo.tci.selenium.TestBrowser;
 import software.xdev.tci.demo.webapp.base.InfraPerCaseTest;
 import software.xdev.tci.demo.webapp.datageneration.ProductDG;
+import software.xdev.tci.selenium.TestBrowser;
 
 
 class ProductTest extends InfraPerCaseTest
