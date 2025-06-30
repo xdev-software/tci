@@ -17,7 +17,7 @@ jobs:
       uses: actions/setup-java@v4
       with: # running setup-java again overwrites the settings.xml
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '21'
         server-id: sonatype-central-portal
         server-username: MAVEN_CENTRAL_USERNAME
         server-password: MAVEN_CENTRAL_TOKEN
