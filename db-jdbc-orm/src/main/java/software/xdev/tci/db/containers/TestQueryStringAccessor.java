@@ -23,6 +23,7 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 
 public final class TestQueryStringAccessor
 {
+	@SuppressWarnings("java:S3011")
 	public static String testQueryString(final JdbcDatabaseContainer<?> container)
 		throws NoSuchMethodException, InvocationTargetException, IllegalAccessException
 	{

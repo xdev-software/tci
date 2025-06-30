@@ -315,6 +315,7 @@ public class LazyNetwork implements Network
 	 */
 	@Deprecated(forRemoval = true)
 	@Override
+	@SuppressWarnings("java:S1133")
 	public Statement apply(final Statement base, final Description description)
 	{
 		return null;
