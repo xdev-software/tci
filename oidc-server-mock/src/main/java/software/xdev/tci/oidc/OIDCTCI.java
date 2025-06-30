@@ -1,4 +1,4 @@
-package software.xdev.tci.demo.tci.oidc;
+package software.xdev.tci.oidc;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -23,14 +23,16 @@ import org.apache.hc.core5.util.Timeout;
 import org.rnorth.ducttape.unreliables.Unreliables;
 
 import software.xdev.tci.TCI;
-import software.xdev.tci.demo.tci.oidc.containers.OIDCServerContainer;
+import software.xdev.tci.envperf.EnvironmentPerformance;
+import software.xdev.tci.misc.http.HttpClientCloser;
+import software.xdev.tci.oidc.containers.OIDCServerContainer;
 
 
 public class OIDCTCI extends TCI<OIDCServerContainer>
 {
 	protected static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);
 	
-	public static final String DEFAULT_DOMAIN = "example.org";
+	public static final String DEFAULT_DOMAIN = "example.local";
 	public static final String CLIENT_ID = OIDCServerContainer.DEFAULT_CLIENT_ID;
 	public static final String CLIENT_SECRET = OIDCServerContainer.DEFAULT_CLIENT_SECRET;
 	
@@ -38,18 +40,29 @@ public class OIDCTCI extends TCI<OIDCServerContainer>
 	public static final String DEFAULT_USER_NAME = "Testuser";
 	public static final String DEFAULT_USER_PASSWORD = "pwd";
 	
+	protected boolean shouldAddDefaultUser;
+	
 	public OIDCTCI(final OIDCServerContainer container, final String networkAlias)
 	{
 		super(container, networkAlias);
+	}
+	
+	protected OIDCTCI withShouldAddDefaultUser(final boolean shouldAddDefaultUser)
+	{
+		this.shouldAddDefaultUser = shouldAddDefaultUser;
+		return this;
 	}
 	
 	@Override
 	public void start(final String containerName)
 	{
 		super.start(containerName);
-		this.addUser(DEFAULT_USER_EMAIL, DEFAULT_USER_NAME, DEFAULT_USER_PASSWORD);
+		if(this.shouldAddDefaultUser)
+		{
+			this.addUser(this.getDefaultUserEmail(), this.getDefaultUserName(), this.getDefaultUserPassword());
+		}
 		
-		// Otherwise app server response may time out as initial requests needs a few seconds
+		// Warm up; Otherwise slow initial response may cause a timeout during tests
 		this.warmUpWellKnownJWKsEndpoint();
 	}
 	
@@ -85,21 +98,27 @@ public class OIDCTCI extends TCI<OIDCServerContainer>
 	
 	public void warmUpWellKnownJWKsEndpoint()
 	{
-		// NOTE: ON JDK 21+ you should close this!
+		final int slownessFactor = EnvironmentPerformance.cpuSlownessFactor();
 		final HttpClient httpClient = HttpClient.newBuilder()
-			.connectTimeout(Duration.ofSeconds(2L))
+			.connectTimeout(Duration.ofSeconds(1L + slownessFactor))
 			.build();
 		
-		Unreliables.retryUntilSuccess(
-			5,
-			() ->
-				httpClient.send(
+		try
+		{
+			Unreliables.retryUntilSuccess(
+				5 + slownessFactor,
+				() -> httpClient.send(
 					HttpRequest.newBuilder(URI.create(
 							this.getExternalHttpBaseEndPoint() + "/.well-known/openid-configuration/jwks"))
-						.timeout(Duration.ofSeconds(10L))
+						.timeout(Duration.ofSeconds(10L + slownessFactor * 5L))
 						.GET()
 						.build(),
 					HttpResponse.BodyHandlers.discarding()));
+		}
+		finally
+		{
+			HttpClientCloser.close(httpClient);
+		}
 	}
 	
 	public void addUser(
@@ -107,18 +126,9 @@ public class OIDCTCI extends TCI<OIDCServerContainer>
 		final String name,
 		final String pw)
 	{
-		addUser(this.getContainer(), email, name, pw);
-	}
-	
-	protected static void addUser(
-		final OIDCServerContainer container,
-		final String email,
-		final String name,
-		final String pw)
-	{
-		try(final CloseableHttpClient client = createDefaultHttpClient())
+		try(final CloseableHttpClient client = this.createDefaultHttpClient())
 		{
-			final HttpPost post = new HttpPost(container.getExternalHttpBaseEndPoint() + "/api/v1/user");
+			final HttpPost post = new HttpPost(this.getContainer().getExternalHttpBaseEndPoint() + "/api/v1/user");
 			post.setEntity(new StringEntity("""
 				{
 				  "SubjectId":"%s",
@@ -161,7 +171,7 @@ public class OIDCTCI extends TCI<OIDCServerContainer>
 		}
 	}
 	
-	protected static CloseableHttpClient createDefaultHttpClient()
+	protected CloseableHttpClient createDefaultHttpClient()
 	{
 		return HttpClientBuilder.create()
 			.setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()

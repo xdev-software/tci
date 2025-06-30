@@ -26,8 +26,6 @@ import org.testcontainers.containers.Network;
 import software.xdev.tci.TCI;
 import software.xdev.tci.demo.tci.db.DBTCI;
 import software.xdev.tci.demo.tci.db.factory.DBTCIFactory;
-import software.xdev.tci.demo.tci.oidc.OIDCTCI;
-import software.xdev.tci.demo.tci.oidc.factory.OIDCTCIFactory;
 import software.xdev.tci.demo.tci.selenium.BrowserTCI;
 import software.xdev.tci.demo.tci.selenium.TestBrowser;
 import software.xdev.tci.demo.tci.selenium.factory.BrowsersTCIFactory;
@@ -38,6 +36,8 @@ import software.xdev.tci.demo.tci.webapp.factory.WebAppTCIFactory;
 import software.xdev.tci.factory.registry.TCIFactoryRegistry;
 import software.xdev.tci.leakdetection.LeakDetectionAsyncReaper;
 import software.xdev.tci.network.LazyNetworkPool;
+import software.xdev.tci.oidc.OIDCTCI;
+import software.xdev.tci.oidc.factory.OIDCTCIFactory;
 import software.xdev.tci.tracing.TCITracer;
 
 

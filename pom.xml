@@ -20,6 +20,7 @@
 		<module>db-jdbc-orm</module>
 		<module>jul-to-slf4j</module>
 		<module>mockserver</module>
+		<module>oidc-server-mock</module>
 		<module>spring-dao-support</module>
 
 		<!-- Demo -->

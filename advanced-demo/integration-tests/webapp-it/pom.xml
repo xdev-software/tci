@@ -23,8 +23,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>software.xdev.tci.demo.it</groupId>
-			<artifactId>tci-oidc</artifactId>
+			<groupId>software.xdev.tci</groupId>
+			<artifactId>oidc-server-mock</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

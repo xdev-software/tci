@@ -18,7 +18,6 @@
 	<modules>
 		<module>persistence-it</module>
 		<module>tci-db</module>
-		<module>tci-oidc</module>
 		<module>tci-selenium</module>
 		<module>tci-testcontainers</module>
 		<module>tci-webapp</module>
@@ -31,12 +30,6 @@
 			<dependency>
 				<groupId>software.xdev.tci.demo.it</groupId>
 				<artifactId>tci-db</artifactId>
-				<version>2.0.0-SNAPSHOT</version>
-			</dependency>
-
-			<dependency>
-				<groupId>software.xdev.tci.demo.it</groupId>
-				<artifactId>tci-oidc</artifactId>
 				<version>2.0.0-SNAPSHOT</version>
 			</dependency>
 
@@ -66,6 +59,11 @@
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
 				<artifactId>db-jdbc-orm</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>software.xdev.tci</groupId>
+				<artifactId>oidc-server-mock</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
