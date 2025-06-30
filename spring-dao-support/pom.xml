@@ -10,7 +10,7 @@
 	<packaging>jar</packaging>
 
 	<name>spring-dao-support</name>
-	<description>spring-dao-support</description>
+	<description>TCI - spring-dao-support</description>
 	<url>https://github.com/xdev-software/tci</url>
 
 	<scm>
