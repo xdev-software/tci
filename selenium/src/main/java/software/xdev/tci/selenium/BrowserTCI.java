@@ -45,6 +45,7 @@ import org.testcontainers.lifecycle.TestDescription;
 
 import software.xdev.tci.TCI;
 import software.xdev.tci.envperf.EnvironmentPerformance;
+import software.xdev.tci.logging.JULtoSLF4JRedirector;
 import software.xdev.tci.selenium.containers.SeleniumBrowserWebDriverContainer;
 
 
@@ -126,6 +127,9 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 	public void start(final String containerName)
 	{
 		super.start(containerName);
+		
+		// Selenium uses JUL
+		JULtoSLF4JRedirector.redirect();
 		
 		this.initWebDriver();
 	}

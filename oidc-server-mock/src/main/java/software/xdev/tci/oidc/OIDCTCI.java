@@ -47,25 +47,22 @@ public class OIDCTCI extends TCI<OIDCServerContainer>
 {
 	protected static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);
 	
-	public static final String DEFAULT_DOMAIN = "example.local";
 	public static final String CLIENT_ID = OIDCServerContainer.DEFAULT_CLIENT_ID;
 	public static final String CLIENT_SECRET = OIDCServerContainer.DEFAULT_CLIENT_SECRET;
 	
-	public static final String DEFAULT_USER_EMAIL = "test@" + DEFAULT_DOMAIN;
-	public static final String DEFAULT_USER_NAME = "Testuser";
-	public static final String DEFAULT_USER_PASSWORD = "pwd";
+	protected static final String DEFAULT_DOMAIN = "example.local";
+	protected static final String DEFAULT_USER_EMAIL = "test@" + DEFAULT_DOMAIN;
+	protected static final String DEFAULT_USER_NAME = "Testuser";
+	protected static final String DEFAULT_USER_PASSWORD = "pwd";
 	
-	protected boolean shouldAddDefaultUser;
+	protected boolean shouldAddDefaultUser = true;
+	protected String defaultUserEmail = DEFAULT_USER_EMAIL;
+	protected String defaultUserName = DEFAULT_USER_NAME;
+	protected String defaultUserPassword = DEFAULT_USER_PASSWORD;
 	
 	public OIDCTCI(final OIDCServerContainer container, final String networkAlias)
 	{
 		super(container, networkAlias);
-	}
-	
-	protected OIDCTCI withShouldAddDefaultUser(final boolean shouldAddDefaultUser)
-	{
-		this.shouldAddDefaultUser = shouldAddDefaultUser;
-		return this;
 	}
 	
 	@Override
@@ -83,17 +80,17 @@ public class OIDCTCI extends TCI<OIDCServerContainer>
 	
 	public String getDefaultUserEmail()
 	{
-		return DEFAULT_USER_EMAIL;
+		return this.defaultUserEmail;
 	}
 	
 	public String getDefaultUserName()
 	{
-		return DEFAULT_USER_NAME;
+		return this.defaultUserName;
 	}
 	
 	public String getDefaultUserPassword()
 	{
-		return DEFAULT_USER_PASSWORD;
+		return this.defaultUserPassword;
 	}
 	
 	public static String getInternalHttpBaseEndPoint(final String networkAlias)
@@ -198,4 +195,32 @@ public class OIDCTCI extends TCI<OIDCServerContainer>
 				.build())
 			.build();
 	}
+	
+	// region Configure
+	
+	protected OIDCTCI withShouldAddDefaultUser(final boolean shouldAddDefaultUser)
+	{
+		this.shouldAddDefaultUser = shouldAddDefaultUser;
+		return this;
+	}
+	
+	public OIDCTCI withDefaultUserEmail(final String defaultUserEmail)
+	{
+		this.defaultUserEmail = defaultUserEmail;
+		return this;
+	}
+	
+	public OIDCTCI withDefaultUserName(final String defaultUserName)
+	{
+		this.defaultUserName = defaultUserName;
+		return this;
+	}
+	
+	public OIDCTCI withDefaultUserPassword(final String defaultUserPassword)
+	{
+		this.defaultUserPassword = defaultUserPassword;
+		return this;
+	}
+	
+	// endregion
 }
