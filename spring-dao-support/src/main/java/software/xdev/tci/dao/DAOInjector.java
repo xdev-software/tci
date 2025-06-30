@@ -1,4 +1,4 @@
-package software.xdev.tci.demo.persistence.base;
+package software.xdev.tci.dao;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -19,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 import software.xdev.tci.db.persistence.TransactionExecutor;
-import software.xdev.tci.demo.persistence.jpa.dao.BaseDAO;
-import software.xdev.tci.demo.persistence.jpa.dao.TransactionReflector;
 
 
 /**
@@ -33,6 +32,20 @@ public class DAOInjector
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DAOInjector.class);
 	
+	protected final Class<?> baseDAOClazz;
+	protected final ThrowingFieldSupplier fEntityManagerInBaseDAOSupplier;
+	protected final HandleSpecialFields handleSpecialFields;
+	
+	public DAOInjector(
+		final Class<?> baseDAOClazz,
+		final ThrowingFieldSupplier fEntityManagerInBaseDAOSupplier,
+		final HandleSpecialFields handleSpecialFields)
+	{
+		this.baseDAOClazz = Objects.requireNonNull(baseDAOClazz);
+		this.fEntityManagerInBaseDAOSupplier = Objects.requireNonNull(fEntityManagerInBaseDAOSupplier);
+		this.handleSpecialFields = handleSpecialFields;
+	}
+	
 	public void doInjections(
 		final Class<?> clazz,
 		final Supplier<EntityManager> emSupplier,
@@ -40,7 +53,7 @@ public class DAOInjector
 	{
 		this.collectAllDeclaredFields(clazz).stream()
 			.filter(field -> field.isAnnotationPresent(Autowired.class))
-			.filter(field -> BaseDAO.class.isAssignableFrom(field.getType()))
+			.filter(field -> this.baseDAOClazz.isAssignableFrom(field.getType()))
 			.forEach(field -> {
 				final Class<?> fieldType = field.getType();
 				final EntityManager em = emSupplier.get();
@@ -52,30 +65,17 @@ public class DAOInjector
 					? this.createProxiedDAO(fieldType, em, originalDAO)
 					: originalDAO;
 				
-				this.collectAllDeclaredFields(fieldType)
-					.stream()
-					.filter(f -> TransactionReflector.class.equals(f.getType()))
-					.forEach(f -> this.setIntoField(dao, f, new TransactionReflector()
-					{
-						@Override
-						public void runWithTransaction(final Runnable runnable)
-						{
-							new TransactionExecutor(em).execWithTransaction(runnable);
-						}
-						
-						@Override
-						public <T> T runWithTransaction(final Supplier<T> supplier)
-						{
-							return new TransactionExecutor(em).execWithTransaction(supplier);
-						}
-					}));
+				if(this.handleSpecialFields != null)
+				{
+					this.handleSpecialFields.handle(this, this.collectAllDeclaredFields(fieldType), dao, em);
+				}
 				
 				this.setIntoField(instanceSupplier.get(), field, dao);
 			});
 	}
 	
 	@SuppressWarnings("PMD.PreserveStackTrace")
-	private Object createProxiedDAO(final Class<?> fieldType, final EntityManager em, final Object original)
+	protected Object createProxiedDAO(final Class<?> fieldType, final EntityManager em, final Object original)
 	{
 		// java.lang.reflect.Proxy only proxies interfaces and doesn't work here!
 		// https://stackoverflow.com/a/3292208
@@ -92,7 +92,7 @@ public class DAOInjector
 				}
 				catch(final IllegalAccessException | InvocationTargetException e)
 				{
-					throw new RuntimeException(e);
+					throw new IllegalStateException("Failed to invoke", e);
 				}
 			};
 			if(em.getTransaction().isActive())
@@ -114,19 +114,19 @@ public class DAOInjector
 			{
 				return this.setIntoField(
 					factory.create(new Class<?>[0], new Object[0], methodHandler),
-					BaseDAO.class.getDeclaredField("em"),
+					this.fEntityManagerInBaseDAOSupplier.field(),
 					em);
 			}
-			catch(final NoSuchMethodException | InstantiationException | IllegalAccessException
-						| InvocationTargetException | NoSuchFieldException e2)
+			catch(final NoSuchFieldException | NoSuchMethodException | InstantiationException | IllegalAccessException
+						| InvocationTargetException e2)
 			{
-				throw new RuntimeException("Failed to proxy dao", e2);
+				throw new IllegalStateException("Failed to proxy dao", e2);
 			}
 		}
 	}
 	
 	@SuppressWarnings("PMD.PreserveStackTrace")
-	private Object createDAO(final Class<?> fieldType, final EntityManager em)
+	protected Object createDAO(final Class<?> fieldType, final EntityManager em)
 	{
 		try
 		{
@@ -142,7 +142,7 @@ public class DAOInjector
 			{
 				return this.setIntoField(
 					fieldType.getConstructor().newInstance(),
-					BaseDAO.class.getDeclaredField("em"),
+					this.fEntityManagerInBaseDAOSupplier.field(),
 					em);
 			}
 			catch(final NoSuchFieldException | NoSuchMethodException | InstantiationException
@@ -153,7 +153,7 @@ public class DAOInjector
 		}
 	}
 	
-	private Set<Field> collectAllDeclaredFields(final Class<?> clazz)
+	protected Set<Field> collectAllDeclaredFields(final Class<?> clazz)
 	{
 		final Set<Field> fields = new HashSet<>();
 		Class<?> currentClazz = clazz;
@@ -165,7 +165,7 @@ public class DAOInjector
 		return fields;
 	}
 	
-	private Set<Method> collectAllDeclaredMethods(final Class<?> clazz)
+	protected Set<Method> collectAllDeclaredMethods(final Class<?> clazz)
 	{
 		final Set<Method> methods = new HashSet<>();
 		Class<?> currentClazz = clazz;
@@ -177,7 +177,8 @@ public class DAOInjector
 		return methods;
 	}
 	
-	private Object setIntoField(final Object instance, final Field field, final Object newValue)
+	@SuppressWarnings("java:S3011")
+	public Object setIntoField(final Object instance, final Field field, final Object newValue)
 	{
 		field.setAccessible(true);
 		try
@@ -186,8 +187,21 @@ public class DAOInjector
 		}
 		catch(final IllegalAccessException iae)
 		{
-			throw new RuntimeException(iae);
+			throw new IllegalStateException("Failed to set into field", iae);
 		}
 		return instance;
+	}
+	
+	@FunctionalInterface
+	public interface ThrowingFieldSupplier
+	{
+		Field field() throws NoSuchFieldException;
+	}
+	
+	
+	@FunctionalInterface
+	public interface HandleSpecialFields
+	{
+		void handle(DAOInjector self, Set<Field> fields, Object dao, EntityManager em);
 	}
 }

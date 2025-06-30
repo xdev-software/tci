@@ -17,6 +17,7 @@
 	<modules>
 		<module>base</module>
 		<module>db-jdbc-orm</module>
+		<module>spring-dao-support</module>
 
 		<!-- Demo -->
 		<module>base-demo</module>

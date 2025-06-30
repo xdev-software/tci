@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -21,7 +22,11 @@ import org.rnorth.ducttape.unreliables.Unreliables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import software.xdev.tci.dao.DAOInjector;
+import software.xdev.tci.db.persistence.TransactionExecutor;
 import software.xdev.tci.demo.persistence.FlywayInfo;
+import software.xdev.tci.demo.persistence.jpa.dao.BaseDAO;
+import software.xdev.tci.demo.persistence.jpa.dao.TransactionReflector;
 import software.xdev.tci.demo.tci.db.DBTCI;
 import software.xdev.tci.demo.tci.db.factory.DBTCIFactory;
 import software.xdev.tci.demo.tci.util.ContainerLoggingUtil;
@@ -42,7 +47,26 @@ abstract class BaseTest
 	static final TCITracer.Timed TRACE_START_INFRA_MIGRATE_DB = new TCITracer.Timed();
 	static final TCITracer.Timed TRACE_START_INFRA_CHECK_EMC = new TCITracer.Timed();
 	
-	static final DAOInjector DAO_INJECTOR = new DAOInjector();
+	static final DAOInjector DAO_INJECTOR = new DAOInjector(
+		BaseDAO.class,
+		() -> BaseDAO.class.getDeclaredField("em"),
+		(self, fields, dao, em) -> fields.stream()
+			.filter(f -> TransactionReflector.class.equals(f.getType()))
+			.forEach(f -> self.setIntoField(
+				dao, f, new TransactionReflector()
+				{
+					@Override
+					public void runWithTransaction(final Runnable runnable)
+					{
+						new TransactionExecutor(em).execWithTransaction(runnable);
+					}
+					
+					@Override
+					public <T> T runWithTransaction(final Supplier<T> supplier)
+					{
+						return new TransactionExecutor(em).execWithTransaction(supplier);
+					}
+				})));
 	
 	static final DBTCIFactory DB_INFRA_FACTORY = new DBTCIFactory(false);
 	
