@@ -23,7 +23,7 @@ Basis Module for XDEV's Testcontainer Infrastructure Framework
 ## Usage
 Take a look at the [minimalistic demo](./base-demo/) that showcases the components individually.
 
-You may also checkout the [advanced demo](./tci-advanced-demo/) - a reference implementation of all features in a realistic project - to get a better feeling how this can be done.
+You may also checkout the [advanced demo](./advanced-demo/) - a reference implementation of all features in a realistic project - to get a better feeling how this can be done.
 
 > [!TIP]
 > More detailed documentation is usually available in the corresponding [JavaDocs](https://javadoc.io/doc/software.xdev.tci/base).
