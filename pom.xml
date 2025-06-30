@@ -16,7 +16,9 @@
 
 	<modules>
 		<module>base</module>
+		<module>bom</module>
 		<module>db-jdbc-orm</module>
+		<module>jul-to-slf4j</module>
 		<module>spring-dao-support</module>
 
 		<!-- Demo -->
