@@ -483,22 +483,26 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 			GlobalPreStartCoordinator.instance().unregister(this);
 		}
 		this.executorService.shutdown();
-		final List<CompletableFuture<Void>> stopCFs = this.preStartQueue.stream()
-			.map(i -> CompletableFuture.runAsync(() ->
-			{
-				try
+		
+		if(this.preStartQueue != null)
+		{
+			final List<CompletableFuture<Void>> stopCFs = this.preStartQueue.stream()
+				.map(i -> CompletableFuture.runAsync(() ->
 				{
-					i.infra().stop();
-				}
-				catch(final Exception e)
-				{
-					this.log().warn("[{}] Failed to shutdown infra", this.name, e);
-				}
-			}))
-			.toList();
-		stopCFs.forEach(CompletableFuture::join);
-		// De-Ref for GC
-		this.preStartQueue.clear();
+					try
+					{
+						i.infra().stop();
+					}
+					catch(final Exception e)
+					{
+						this.log().warn("[{}] Failed to shutdown infra", this.name, e);
+					}
+				}))
+				.toList();
+			stopCFs.forEach(CompletableFuture::join);
+			// De-Ref for GC
+			this.preStartQueue.clear();
+		}
 		
 		super.close();
 	}
