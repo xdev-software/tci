@@ -19,6 +19,7 @@
 		<module>bom</module>
 		<module>db-jdbc-orm</module>
 		<module>jul-to-slf4j</module>
+		<module>mockserver</module>
 		<module>spring-dao-support</module>
 
 		<!-- Demo -->

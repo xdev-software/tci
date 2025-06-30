@@ -21,6 +21,22 @@ public abstract class BaseDBTCIFactory<C extends JdbcDatabaseContainer<C>, I ext
 {
 	public BaseDBTCIFactory(
 		final BiFunction<C, String, I> infraBuilder,
+		final Supplier<C> containerBuilder)
+	{
+		super(infraBuilder, containerBuilder, "db", "container.db", "DB");
+	}
+	
+	public BaseDBTCIFactory(
+		final BiFunction<C, String, I> infraBuilder,
+		final Supplier<C> containerBuilder,
+		final PreStartConfig config,
+		final Timeouts timeouts)
+	{
+		super(infraBuilder, containerBuilder, "db", "container.db", "DB", config, timeouts);
+	}
+	
+	public BaseDBTCIFactory(
+		final BiFunction<C, String, I> infraBuilder,
 		final Supplier<C> containerBuilder,
 		final String containerBaseName,
 		final String containerLoggerName,

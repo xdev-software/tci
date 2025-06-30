@@ -22,10 +22,7 @@ public class DBTCIFactory extends BaseDBTCIFactory<DBContainer, DBTCI>
 			(c, n) -> new DBTCI(c, n, migrateAndInitializeEMC),
 			() -> new DBContainer(DBContainerBuilder.getBuiltImageName())
 				.withDatabaseName(DBTCI.DB_DATABASE)
-				.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M)),
-			"db-mariadb",
-			"container.db",
-			"DB");
+				.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M)));
 		this.withSnapshotManager(new CommitedImageSnapshotManager("/var/lib/mysql"));
 	}
 }
