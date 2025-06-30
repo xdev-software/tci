@@ -116,6 +116,7 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 		this.browserName = browserName;
 	}
 	
+	@SuppressWarnings("java:S107")
 	public BrowserTCIFactory(
 		final BiFunction<SeleniumBrowserWebDriverContainer, String, BrowserTCI> infraBuilder,
 		final Supplier<SeleniumBrowserWebDriverContainer> containerBuilder,
