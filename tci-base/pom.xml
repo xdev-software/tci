@@ -4,18 +4,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>software.xdev</groupId>
-	<artifactId>tci-base</artifactId>
+	<groupId>software.xdev.tci</groupId>
+	<artifactId>base</artifactId>
 	<version>2.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>tci-base</name>
-	<description>tci-base</description>
-	<url>https://github.com/xdev-software/tci-base</url>
+	<name>base</name>
+	<description>base</description>
+	<url>https://github.com/xdev-software/tci</url>
 
 	<scm>
-		<url>https://github.com/xdev-software/tci-base</url>
-		<connection>scm:git:https://github.com/xdev-software/tci-base.git</connection>
+		<url>https://github.com/xdev-software/tci</url>
+		<connection>scm:git:https://github.com/xdev-software/tci.git</connection>
 	</scm>
 
 	<inceptionYear>2024</inceptionYear>

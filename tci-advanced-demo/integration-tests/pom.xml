@@ -59,8 +59,8 @@
 			</dependency>
 
 			<dependency>
-				<groupId>software.xdev</groupId>
-				<artifactId>tci-base</artifactId>
+				<groupId>software.xdev.tci</groupId>
+				<artifactId>base</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
