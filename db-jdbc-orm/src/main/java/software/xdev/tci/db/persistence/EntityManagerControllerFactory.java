@@ -156,14 +156,6 @@ public class EntityManagerControllerFactory
 	public EntityManagerController build()
 	{
 		final MutablePersistenceUnitInfo persistenceUnitInfo = this.createBasicMutablePersistenceUnitInfo();
-		// TODO
-		// if(cachedEntityClassNames == null)
-		// {
-		// 	cachedEntityClassNames = AnnotatedClassFinder.find(DefaultJPAConfig.ENTITY_PACKAGE, Entity.class)
-		// 		.stream()
-		// 		.map(Class::getName)
-		// 		.collect(Collectors.toSet());
-		// }
 		if(this.entityClassesFinder != null)
 		{
 			persistenceUnitInfo.getManagedClassNames().addAll(this.entityClassesFinder.get());

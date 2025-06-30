@@ -47,6 +47,7 @@ public abstract class BaseDBDataGenerator implements DataGenerator
 	/**
 	 * Returns the {@link EntityManager}-Instance of this generator, which can be used to save data.
 	 */
+	@SuppressWarnings("java:S1845") // Record style access
 	protected EntityManager em()
 	{
 		return this.em;
@@ -56,6 +57,7 @@ public abstract class BaseDBDataGenerator implements DataGenerator
 	 * Returns the {@link TransactionExecutor}-Instance of this generator, which can be used to save data with a
 	 * transaction.
 	 */
+	@SuppressWarnings("java:S1845") // Record style access
 	protected TransactionExecutor transactor()
 	{
 		return this.transactor;

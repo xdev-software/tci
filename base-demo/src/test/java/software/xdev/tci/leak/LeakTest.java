@@ -14,7 +14,7 @@ class LeakTest
 	
 	static final DummyTCIFactory DUMMY_FACTORY = new DummyTCIFactory();
 	
-	@SuppressWarnings({"java:S2699"})
+	@SuppressWarnings({"java:S2699", "java:S125"})
 	@Test
 	void createLeak()
 	{

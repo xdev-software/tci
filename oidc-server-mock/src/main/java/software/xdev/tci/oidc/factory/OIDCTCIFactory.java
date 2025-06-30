@@ -34,11 +34,16 @@ import software.xdev.tci.oidc.containers.OIDCServerContainer;
 
 public class OIDCTCIFactory extends PreStartableTCIFactory<OIDCServerContainer, OIDCTCI>
 {
+	private static final String DEFAULT_CONTAINER_LOGGER_NAME = "container.oidc";
+	private static final String DEFAULT_CONTAINER_BASE_NAME = "oidc";
+	private static final String DEFAULT_NAME = "OIDC";
+	
 	public OIDCTCIFactory(
 		final BiFunction<OIDCServerContainer, String, OIDCTCI> infraBuilder,
 		final Supplier<OIDCServerContainer> containerBuilder)
 	{
-		super(infraBuilder, containerBuilder, "oidc", "container.oidc", "OIDC");
+		super(infraBuilder, containerBuilder, DEFAULT_CONTAINER_BASE_NAME, DEFAULT_CONTAINER_LOGGER_NAME,
+			DEFAULT_NAME);
 	}
 	
 	public OIDCTCIFactory(
@@ -47,7 +52,9 @@ public class OIDCTCIFactory extends PreStartableTCIFactory<OIDCServerContainer, 
 		final PreStartConfig config,
 		final Timeouts timeouts)
 	{
-		super(infraBuilder, containerBuilder, "oidc", "container.oidc", "OIDC", config, timeouts);
+		super(
+			infraBuilder, containerBuilder,
+			DEFAULT_CONTAINER_BASE_NAME, DEFAULT_CONTAINER_LOGGER_NAME, DEFAULT_NAME, config, timeouts);
 	}
 	
 	public OIDCTCIFactory(
@@ -77,9 +84,9 @@ public class OIDCTCIFactory extends PreStartableTCIFactory<OIDCServerContainer, 
 		super(
 			OIDCTCI::new,
 			OIDCTCIFactory::createDefaultContainer,
-			"oidc",
-			"container.oidc",
-			"OIDC");
+			DEFAULT_CONTAINER_BASE_NAME,
+			DEFAULT_CONTAINER_LOGGER_NAME,
+			DEFAULT_NAME);
 	}
 	
 	@SuppressWarnings({"resource", "checkstyle:MagicNumber"})

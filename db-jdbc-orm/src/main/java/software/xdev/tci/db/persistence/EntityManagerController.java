@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -36,8 +35,6 @@ import org.slf4j.LoggerFactory;
 public class EntityManagerController implements AutoCloseable
 {
 	private static final Logger LOG = LoggerFactory.getLogger(EntityManagerController.class);
-	
-	private static Set<String> cachedEntityClassNames;
 	
 	protected final List<EntityManager> activeEms = Collections.synchronizedList(new ArrayList<>());
 	protected final EntityManagerFactory emf;

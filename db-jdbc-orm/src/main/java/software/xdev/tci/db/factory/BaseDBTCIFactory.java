@@ -34,14 +34,14 @@ import software.xdev.tci.factory.prestart.config.PreStartConfig;
 public abstract class BaseDBTCIFactory<C extends JdbcDatabaseContainer<C>, I extends BaseDBTCI<C>>
 	extends PreStartableTCIFactory<C, I>
 {
-	public BaseDBTCIFactory(
+	protected BaseDBTCIFactory(
 		final BiFunction<C, String, I> infraBuilder,
 		final Supplier<C> containerBuilder)
 	{
 		super(infraBuilder, containerBuilder, "db", "container.db", "DB");
 	}
 	
-	public BaseDBTCIFactory(
+	protected BaseDBTCIFactory(
 		final BiFunction<C, String, I> infraBuilder,
 		final Supplier<C> containerBuilder,
 		final PreStartConfig config,
@@ -50,7 +50,7 @@ public abstract class BaseDBTCIFactory<C extends JdbcDatabaseContainer<C>, I ext
 		super(infraBuilder, containerBuilder, "db", "container.db", "DB", config, timeouts);
 	}
 	
-	public BaseDBTCIFactory(
+	protected BaseDBTCIFactory(
 		final BiFunction<C, String, I> infraBuilder,
 		final Supplier<C> containerBuilder,
 		final String containerBaseName,
@@ -60,7 +60,7 @@ public abstract class BaseDBTCIFactory<C extends JdbcDatabaseContainer<C>, I ext
 		super(infraBuilder, containerBuilder, containerBaseName, containerLoggerName, name);
 	}
 	
-	public BaseDBTCIFactory(
+	protected BaseDBTCIFactory(
 		final BiFunction<C, String, I> infraBuilder,
 		final Supplier<C> containerBuilder,
 		final String containerBaseName,

@@ -102,6 +102,7 @@ public interface WaitableJDBCContainer extends WaitStrategyTarget
 			);
 		}
 		
+		@SuppressWarnings("unused") // Variable might be used by extension
 		protected boolean waitUntilJDBCConnectionValidated(
 			final JdbcDatabaseContainer<?> container,
 			final Connection connection)

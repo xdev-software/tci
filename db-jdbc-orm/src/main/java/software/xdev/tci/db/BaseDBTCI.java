@@ -60,7 +60,7 @@ public abstract class BaseDBTCI<C extends JdbcDatabaseContainer<C>> extends TCI<
 	
 	protected EntityManagerController emc;
 	
-	public BaseDBTCI(
+	protected BaseDBTCI(
 		final C container,
 		final String networkAlias,
 		final boolean migrateAndInitializeEMC,
