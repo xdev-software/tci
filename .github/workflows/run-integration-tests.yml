@@ -63,5 +63,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: test-fail-videos-${{ matrix.java }}-${{ env.PROJECT_NORMALIZED }}-${{ matrix.parallel }}-${{ matrix.pre-start }}
-        path: ${{ matrix.project }}/target/records
+        path: advanced-demo/integration-tests/${{ matrix.project }}/target/records
         if-no-files-found: ignore
