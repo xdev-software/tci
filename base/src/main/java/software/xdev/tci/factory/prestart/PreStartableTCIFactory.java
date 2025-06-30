@@ -51,7 +51,7 @@ import software.xdev.tci.portfixation.PortFixation;
  * <h3>What is PreStarting?</h3>
  * <p>
  * When running tests usually there are certain times when the available resources are barely utilized:<br/>
- * <img src="https://raw.githubusercontent.com/xdev-software/tci-base/develop/assets/PreStartingCauseIdea.png"/>
+ * <img src="https://raw.githubusercontent.com/xdev-software/tci/develop/assets/PreStartingCauseIdea.png"/>
  * </p>
  * <p>
  * PreStarting uses a "cached" pool of infrastructure and tries to utilize these idle times to fill/replenish this
