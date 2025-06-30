@@ -63,6 +63,11 @@
 				<artifactId>base</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>software.xdev.tci</groupId>
+				<artifactId>db-jdbc-orm</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
 			<!-- Selenium -->
 			<dependency>

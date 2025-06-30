@@ -1,7 +1,6 @@
-package software.xdev.tci.demo.tci.db.containers;
+package software.xdev.tci.db.containers;
 
 import java.sql.Connection;
-import java.sql.Statement;
 import java.util.concurrent.TimeUnit;
 
 import org.rnorth.ducttape.TimeoutException;
@@ -16,14 +15,12 @@ import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
 
 
-interface WaitableJDBCContainer extends WaitStrategyTarget
+public interface WaitableJDBCContainer extends WaitStrategyTarget
 {
 	default WaitStrategy completeJDBCWaitStrategy()
 	{
 		return new WaitAllStrategy()
-			// First wait for ports to be accessible
 			.withStrategy(Wait.defaultWaitStrategy())
-			// then check if a JDBC connection (requires more resources) is possible
 			.withStrategy(new JDBCWaitStrategy());
 	}
 	
@@ -37,8 +34,6 @@ interface WaitableJDBCContainer extends WaitStrategyTarget
 			waitStrategy.waitUntilReady(this);
 		}
 	}
-	
-	String getTestQueryString();
 	
 	/**
 	 * @apiNote Assumes that the container is already started
@@ -58,8 +53,7 @@ interface WaitableJDBCContainer extends WaitStrategyTarget
 		@Override
 		protected void waitUntilReady()
 		{
-			if(!(this.waitStrategyTarget instanceof final JdbcDatabaseContainer<?> container
-				&& this.waitStrategyTarget instanceof final WaitableJDBCContainer waitableJDBCContainer))
+			if(!(this.waitStrategyTarget instanceof final JdbcDatabaseContainer<?> container))
 			{
 				throw new IllegalArgumentException(
 					"Container must implement JdbcDatabaseContainer and WaitableJDBCContainer");
@@ -67,17 +61,7 @@ interface WaitableJDBCContainer extends WaitStrategyTarget
 			
 			try
 			{
-				Unreliables.retryUntilTrue(
-					(int)this.startupTimeout.getSeconds(),
-					TimeUnit.SECONDS,
-					() -> this.getRateLimiter().getWhenReady(() -> {
-						try(final Connection connection = container.createConnection("");
-							final Statement statement = connection.createStatement())
-						{
-							return statement.execute(waitableJDBCContainer.getTestQueryString());
-						}
-					})
-				);
+				this.waitUntilJDBCValid(container);
 			}
 			catch(final TimeoutException e)
 			{
@@ -86,6 +70,37 @@ interface WaitableJDBCContainer extends WaitStrategyTarget
 						+ container.getJdbcUrl()
 						+ "), please check container logs");
 			}
+		}
+		
+		protected void waitUntilJDBCValid(final JdbcDatabaseContainer<?> container)
+		{
+			Unreliables.retryUntilTrue(
+				(int)this.startupTimeout.getSeconds(),
+				TimeUnit.SECONDS,
+				// Rate limit creation of connections as this is quite an expensive operation
+				() -> this.getRateLimiter().getWhenReady(() -> {
+					try(final Connection connection = container.createConnection(""))
+					{
+						return this.waitUntilJDBCConnectionValidated(container, connection);
+					}
+				})
+			);
+		}
+		
+		protected boolean waitUntilJDBCConnectionValidated(
+			final JdbcDatabaseContainer<?> container,
+			final Connection connection)
+		{
+			return Unreliables.retryUntilSuccess(
+				(int)this.startupTimeout.getSeconds(),
+				TimeUnit.SECONDS,
+				() -> this.validateJDBCConnection(connection));
+		}
+		
+		@SuppressWarnings("java:S112")
+		protected boolean validateJDBCConnection(final Connection connection) throws Exception
+		{
+			return connection.isValid(10);
 		}
 	}
 }

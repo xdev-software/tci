@@ -1,4 +1,4 @@
-package software.xdev.tci.demo.tci.db.persistence;
+package software.xdev.tci.db.persistence.classfinder;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -17,14 +17,10 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.SystemPropertyUtils;
 
 
-public final class AnnotatedClassFinder
+public class AnnotatedClassFinder
 {
-	private AnnotatedClassFinder()
-	{
-	}
-	
 	@SuppressWarnings({"java:S1452", "java:S4968"}) // Returned so by stream
-	public static List<? extends Class<?>> find(
+	public List<? extends Class<?>> find(
 		final String basePackage,
 		final Class<? extends Annotation> annotationClazz)
 	{
@@ -35,12 +31,14 @@ public final class AnnotatedClassFinder
 		{
 			return Stream.of(resourcePatternResolver.getResources(
 					ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
-						+ resolveBasePackage(basePackage) + "/" + "**/*.class"))
+						+ this.resolveBasePackage(basePackage) + "/" + "**/*.class"))
 				.filter(Resource::isReadable)
 				.map(resource -> {
 					try
 					{
-						return getIfIsCandidate(metadataReaderFactory.getMetadataReader(resource), annotationClazz);
+						return this.getIfIsCandidate(
+							metadataReaderFactory.getMetadataReader(resource),
+							annotationClazz);
 					}
 					catch(final IOException e)
 					{
@@ -56,12 +54,12 @@ public final class AnnotatedClassFinder
 		}
 	}
 	
-	private static String resolveBasePackage(final String basePackage)
+	protected String resolveBasePackage(final String basePackage)
 	{
 		return ClassUtils.convertClassNameToResourcePath(SystemPropertyUtils.resolvePlaceholders(basePackage));
 	}
 	
-	private static Class<?> getIfIsCandidate(
+	protected Class<?> getIfIsCandidate(
 		final MetadataReader metadataReader,
 		final Class<? extends Annotation> annotationClazz)
 	{

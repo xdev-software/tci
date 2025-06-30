@@ -1,4 +1,4 @@
-package software.xdev.tci.demo.tci.db.persistence.hibernate;
+package software.xdev.tci.db.persistence.hibernate;
 
 import java.net.URL;
 import java.util.List;

@@ -1,4 +1,4 @@
-package software.xdev.tci.demo.tci.db.persistence;
+package software.xdev.tci.db.persistence;
 
 import java.util.Objects;
 import java.util.function.Supplier;

@@ -3,6 +3,8 @@ package software.xdev.tci.demo.tci.db.containers;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.utility.DockerImageName;
 
+import software.xdev.tci.db.containers.WaitableJDBCContainer;
+
 
 public class DBContainer
 	extends MariaDBContainer<DBContainer>

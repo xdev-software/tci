@@ -21,6 +21,11 @@
 			<artifactId>persistence</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>software.xdev.tci</groupId>
+			<artifactId>db-jdbc-orm</artifactId>
+		</dependency>
+
 		<!-- Test Infrastructure -->
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
