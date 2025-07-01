@@ -1,5 +1,7 @@
-# 2.0.0
+# 2.0.1
+* Various fixes regarding the release workflow
 
+# 2.0.0
 > [!WARNING]
 > This release contains breaking changes
 
