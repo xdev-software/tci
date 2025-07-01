@@ -1,3 +1,6 @@
+# 2.0.2
+* Fix bom using incorrect groupId
+
 # 2.0.1
 * Various fixes regarding the release workflow
 
