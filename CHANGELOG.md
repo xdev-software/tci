@@ -1,3 +1,7 @@
+# 2.0.0
+* Moved module location from ``software.xdev:tci-base`` to ``software.xdev.tci:base``
+* Added ``TCIEnvironmentPerformance``
+
 # 1.2.0
 * [PreStart] Make it possible to "snapshot" containers and use these snapshots to speed up subsequent containers
     * Recommended for containers that highly depend on storage (e.g. databases)
