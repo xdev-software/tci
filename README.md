@@ -1,7 +1,7 @@
-[![Latest version](https://img.shields.io/maven-central/v/software.xdev/tci?logo=apache%20maven)](https://mvnrepository.com/artifact/software.xdev/tci)
+[![Latest version](https://img.shields.io/maven-central/v/software.xdev.tci/bom?logo=apache%20maven)](https://mvnrepository.com/artifact/software.xdev.tci/bom)
 [![Build](https://img.shields.io/github/actions/workflow/status/xdev-software/tci/check-build.yml?branch=develop)](https://github.com/xdev-software/tci/actions/workflows/check-build.yml?query=branch%3Adevelop)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=xdev-software_tci&metric=alert_status)](https://sonarcloud.io/dashboard?id=xdev-software_tci)
-[![javadoc](https://javadoc.io/badge2/software.xdev/tci/javadoc.svg)](https://javadoc.io/doc/software.xdev/tci) 
+[![javadoc](https://javadoc.io/badge2/software.xdev.tci/base/javadoc.svg)](https://javadoc.io/doc/software.xdev.tci/base) 
 
 # <img src="./assets/logo.svg" height=28 > Testcontainers Infrastructure (TCI) Framework
 
