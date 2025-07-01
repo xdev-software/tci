@@ -1,3 +1,15 @@
+# 2.0.0
+
+> [!WARNING]
+> This release contains breaking changes
+
+* ⚠ Renamed ``tci-base`` to ``tci``
+* ⚠ Moved maven coordinates ``software.xdev:tci-base`` to ``software.xdev.tci:base``
+* Added common modules, like selenium, db-jdbc-orm, mockserver, ... #208
+  * Updated demo accordingly
+* Added ``EnvironmentPerformance`` which currently tracks ``cpuSlownessFactor``
+* Refactoring and code cleanup
+
 # 1.2.0
 * [PreStart] Make it possible to "snapshot" containers and use these snapshots to speed up subsequent containers
     * Recommended for containers that highly depend on storage (e.g. databases)

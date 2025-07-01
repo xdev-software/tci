@@ -31,7 +31,7 @@ _As of: 2024-05-03_
 
 ## Live 
 
-A live comparison using [GitHub actions is also available](https://github.com/xdev-software/tci-base/actions/workflows/run-integration-tests.yml).
+A live comparison using [GitHub actions is also available](https://github.com/xdev-software/tci/actions/workflows/run-integration-tests.yml).
 
 > [!NOTE]
 > Format explanation of ``run-integration-tests (21, webapp-it, 2, true)``

@@ -4,7 +4,7 @@
   "packageRules": [
     {
       "description": "Ignore project internal dependencies",
-      "packagePattern": "^software.xdev:tci-base",
+      "packagePattern": "^software.xdev.tci",
       "datasources": [
         "maven"
       ],
@@ -72,6 +72,16 @@
         "maven"
       ],
       "groupName": "org.junit"
+    },
+    {
+      "description": "Group org.hibernate.orm",
+      "matchPackagePatterns": [
+        "^org.hibernate.orm"
+      ],
+      "datasources": [
+        "maven"
+      ],
+      "groupName": "org.hibernate.orm"
     }
   ]
 }
