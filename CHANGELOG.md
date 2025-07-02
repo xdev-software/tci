@@ -1,3 +1,14 @@
+# 2.1.0
+* ``CommitedImageSnapshotManager``
+  * ``waitForFirstSnapshot``
+    * Waits for the first snapshot to be created
+    * Significantly reduces resource usage and prevents bottlenecks in most use cases
+    * Enabled by default
+  * ``commitedImagePrefix``
+    * Let's you control the prefix of the commited/snapshotted image
+    * Default value: ``commited-cache``
+* Minor performance improvements
+
 # 2.0.4
 * Made some constants public
 

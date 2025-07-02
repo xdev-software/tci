@@ -27,6 +27,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -293,20 +294,19 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 						{
 							PortFixation.makeExposedPortsFix(container);
 						}
-						if(this.snapshotManager != null)
-						{
-							this.snapshotManager.tryReuse(container);
-						}
+						this.runIfSnapshotManager(sm -> sm.tryReuse(container));
 						
 						infra.start(this.containerBaseName
 							+ "-"
 							+ this.preStartCounter.getAndIncrement()
 							+ (preStarted ? "-PS" : ""));
 						
-						if(this.snapshotManager != null)
-						{
-							this.snapshotManager.snapshot(container);
-						}
+						this.runIfSnapshotManager(sm -> sm.snapshot(container));
+					}
+					catch(final Exception ex)
+					{
+						this.runIfSnapshotManager(sm -> sm.snapshotFailed(container, ex));
+						throw ex;
 					}
 					finally
 					{
@@ -318,6 +318,14 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 		finally
 		{
 			this.tracer.timedAdd("bootNew", System.currentTimeMillis() - startTime);
+		}
+	}
+	
+	protected void runIfSnapshotManager(final Consumer<SnapshotManager> snapshotManagerConsumer)
+	{
+		if(this.snapshotManager != null)
+		{
+			snapshotManagerConsumer.accept(this.snapshotManager);
 		}
 	}
 	

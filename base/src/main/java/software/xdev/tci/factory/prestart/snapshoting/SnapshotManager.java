@@ -36,7 +36,9 @@ import org.testcontainers.containers.GenericContainer;
  */
 public interface SnapshotManager
 {
-	void tryReuse(final GenericContainer<?> container);
+	void tryReuse(GenericContainer<?> container);
 	
-	<C extends GenericContainer<?>> void snapshot(final C container);
+	<C extends GenericContainer<?>> void snapshot(C container);
+	
+	void snapshotFailed(GenericContainer<?> container, Exception ex);
 }

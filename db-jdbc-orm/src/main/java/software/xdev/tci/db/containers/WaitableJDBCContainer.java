@@ -108,7 +108,7 @@ public interface WaitableJDBCContainer extends WaitStrategyTarget
 			final Connection connection)
 		{
 			return Unreliables.retryUntilSuccess(
-				(int)this.startupTimeout.getSeconds(),
+				Math.max((int)this.startupTimeout.getSeconds() / 2, 1),
 				TimeUnit.SECONDS,
 				() -> this.validateJDBCConnection(connection));
 		}

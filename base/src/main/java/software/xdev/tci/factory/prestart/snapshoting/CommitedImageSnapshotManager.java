@@ -52,8 +52,14 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 	protected static final Logger LOG = LoggerFactory.getLogger(CommitedImageSnapshotManager.class);
 	
 	protected Set<String> ignoreWarningsVolumePaths = Set.of();
-	protected final ReentrantLock lock = new ReentrantLock();
+	protected boolean waitForFirstSnapshot = true;
+	protected String commitedImagePrefix = "commited-cache";
+	
+	protected final ReentrantLock commitLock = new ReentrantLock();
 	protected final AtomicReference<RemoteDockerImage> cachedImage = new AtomicReference<>();
+	
+	protected final ReentrantLock waitForFirstSnapshotLock = new ReentrantLock();
+	protected final AtomicReference<GenericContainer<?>> waitForFirstSnapshotContainer = new AtomicReference<>();
 	
 	public CommitedImageSnapshotManager()
 	{
@@ -87,15 +93,92 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 		return this;
 	}
 	
+	/**
+	 * Will wait for the first snapshot to be created and block any further calls on
+	 * {@link #tryReuse(GenericContainer)}
+	 * until the snapshot was created.
+	 * <p>
+	 * <b>Enabled by default</b>
+	 * </p>
+	 * <p/>
+	 * This is designed to prevent (CPU) bottlenecks during the initial start.
+	 * <p>
+	 * Example: 50 Containers are totally needed by all tests. Parallelism = 10; Starting a container consumes 20% CPU;
+	 * a snapshotted container start only needs 5%
+	 * <ul>
+	 *     <li>
+	 *         <b>Without</b> waiting
+	 *         <ul>
+	 *             <li>Start 10 Containers in parallel, each one needs 20% CPU</li>
+	 *             <li>200% CPU load during start</li>
+	 *             <li>Each container takes a long time to start (let's say 30s)</li>
+	 *             <li>Snapshot one</li>
+	 *             <li>All subsequent containers only need 5% CPU / 10s for starting</li>
+	 *             <li><i>Overall start behavior: duration=~30s; 200% CPU load</i></li>
+	 *         </ul>
+	 *     </li>
+	 *     <li>
+	 *         <b>With</b> waiting
+	 *         <ul>
+	 *             <li>Start 10 Containers in parallel</li>
+	 *             <li>Only 1 Container will be actually started for the snapshot</li>
+	 *             <li>20% CPU load during start</li>
+	 *             <li>Container is started and snapshotted in 15s</li>
+	 *             <li>Resume the 9 other blocked containers, but they now reuse the snapshot</li>
+	 *             <li>All subsequent containers only need 5% CPU / 10s for starting</li>
+	 *             <li><i>Overall start behavior: duration=~15-20s; 65% CPU load</i></li>
+	 *         </ul>
+	 *     </li>
+	 * </ul>
+	 * </p>
+	 */
+	public CommitedImageSnapshotManager withWaitForFirstSnapshot(final boolean waitForFirstSnapshot)
+	{
+		this.waitForFirstSnapshot = waitForFirstSnapshot;
+		return this;
+	}
+	
+	public CommitedImageSnapshotManager withCommitedImagePrefix(final String commitedImagePrefix)
+	{
+		this.commitedImagePrefix = commitedImagePrefix;
+		return this;
+	}
+	
 	@Override
 	public void tryReuse(final GenericContainer<?> container)
 	{
-		final RemoteDockerImage image = this.cachedImage.get();
+		final RemoteDockerImage image = this.getImageAndMaybeWaitForFirstSnapshot(container);
 		if(image != null)
 		{
 			LOG.debug("Using cached image {} for {}", image, container.getClass());
 			SetImageIntoContainer.instance().accept(container, image);
 		}
+	}
+	
+	protected RemoteDockerImage getImageAndMaybeWaitForFirstSnapshot(final GenericContainer<?> container)
+	{
+		RemoteDockerImage image = this.cachedImage.get();
+		if(this.waitForFirstSnapshot && image == null)
+		{
+			LOG.debug("Will wait for first snapshot for {}", container.getClass());
+			this.waitForFirstSnapshotLock.lock();
+			image = this.cachedImage.get();
+			if(image == null)
+			{
+				// Use this container to create the snapshot
+				this.waitForFirstSnapshotContainer.set(container);
+				LOG.debug(
+					"Will try to create first snapshot for {} with details: {}",
+					container.getClass(),
+					container);
+			}
+			else
+			{
+				// We already created the image -> go on
+				this.waitForFirstSnapshotLock.unlock();
+			}
+		}
+		return image;
 	}
 	
 	@Override
@@ -117,7 +200,7 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 			return;
 		}
 		
-		this.lock.lock();
+		this.commitLock.lock();
 		
 		try
 		{
@@ -134,7 +217,8 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 			
 			this.checkForVolumes(container);
 			
-			final String name = "commited-cache-"
+			final String name = this.commitedImagePrefix
+				+ "-"
 				+ container.getContainerName()
 				.replace("/", "")
 				.toLowerCase(Locale.ENGLISH)
@@ -147,7 +231,7 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 				.withRepository(name)
 				.withLabels(ResourceReaper.instance().getLabels())
 				.exec();
-			LOG.debug("Created cached image {}/{} for {}", name, commitedSha, container.getContainerName());
+			LOG.info("Created cached image {}/{} for {}", name, commitedSha, container.getContainerName());
 			this.cachedImage.set(new RemoteDockerImage(DockerImageName.parse(name))
 				.withImagePullPolicy(ignored2 -> false));
 			
@@ -162,7 +246,8 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 		}
 		finally
 		{
-			this.lock.unlock();
+			this.unlockWaitForFirstSnapshotIfRequired(container);
+			this.commitLock.unlock();
 		}
 	}
 	
@@ -200,6 +285,22 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 					container.getDockerImageName(),
 					String.join("\n", problematicMounts));
 			}
+		}
+	}
+	
+	@Override
+	public void snapshotFailed(final GenericContainer<?> container, final Exception ex)
+	{
+		this.unlockWaitForFirstSnapshotIfRequired(container);
+	}
+	
+	protected void unlockWaitForFirstSnapshotIfRequired(final GenericContainer<?> container)
+	{
+		if(this.waitForFirstSnapshot && this.waitForFirstSnapshotContainer.get() == container)
+		{
+			this.waitForFirstSnapshotLock.unlock();
+			this.waitForFirstSnapshotContainer.set(null);
+			LOG.debug("Unlocked wait for first snapshot {}", container.getClass());
 		}
 	}
 }
