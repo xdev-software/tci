@@ -15,8 +15,8 @@
 	</organization>
 
 	<modules>
-		<module>base</module>
 		<module>bom</module>
+		<module>base</module>
 		<module>db-jdbc-orm</module>
 		<module>jul-to-slf4j</module>
 		<module>mockserver</module>
