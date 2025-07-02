@@ -1,3 +1,6 @@
+# 2.0.4
+* Made some constants public
+
 # 2.0.3
 * Should fix that the bom is not being deployed (likely central-publishing-maven-plugin bug)
 

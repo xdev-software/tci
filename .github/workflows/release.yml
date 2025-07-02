@@ -96,6 +96,8 @@ jobs:
           </dependency>
           ```
 
+          You can also use the [BOM](https://github.com/${{ github.repository }}/tree/develop/bom) for easier dependency management.
+
   publish-maven:
     runs-on: ubuntu-latest
     needs: [prepare-release]
