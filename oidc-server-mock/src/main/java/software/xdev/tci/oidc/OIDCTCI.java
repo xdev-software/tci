@@ -50,7 +50,8 @@ public class OIDCTCI extends TCI<OIDCServerContainer>
 	public static final String CLIENT_ID = OIDCServerContainer.DEFAULT_CLIENT_ID;
 	public static final String CLIENT_SECRET = OIDCServerContainer.DEFAULT_CLIENT_SECRET;
 	
-	protected static final String DEFAULT_DOMAIN = "example.local";
+	public static final String DEFAULT_DOMAIN = "example.local";
+	
 	protected static final String DEFAULT_USER_EMAIL = "test@" + DEFAULT_DOMAIN;
 	protected static final String DEFAULT_USER_NAME = "Testuser";
 	protected static final String DEFAULT_USER_PASSWORD = "pwd";
