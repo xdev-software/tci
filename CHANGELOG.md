@@ -1,5 +1,5 @@
 # 2.1.1
-* Selenium (Docker) 4.34+ correctly detect and replace cdp/bidiUrl (was ``127.0.0.1``, now ``localhost``)
+* Selenium (Docker) 4.34+: Correctly detect and replace cdp/bidiUrl (was ``127.0.0.1``, now ``localhost``)
 * Updated dependencies
 
 # 2.1.0
