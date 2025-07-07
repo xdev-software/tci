@@ -52,7 +52,8 @@ import software.xdev.tci.selenium.containers.SeleniumBrowserWebDriverContainer;
 public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BrowserTCI.class);
-	public static final Pattern IP_PORT_EXTRACTOR = Pattern.compile("(.*\\/\\/)([0-9a-f\\:\\.]*):(\\d*)(\\/.*)");
+	public static final Pattern IP_PORT_EXTRACTOR =
+		Pattern.compile("(.*\\/\\/)([0-9a-f\\:\\.]*|localhost):(\\d*)(\\/.*)");
 	public static final Set<String> CAPS_TO_PATCH_ADDRESS = Set.of("webSocketUrl", "se:cdp");
 	
 	protected final MutableCapabilities capabilities;
@@ -214,7 +215,7 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 			// Cancel further communication and abort all connections
 			try
 			{
-				LOG.warn("Encounter problem in try #{} - Terminating communication", tryCount);
+				LOG.warn("Encounter problem in try #{} - Terminating communication", tryCount, rex);
 				client.close();
 				factory.cleanupIdleClients();
 			}

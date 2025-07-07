@@ -1,3 +1,6 @@
+# 2.1.1
+* Selenium (Docker) 4.34+ correctly detect and replace cdp/bidiUrl (was ``127.0.0.1``, now ``localhost``)
+
 # 2.1.0
 * ``CommitedImageSnapshotManager``
   * ``waitForFirstSnapshot``
