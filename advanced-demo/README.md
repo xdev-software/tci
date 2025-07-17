@@ -2,12 +2,14 @@
 
 This demo is a reference implementation for TCI.
 
-It represents a Spring Boot Application with a Database and OIDC authentication that [is tested](./webapp-it/) using Selenium.
-There are also test that [validate the database migrations and queries](./persistence-it/).
+All code that is ONLY used for integration test is located in [``integration-tests``](./integration-tests/).
+
+It represents a Spring Boot Application with a Database and OIDC authentication that [is tested](./integration-tests/webapp-it/) using Selenium.
+There are also test that [validate the database migrations and queries](./integration-tests/persistence-it/).
 
 ![Overview](../assets/Advanced-Demo-Overview.drawio.svg)
 
-The most interesting project is probably [webapp-it](./webapp-it/) which contains the integration tests for the WebApp.
+The most interesting project is probably [webapp-it](./integration-tests/webapp-it/) which contains the integration tests for the WebApp.
 
 > [!TIP]
 > Pre defined launchers exist for running the app and the integration tests.
