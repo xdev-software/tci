@@ -17,11 +17,13 @@ package software.xdev.tci.leakdetection.config;
 
 import java.time.Duration;
 
+import software.xdev.tci.envperf.EnvironmentPerformance;
+
 
 public interface LeakDetectionConfig
 {
 	boolean DEFAULT_ENABLED = true;
-	Duration DEFAULT_STOP_TIMEOUT = Duration.ofMinutes(1);
+	Duration DEFAULT_STOP_TIMEOUT = Duration.ofSeconds(15L + EnvironmentPerformance.cpuSlownessFactor() * 5L);
 	
 	default boolean enabled()
 	{

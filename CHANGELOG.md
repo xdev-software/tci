@@ -1,3 +1,6 @@
+# 2.2.1
+* Improve default leak detection stop timeout
+
 # 2.2.0
 * Leak-Detection: Automatically wait until infra is stopped #308
   * This should no longer require you to manually implement a ``LeakDetectionAsyncReaper`` and ``REAP_CFS``
