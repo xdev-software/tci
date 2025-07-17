@@ -16,14 +16,13 @@
 package software.xdev.tci.tracing;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class TCITracer
 {
-	private final Map<String, Timed> timers = Collections.synchronizedMap(new HashMap<>());
+	private final Map<String, Timed> timers = new ConcurrentHashMap<>();
 	
 	public Timed getTimedOrCreate(final String name)
 	{

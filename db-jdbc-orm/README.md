@@ -1,8 +1,8 @@
 # DB JDBC ORM
 
-Common TCI code for Database info.
+Common TCI code for Database infra, including JDBC and ORM.
 
 ## Features
+* Data-generation template
 * Improved JDBC Container Waiting Strategy
-* Datageneration Template
-* Predefined support for creation of EntityManager and Entity discovery
+* Predefined support for creation of EntityManager and entity discovery

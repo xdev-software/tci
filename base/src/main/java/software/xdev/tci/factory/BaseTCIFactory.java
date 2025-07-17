@@ -15,11 +15,11 @@
  */
 package software.xdev.tci.factory;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -45,7 +45,7 @@ public abstract class BaseTCIFactory<
 	 * The future is completed when the infra is stopped.
 	 * </p>
 	 */
-	protected Map<I, CompletableFuture<Boolean>> returnedAndInUse = Collections.synchronizedMap(new HashMap<>());
+	protected Map<I, CompletableFuture<Boolean>> returnedAndInUse = new ConcurrentHashMap<>();
 	protected boolean warmedUp;
 	/**
 	 * Describes how often new infra should be created/started - if it fails.

@@ -15,11 +15,10 @@
  */
 package software.xdev.tci.tracing;
 
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.junit.platform.engine.TestDescriptor;
@@ -56,7 +55,7 @@ public class TCITracingAgent implements TestExecutionListener
 	protected long startTime;
 	
 	protected final TCITracer.Timed testsTimed = new TCITracer.Timed();
-	protected final Map<TestIdentifier, Long> testStartTime = Collections.synchronizedMap(new HashMap<>());
+	protected final Map<TestIdentifier, Long> testStartTime = new ConcurrentHashMap<>();
 	
 	@Override
 	public void testPlanExecutionStarted(final TestPlan testPlan)

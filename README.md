@@ -9,13 +9,31 @@ Modules for XDEV's Testcontainer Infrastructure Framework
 ## Modules
 
 * [base](./base/)
+  * Common code for writing TCI
+  * Pre-starting
+  * Container leak detection
+  * and much more
 * [bom](./bom/)
+  * Bill of Materials for easier version management
 * [db-jdbc-orm](./db-jdbc-orm/)
+  * Common code for db infra, including JDBC and ORM
+  * Data-generation template
+  * Improved JDBC Container wait strategy
 * [jul-to-slf4j](./jul-to-slf4j/)
+  * Logging Adapter to redirect JUL to SLF4J
 * [mockserver](./mockserver/)
+  * Predefined implementation for [Mockserver](https://github.com/xdev-software/mockserver-neolight)
 * [oidc-server-mock](./oidc-server-mock/)
+  * Predefined implementation for [OIDC Server Mock](https://github.com/xdev-software/oidc-server-mock)
 * [selenium](./selenium/)
+  * Predefined implementation for [Selenium](https://github.com/SeleniumHQ/selenium)
+  * Includes improvements from [xdev-software/testcontainers-selenium](https://github.com/xdev-software/testcontainers-selenium/)
+  * Predefined browsers (Firefox, Chromium)
+  * NoVNC support (you no longer need a VNC client and can simply use the browser)
+  * Enhanced video recording
+  * Browser logs
 * [spring-dao-support](./spring-dao-support/)
+  * Helper for injecting DAOs using Spring
 
 ## Usage
 

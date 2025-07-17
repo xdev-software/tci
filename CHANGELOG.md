@@ -1,3 +1,6 @@
+# 2.2.2
+* Use ``ConcurrentHashMap`` instead of ``Collections.synchronizedMap(new HashMap<>())`` to prevent ``ConcurrentModification`` in recursive ``computeIfAbsent`` calls
+
 # 2.2.1
 * Improve default leak detection stop timeout
 

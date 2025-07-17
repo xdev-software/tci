@@ -17,11 +17,10 @@ package software.xdev.tci.selenium.factory;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,7 +41,7 @@ import software.xdev.testcontainers.selenium.containers.recorder.SeleniumRecordi
 
 public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverContainer, BrowserTCI>
 {
-	protected final Map<String, BrowserTCIFactory> browserFactories = Collections.synchronizedMap(new HashMap<>());
+	protected final Map<String, BrowserTCIFactory> browserFactories = new ConcurrentHashMap<>();
 	protected boolean alreadyWarmedUp;
 	
 	public BrowsersTCIFactory()

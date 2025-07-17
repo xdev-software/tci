@@ -17,9 +17,8 @@ package software.xdev.tci.db;
 
 import java.sql.Driver;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -42,7 +41,7 @@ import software.xdev.tci.db.persistence.hibernate.CachingStandardScanner;
 
 public abstract class BaseDBTCI<C extends JdbcDatabaseContainer<C>> extends TCI<C>
 {
-	protected static final Map<Class<?>, Logger> LOGGER_CACHE = Collections.synchronizedMap(new WeakHashMap<>());
+	protected static final Map<Class<?>, Logger> LOGGER_CACHE = new ConcurrentHashMap<>();
 	
 	public static final String DEFAULT_DATABASE = "testdb";
 	public static final String DEFAULT_USERNAME = "testuser";
