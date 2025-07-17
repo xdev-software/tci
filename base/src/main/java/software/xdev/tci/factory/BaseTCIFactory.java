@@ -16,9 +16,9 @@
 package software.xdev.tci.factory;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -39,7 +39,13 @@ public abstract class BaseTCIFactory<
 	implements TCIFactory<C, I>
 {
 	private final Logger logger;
-	protected Set<I> returnedAndInUse = Collections.synchronizedSet(new HashSet<>());
+	/**
+	 * Describes infra that is currently in use.
+	 * <p>
+	 * The future is completed when the infra is stopped.
+	 * </p>
+	 */
+	protected Map<I, CompletableFuture<Boolean>> returnedAndInUse = Collections.synchronizedMap(new HashMap<>());
 	protected boolean warmedUp;
 	/**
 	 * Describes how often new infra should be created/started - if it fails.
@@ -125,8 +131,13 @@ public abstract class BaseTCIFactory<
 	
 	protected I registerReturned(final I infra)
 	{
-		this.returnedAndInUse.add(infra);
-		infra.setOnStopped(() -> this.returnedAndInUse.remove(infra));
+		this.returnedAndInUse.put(infra, new CompletableFuture<>());
+		infra.setOnStopped(() ->
+			// Remove it from the "in use" list
+			this.returnedAndInUse.remove(infra)
+				// Mark its stop future as completed
+				.complete(true));
+		
 		return infra;
 	}
 	
@@ -137,9 +148,9 @@ public abstract class BaseTCIFactory<
 	}
 	
 	@Override
-	public Set<I> getReturnedAndInUse()
+	public Map<I, CompletableFuture<Boolean>> getReturnedAndInUse()
 	{
-		return new HashSet<>(this.returnedAndInUse);
+		return new HashMap<>(this.returnedAndInUse);
 	}
 	
 	@Override

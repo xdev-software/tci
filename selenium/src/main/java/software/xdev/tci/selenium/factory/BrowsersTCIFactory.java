@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -123,13 +122,14 @@ public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverCo
 	}
 	
 	@Override
-	public Set<BrowserTCI> getReturnedAndInUse()
+	public Map<BrowserTCI, CompletableFuture<Boolean>> getReturnedAndInUse()
 	{
 		return this.browserFactories.values()
 			.stream()
 			.map(BrowserTCIFactory::getReturnedAndInUse)
+			.map(Map::entrySet)
 			.flatMap(Collection::stream)
-			.collect(Collectors.toSet());
+			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 	
 	@Override

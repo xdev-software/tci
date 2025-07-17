@@ -15,6 +15,11 @@
  */
 package software.xdev.tci.leakdetection;
 
+/**
+ * Reaps infra or waits for it to finish.
+ * <p/>
+ * Since v2.2.0 a dedicated reaper is usually no longer required by default.
+ */
 public interface LeakDetectionAsyncReaper
 {
 	void blockUntilReaped();

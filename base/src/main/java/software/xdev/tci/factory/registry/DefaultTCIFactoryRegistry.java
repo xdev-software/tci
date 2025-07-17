@@ -75,14 +75,14 @@ public class DefaultTCIFactoryRegistry implements TCIFactoryRegistry
 	
 	@Override
 	@SuppressWarnings("java:S1452")
-	public Map<TCIFactory<?, ?>, Set<TCI<?>>> getReturnedAndInUse()
+	public Map<TCIFactory<?, ?>, Map<TCI<?>, CompletableFuture<Boolean>>> getReturnedAndInUse()
 	{
 		return this.factories.stream()
 			.filter(f -> !f.getReturnedAndInUse().isEmpty())
 			.collect(Collectors.toMap(
 				Function.identity(),
-				f -> f.getReturnedAndInUse().stream()
-					.map(x -> (TCI<?>)x)
-					.collect(Collectors.toSet())));
+				f -> f.getReturnedAndInUse().entrySet()
+					.stream()
+					.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))));
 	}
 }

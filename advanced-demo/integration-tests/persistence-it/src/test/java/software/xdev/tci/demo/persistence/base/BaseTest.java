@@ -2,11 +2,7 @@ package software.xdev.tci.demo.persistence.base;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -30,7 +26,6 @@ import software.xdev.tci.demo.persistence.jpa.dao.TransactionReflector;
 import software.xdev.tci.demo.tci.db.DBTCI;
 import software.xdev.tci.demo.tci.db.factory.DBTCIFactory;
 import software.xdev.tci.factory.registry.TCIFactoryRegistry;
-import software.xdev.tci.leakdetection.LeakDetectionAsyncReaper;
 import software.xdev.tci.tracing.TCITracer;
 
 
@@ -38,9 +33,6 @@ import software.xdev.tci.tracing.TCITracer;
 abstract class BaseTest
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BaseTest.class);
-	
-	static final Set<CompletableFuture<?>> REAP_CFS =
-		Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
 	
 	static final TCITracer.Timed TRACE_START_INFRA = new TCITracer.Timed();
 	static final TCITracer.Timed TRACE_START_INFRA_MIGRATE_DB = new TCITracer.Timed();
@@ -144,7 +136,7 @@ abstract class BaseTest
 		if(this.dbInfra != null)
 		{
 			final DBTCI fDbInfra = this.dbInfra;
-			REAP_CFS.add(CompletableFuture.runAsync(fDbInfra::stop));
+			CompletableFuture.runAsync(fDbInfra::stop);
 			
 			this.dbInfra = null;
 		}
@@ -186,18 +178,6 @@ abstract class BaseTest
 				TRACE_START_INFRA,
 				TRACE_START_INFRA_MIGRATE_DB,
 				TRACE_START_INFRA_CHECK_EMC);
-		}
-	}
-	
-	
-	public static class Reaper implements LeakDetectionAsyncReaper
-	{
-		@Override
-		public void blockUntilReaped()
-		{
-			REAP_CFS.stream()
-				.filter(Objects::nonNull)
-				.forEach(CompletableFuture::join);
 		}
 	}
 }
