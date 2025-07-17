@@ -1,3 +1,9 @@
+# 2.2.0
+* Leak-Detection: Automatically wait until infra is stopped #308
+  * This should no longer require you to manually implement a ``LeakDetectionAsyncReaper`` and ``REAP_CFS``
+* Made it possible to configure default leak-detection with environment variables and properties
+* Updated dependencies
+
 # 2.1.1
 * Selenium (Docker) 4.34+: Correctly detect and replace cdp/bidiUrl (was ``127.0.0.1``, now ``localhost``)
 * Updated dependencies
