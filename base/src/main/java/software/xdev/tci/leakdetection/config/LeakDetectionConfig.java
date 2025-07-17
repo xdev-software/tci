@@ -15,7 +15,21 @@
  */
 package software.xdev.tci.leakdetection.config;
 
+import java.time.Duration;
+
+
 public interface LeakDetectionConfig
 {
-	boolean enabled();
+	boolean DEFAULT_ENABLED = true;
+	Duration DEFAULT_STOP_TIMEOUT = Duration.ofMinutes(1);
+	
+	default boolean enabled()
+	{
+		return DEFAULT_ENABLED;
+	}
+	
+	default Duration defaultStopTimeout()
+	{
+		return DEFAULT_STOP_TIMEOUT;
+	}
 }

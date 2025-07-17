@@ -15,11 +15,16 @@
  */
 package software.xdev.tci.leakdetection;
 
+import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
-import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.junit.platform.launcher.TestExecutionListener;
@@ -62,7 +67,6 @@ public class TCILeakAgent implements TestExecutionListener
 		LOG.debug("Registered");
 	}
 	
-	@SuppressWarnings({"java:S2629", "java:S106", "PMD.SystemPrintln"})
 	@Override
 	public void testPlanExecutionFinished(final TestPlan testPlan)
 	{
@@ -81,13 +85,75 @@ public class TCILeakAgent implements TestExecutionListener
 			pendingReapers.forEach(LeakDetectionAsyncReaper::blockUntilReaped);
 		}
 		
-		final Map<TCIFactory<?, ?>, Set<TCI<?>>> leaked = TCIFactoryRegistry.instance().getReturnedAndInUse();
+		if(this.waitForAllInfraToFullyStop(this.config.defaultStopTimeout()))
+		{
+			LOG.info("No leaks detected");
+			return;
+		}
+		
+		final Map<TCIFactory<?, ?>, Map<TCI<?>, CompletableFuture<Boolean>>> leaked =
+			TCIFactoryRegistry.instance().getReturnedAndInUse();
 		if(leaked.isEmpty())
 		{
 			LOG.info("No leaks detected");
 			return;
 		}
 		
+		this.reportLeak(leaked);
+	}
+	
+	/**
+	 * @return <code>true</code> if all infra was determined to be stopped
+	 */
+	protected boolean waitForAllInfraToFullyStop(final Duration defaultStopTimeout)
+	{
+		if(defaultStopTimeout == null)
+		{
+			return false;
+		}
+		
+		final Map<TCIFactory<?, ?>, Map<TCI<?>, CompletableFuture<Boolean>>> leaked =
+			TCIFactoryRegistry.instance().getReturnedAndInUse();
+		if(leaked.isEmpty())
+		{
+			return true;
+		}
+		
+		try
+		{
+			final List<CompletableFuture<Boolean>> stopCfs = leaked.values()
+				.stream()
+				.map(Map::values)
+				.flatMap(Collection::stream)
+				.toList();
+			LOG.info("Waiting for {}x infras to fully stop within {}", stopCfs.size(), defaultStopTimeout);
+			
+			final long startMs = System.currentTimeMillis();
+			CompletableFuture.allOf(stopCfs.toArray(CompletableFuture[]::new))
+				.get(defaultStopTimeout.toMillis(), TimeUnit.MILLISECONDS);
+			
+			LOG.info("Took {}ms to wait until all infras are fully stopped", System.currentTimeMillis() - startMs);
+			return true;
+		}
+		catch(final InterruptedException e)
+		{
+			LOG.warn("Got interrupted", e);
+			Thread.currentThread().interrupt();
+		}
+		catch(final ExecutionException ignored)
+		{
+			// Can never happen because the completable future is always successfully completed
+		}
+		catch(final TimeoutException e)
+		{
+			LOG.warn("Timed out while waiting for infra to stop[duration={}]", defaultStopTimeout, e);
+		}
+		return false;
+	}
+	
+	@SuppressWarnings({"java:S2629", "java:S106", "PMD.SystemPrintln"})
+	protected void reportLeak(final Map<TCIFactory<?, ?>, Map<TCI<?>, CompletableFuture<Boolean>>> leaked)
+	{
 		final String baseErrorMsg = "PANIC: DETECTED CONTAINER INFRASTRUCTURE LEAK";
 		final String logErrorMsg = "! " + baseErrorMsg + " !";
 		final String border = "!".repeat(logErrorMsg.length());
@@ -104,7 +170,7 @@ public class TCILeakAgent implements TestExecutionListener
 			leaked.entrySet().stream()
 				.map(e -> e.getKey().getClass().getSimpleName() + " leaked " + e.getValue().size() + "x "
 					+ "[container-ids="
-					+ e.getValue().stream()
+					+ e.getValue().keySet().stream()
 					.map(TCI::getContainer)
 					.filter(Objects::nonNull)
 					.map(Container::getContainerId)

@@ -17,6 +17,7 @@ package software.xdev.tci.factory.registry;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import software.xdev.tci.TCI;
 import software.xdev.tci.factory.TCIFactory;
@@ -40,7 +41,7 @@ public interface TCIFactoryRegistry
 	
 	Set<TCIFactory<?, ?>> getFactories();
 	
-	Map<TCIFactory<?, ?>, Set<TCI<?>>> getReturnedAndInUse();
+	Map<TCIFactory<?, ?>, Map<TCI<?>, CompletableFuture<Boolean>>> getReturnedAndInUse();
 	
 	static TCIFactoryRegistry instance()
 	{

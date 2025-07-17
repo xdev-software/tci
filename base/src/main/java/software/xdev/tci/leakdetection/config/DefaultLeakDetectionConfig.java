@@ -15,11 +15,34 @@
  */
 package software.xdev.tci.leakdetection.config;
 
-public class DefaultLeakDetectionConfig implements LeakDetectionConfig
+import java.time.Duration;
+
+import software.xdev.tci.config.DefaultConfig;
+
+
+public class DefaultLeakDetectionConfig extends DefaultConfig implements LeakDetectionConfig
 {
+	protected static final String PROPERTY_PREFIX = "leak-detection.";
+	
+	protected final boolean enabled;
+	protected final Duration defaultStopTimeout;
+	
+	public DefaultLeakDetectionConfig()
+	{
+		this.enabled = this.getBool(PROPERTY_PREFIX + "enabled", DEFAULT_ENABLED);
+		this.defaultStopTimeout = Duration.ofMillis(
+			this.getLong(PROPERTY_PREFIX + "stop-timeout-ms", DEFAULT_STOP_TIMEOUT::toMillis));
+	}
+	
 	@Override
 	public boolean enabled()
 	{
-		return true;
+		return this.enabled;
+	}
+	
+	@Override
+	public Duration defaultStopTimeout()
+	{
+		return this.defaultStopTimeout;
 	}
 }

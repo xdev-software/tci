@@ -15,7 +15,8 @@
  */
 package software.xdev.tci.factory;
 
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.testcontainers.containers.GenericContainer;
 
@@ -52,7 +53,7 @@ public interface TCIFactory<C extends GenericContainer<C>, I extends TCI<C>> ext
 	@Override
 	void close();
 	
-	Set<I> getReturnedAndInUse();
+	Map<I, CompletableFuture<Boolean>> getReturnedAndInUse();
 	
 	default String getFactoryName()
 	{
