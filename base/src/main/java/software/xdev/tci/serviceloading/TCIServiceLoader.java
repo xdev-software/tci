@@ -15,12 +15,11 @@
  */
 package software.xdev.tci.serviceloading;
 
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -36,7 +35,7 @@ public final class TCIServiceLoader
 		return INSTANCE;
 	}
 	
-	private final Map<Class<?>, Object> loadedServices = Collections.synchronizedMap(new HashMap<>());
+	private final Map<Class<?>, Object> loadedServices = new ConcurrentHashMap<>();
 	
 	private TCIServiceLoader()
 	{
