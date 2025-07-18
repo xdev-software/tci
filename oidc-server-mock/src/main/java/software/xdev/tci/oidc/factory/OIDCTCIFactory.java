@@ -81,8 +81,13 @@ public class OIDCTCIFactory extends PreStartableTCIFactory<OIDCServerContainer, 
 	
 	public OIDCTCIFactory()
 	{
+		this(OIDCTCI::new);
+	}
+	
+	public OIDCTCIFactory(final BiFunction<OIDCServerContainer, String, OIDCTCI> infraBuilder)
+	{
 		super(
-			OIDCTCI::new,
+			infraBuilder,
 			OIDCTCIFactory::createDefaultContainer,
 			DEFAULT_CONTAINER_BASE_NAME,
 			DEFAULT_CONTAINER_LOGGER_NAME,
@@ -90,7 +95,7 @@ public class OIDCTCIFactory extends PreStartableTCIFactory<OIDCServerContainer, 
 	}
 	
 	@SuppressWarnings({"resource", "checkstyle:MagicNumber"})
-	protected static OIDCServerContainer createDefaultContainer()
+	public static OIDCServerContainer createDefaultContainer()
 	{
 		return new OIDCServerContainer()
 			.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M))
