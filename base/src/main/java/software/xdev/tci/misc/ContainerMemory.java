@@ -20,7 +20,7 @@ package software.xdev.tci.misc;
  */
 public final class ContainerMemory
 {
-	// NOTE: Variablenames can't start with numbers -> Prefixed with M
+	// NOTE: Names of constants can't start with numbers -> Prefixed with M
 	// Docker uses 1024 as conversion
 	public static final long M64M = 128 * 1024L * 1024L;
 	public static final long M128M = M64M * 2;
