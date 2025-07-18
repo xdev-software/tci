@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="FORMAT" timestamp="1752838957886">
+    <module artifactId="db-jdbc-orm" groupId="software.xdev.tci" version="2.2.3"/>
+    <files>
+        <file path="src/main/java/software/xdev/tci/db/BaseDBTCI.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/containers/TestQueryStringAccessor.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/containers/WaitableJDBCContainer.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/datageneration/BaseDBDataGenerator.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/datageneration/DataGenerator.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/factory/BaseDBTCIFactory.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/persistence/EntityManagerController.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/persistence/EntityManagerControllerFactory.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/persistence/TransactionExecutor.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/persistence/classfinder/AnnotatedClassFinder.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/persistence/classfinder/CachedEntityAnnotatedClassNameFinder.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/persistence/hibernate/CachingStandardScanner.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/persistence/hibernate/DisableHibernateFormatMapper.java" result="NOOP"/>
+        <file path="src/test/java/software/xdev/tci/db/containers/TestQueryStringAccessorTest.java" result="NOOP"/>
+    </files>
+</licensePluginReport>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="FORMAT" timestamp="1752838946646">
+    <module artifactId="jul-to-slf4j" groupId="software.xdev.tci" version="2.2.3"/>
+    <files>
+        <file path="src/main/java/software/xdev/tci/logging/JULtoSLF4JRedirector.java" result="NOOP"/>
+    </files>
+</licensePluginReport>
