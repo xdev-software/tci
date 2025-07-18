@@ -74,6 +74,16 @@
       "groupName": "org.junit"
     },
     {
+      "description": "Group org.springframework",
+      "matchPackagePatterns": [
+        "^org.springframework:"
+      ],
+      "datasources": [
+        "maven"
+      ],
+      "groupName": "org.springframework"
+    },
+    {
       "description": "Group org.hibernate.orm",
       "matchPackagePatterns": [
         "^org.hibernate.orm"
