@@ -1,6 +1,7 @@
 # 2.2.3
 * ``oidc-server-mock``
   * Make it easier to define extend from ``OIDCTCIFactory``
+* Updated ``org.springframework`` to latest version
 
 # 2.2.2
 * Use ``ConcurrentHashMap`` instead of ``Collections.synchronizedMap(new HashMap<>())`` to prevent ``ConcurrentModification`` in recursive ``computeIfAbsent`` calls
