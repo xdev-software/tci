@@ -78,6 +78,6 @@ public abstract class BaseDBDataGenerator implements DataGenerator
 	@SuppressWarnings("checkstyle:MagicNumber")
 	public LocalDate getLocalDateInFuture()
 	{
-		return LocalDate.of(3000, 1, 1).plusYears(1);
+		return LocalDate.of(3000, 1, 1);
 	}
 }
