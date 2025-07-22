@@ -1,3 +1,7 @@
+# 2.2.4
+* ``oidc-server-mock``
+  * Split ``addUser`` into better customizable methods
+
 # 2.2.3
 * ``oidc-server-mock``
   * Make it easier to define extend from ``OIDCTCIFactory``
