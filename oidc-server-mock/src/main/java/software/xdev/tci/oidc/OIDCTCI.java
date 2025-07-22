@@ -140,34 +140,15 @@ public class OIDCTCI extends TCI<OIDCServerContainer>
 		final String name,
 		final String pw)
 	{
+		this.apiAddUser(this.createDefaultBodyForAddUser(email, name, pw));
+	}
+	
+	protected void apiAddUser(final String jsonBody)
+	{
 		try(final CloseableHttpClient client = this.createDefaultHttpClient())
 		{
 			final HttpPost post = new HttpPost(this.getContainer().getExternalHttpBaseEndPoint() + "/api/v1/user");
-			post.setEntity(new StringEntity("""
-				{
-				  "SubjectId":"%s",
-				  "Username":"%s",
-				  "Password":"%s",
-				  "Claims": [
-				    {
-				      "Type": "name",
-				      "Value": "%s",
-				      "ValueType": "string"
-				    },
-				    {
-				      "Type": "email",
-				      "Value": "%s",
-				      "ValueType": "string"
-				    }
-				  ]
-				}
-				""".formatted(
-				UUID.randomUUID().toString(),
-				email,
-				pw,
-				name,
-				email
-			)));
+			post.setEntity(new StringEntity(jsonBody));
 			post.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
 			post.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 			
@@ -183,6 +164,38 @@ public class OIDCTCI extends TCI<OIDCServerContainer>
 		{
 			throw new UncheckedIOException(ioe);
 		}
+	}
+	
+	protected String createDefaultBodyForAddUser(
+		final String email,
+		final String name,
+		final String pw)
+	{
+		return """
+			{
+			  "SubjectId":"%s",
+			  "Username":"%s",
+			  "Password":"%s",
+			  "Claims": [
+			    {
+			      "Type": "name",
+			      "Value": "%s",
+			      "ValueType": "string"
+			    },
+			    {
+			      "Type": "email",
+			      "Value": "%s",
+			      "ValueType": "string"
+			    }
+			  ]
+			}
+			""".formatted(
+			UUID.randomUUID().toString(),
+			email,
+			pw,
+			name,
+			email
+		);
 	}
 	
 	protected CloseableHttpClient createDefaultHttpClient()
