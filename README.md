@@ -15,10 +15,11 @@ Modules for XDEV's Testcontainer Infrastructure Framework
   * and much more
 * [bom](./bom/)
   * Bill of Materials for easier version management
-* [db-jdbc-orm](./db-jdbc-orm/)
-  * Common code for db infra, including JDBC and ORM
+* [db-jdbc](./db-jdbc/)
+  * Common code for db infra, including JDBC
   * Data-generation template
   * Improved JDBC Container wait strategy
+  * Predefined implementations for [Spring-ORM](./db-jdbc-spring-orm/) and [Hibernate](./db-jdbc-spring-orm-hibernate/)
 * [jul-to-slf4j](./jul-to-slf4j/)
   * Logging Adapter to redirect JUL to SLF4J
 * [mockserver](./mockserver/)

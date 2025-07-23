@@ -1,6 +1,6 @@
-# DB JDBC ORM
+# DB JDBC
 
-Common TCI code for Database infra, including JDBC and ORM.
+Common TCI code for Database infra, including JDBC.
 
 ## Features
 * Data-generation template

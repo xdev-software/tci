@@ -21,11 +21,16 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 
+/**
+ * @deprecated Use {@link DynamicClassFinder} instead.
+ */
+@Deprecated(forRemoval = true)
 public class CachedEntityAnnotatedClassNameFinder implements Supplier<Set<String>>
 {
 	protected final Supplier<AnnotatedClassFinder> classFinderProvider = AnnotatedClassFinder::new;
 	protected final String basePackage;
 	protected final Class<? extends Annotation> annotationClazz;
+	
 	protected Set<String> cache;
 	
 	public CachedEntityAnnotatedClassNameFinder(
