@@ -18,9 +18,10 @@ package software.xdev.tci.db.persistence.classfinder;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.Set;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -39,34 +40,53 @@ public class AnnotatedClassFinder
 		final String basePackage,
 		final Class<? extends Annotation> annotationClazz)
 	{
+		return this.find(Set.of(basePackage), Set.of(annotationClazz));
+	}
+	
+	@SuppressWarnings({"java:S1452", "java:S4968"}) // Returned so by stream
+	public List<? extends Class<?>> find(
+		final Set<String> basePackages,
+		final Set<Class<? extends Annotation>> annotationClasses)
+	{
+		if(basePackages.isEmpty() || annotationClasses.isEmpty())
+		{
+			return List.of();
+		}
+		
 		final ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 		final MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
 		
-		try
-		{
-			return Stream.of(resourcePatternResolver.getResources(
-					ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
-						+ this.resolveBasePackage(basePackage) + "/" + "**/*.class"))
-				.filter(Resource::isReadable)
-				.map(resource -> {
-					try
-					{
-						return this.getIfIsCandidate(
-							metadataReaderFactory.getMetadataReader(resource),
-							annotationClazz);
-					}
-					catch(final IOException e)
-					{
-						return null;
-					}
-				})
-				.filter(Objects::nonNull)
-				.toList();
-		}
-		catch(final IOException ioe)
-		{
-			throw new UncheckedIOException(ioe);
-		}
+		return basePackages.stream()
+			.map(pkg -> ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
+				+ this.resolveBasePackage(pkg)
+				+ "/**/*.class")
+			.map(path -> {
+				try
+				{
+					return resourcePatternResolver.getResources(path);
+				}
+				catch(final IOException ioe)
+				{
+					throw new UncheckedIOException(ioe);
+				}
+			})
+			.flatMap(Arrays::stream)
+			.distinct()
+			.filter(Resource::isReadable)
+			.map(resource -> {
+				try
+				{
+					return this.getIfIsCandidate(
+						metadataReaderFactory.getMetadataReader(resource),
+						annotationClasses);
+				}
+				catch(final IOException e)
+				{
+					return null;
+				}
+			})
+			.filter(Objects::nonNull)
+			.toList();
 	}
 	
 	protected String resolveBasePackage(final String basePackage)
@@ -76,15 +96,15 @@ public class AnnotatedClassFinder
 	
 	protected Class<?> getIfIsCandidate(
 		final MetadataReader metadataReader,
-		final Class<? extends Annotation> annotationClazz)
+		final Set<Class<? extends Annotation>> annotationClasses)
 	{
 		try
 		{
 			final Class<?> clazz = Class.forName(metadataReader.getClassMetadata().getClassName());
-			if(clazz.getAnnotation(annotationClazz) != null)
-			{
-				return clazz;
-			}
+			return annotationClasses.stream()
+				.filter(annotation -> clazz.getAnnotation(annotation) != null)
+				.findFirst()
+				.orElse(null);
 		}
 		catch(final Exception e)
 		{

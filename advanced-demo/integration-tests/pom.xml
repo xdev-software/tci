@@ -44,7 +44,7 @@
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
-				<artifactId>db-jdbc-orm</artifactId>
+				<artifactId>db-jdbc-spring-orm-hibernate</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

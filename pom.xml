@@ -17,7 +17,9 @@
 	<modules>
 		<module>bom</module>
 		<module>base</module>
-		<module>db-jdbc-orm</module>
+		<module>db-jdbc</module>
+		<module>db-jdbc-spring-orm</module>
+		<module>db-jdbc-spring-orm-hibernate</module>
 		<module>jul-to-slf4j</module>
 		<module>mockserver</module>
 		<module>oidc-server-mock</module>

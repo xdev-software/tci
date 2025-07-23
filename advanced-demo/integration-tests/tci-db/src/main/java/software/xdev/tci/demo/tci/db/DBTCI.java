@@ -10,8 +10,8 @@ import jakarta.persistence.Entity;
 import org.mariadb.jdbc.MariaDbDataSource;
 
 import software.xdev.tci.db.BaseDBTCI;
-import software.xdev.tci.db.persistence.EntityManagerControllerFactory;
-import software.xdev.tci.db.persistence.classfinder.CachedEntityAnnotatedClassNameFinder;
+import software.xdev.tci.db.persistence.classfinder.DynamicClassFinder;
+import software.xdev.tci.db.persistence.hibernate.HibernateEntityManagerControllerFactory;
 import software.xdev.tci.demo.persistence.FlywayInfo;
 import software.xdev.tci.demo.persistence.FlywayMigration;
 import software.xdev.tci.demo.persistence.config.DefaultJPAConfig;
@@ -25,6 +25,9 @@ public class DBTCI extends BaseDBTCI<DBContainer>
 	@SuppressWarnings("java:S2068") // This is a test calm down
 	public static final String DB_PASSWORD = "test";
 	
+	private static final DynamicClassFinder ENTITY_CLASSES_FINDER = new DynamicClassFinder()
+		.withSearchForAnnotatedClasses(DefaultJPAConfig.ENTITY_PACKAGE, Entity.class);
+	
 	public DBTCI(
 		final DBContainer container,
 		final String networkAlias,
@@ -34,9 +37,7 @@ public class DBTCI extends BaseDBTCI<DBContainer>
 			container,
 			networkAlias,
 			migrateAndInitializeEMC,
-			() -> new EntityManagerControllerFactory(new CachedEntityAnnotatedClassNameFinder(
-				DefaultJPAConfig.ENTITY_PACKAGE,
-				Entity.class)));
+			() -> new HibernateEntityManagerControllerFactory(ENTITY_CLASSES_FINDER));
 		this.withDatabase(DB_DATABASE)
 			.withUsername(DB_USERNAME)
 			.withPassword(DB_PASSWORD);
