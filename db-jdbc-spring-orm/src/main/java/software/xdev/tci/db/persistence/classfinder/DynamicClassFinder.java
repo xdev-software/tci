@@ -26,6 +26,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
+/**
+ * Used to dynamically search for classes.
+ * <p>
+ * Utilizes caching and only searches for these classes once.
+ * </p>
+ * It's recommended to instantiate this in a static field/constant for optimal performance.
+ */
 public class DynamicClassFinder implements Supplier<Set<String>>
 {
 	protected Supplier<AnnotatedClassFinder> classFinderProvider = AnnotatedClassFinder::new;
