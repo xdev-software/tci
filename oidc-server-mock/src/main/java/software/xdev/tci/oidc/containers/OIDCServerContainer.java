@@ -105,7 +105,7 @@ public class OIDCServerContainer extends GenericContainer<OIDCServerContainer>
 			      "ClientSecrets": [
 			          "%s"
 			      ],
-			      "Description": "TimelineDesc",
+			      "Description": "TestDesc",
 			      "AllowedGrantTypes": [
 			          "authorization_code",
 			          "refresh_token"
