@@ -27,8 +27,6 @@ import javax.sql.DataSource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
-import org.hibernate.cfg.PersistenceSettings;
-import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.JdbcDatabaseContainer;
@@ -36,7 +34,6 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import software.xdev.tci.TCI;
 import software.xdev.tci.db.persistence.EntityManagerController;
 import software.xdev.tci.db.persistence.EntityManagerControllerFactory;
-import software.xdev.tci.db.persistence.hibernate.CachingStandardScanner;
 
 
 public abstract class BaseDBTCI<C extends JdbcDatabaseContainer<C>> extends TCI<C>
@@ -49,7 +46,7 @@ public abstract class BaseDBTCI<C extends JdbcDatabaseContainer<C>> extends TCI<
 	public static final String DEFAULT_PASSWORD = "testpw";
 	
 	protected final boolean migrateAndInitializeEMC;
-	protected final Supplier<EntityManagerControllerFactory> emcFactorySupplier;
+	protected final Supplier<EntityManagerControllerFactory<?, ?>> emcFactorySupplier;
 	protected final Logger logger;
 	
 	protected String database = DEFAULT_DATABASE;
@@ -63,7 +60,7 @@ public abstract class BaseDBTCI<C extends JdbcDatabaseContainer<C>> extends TCI<
 		final C container,
 		final String networkAlias,
 		final boolean migrateAndInitializeEMC,
-		final Supplier<EntityManagerControllerFactory> emcFactorySupplier)
+		final Supplier<EntityManagerControllerFactory<?, ?>> emcFactorySupplier)
 	{
 		super(container, networkAlias);
 		this.migrateAndInitializeEMC = migrateAndInitializeEMC;
@@ -127,18 +124,16 @@ public abstract class BaseDBTCI<C extends JdbcDatabaseContainer<C>> extends TCI<
 			return;
 		}
 		
-		final EntityManagerControllerFactory emcFactory = this.emcFactorySupplier.get();
-		this.emc = emcFactory
+		this.emc = this.createEMC(this.emcFactorySupplier.get());
+	}
+	
+	protected EntityManagerController createEMC(final EntityManagerControllerFactory<?, ?> factory)
+	{
+		return factory
 			.withDriverFullClassName(this.driverClazz().getName())
-			// Use production-ready pool; otherwise Hibernate warnings occur
-			.withConnectionProviderClassName(HikariCPConnectionProvider.class.getName())
 			.withJdbcUrl(this.getExternalJDBCUrl())
 			.withUsername(this.username)
 			.withPassword(this.password)
-			.withAdditionalConfig(Map.ofEntries(
-				// Use caching scanner to massively improve performance (this way the scanning only happens once)
-				Map.entry(PersistenceSettings.SCANNER, CachingStandardScanner.instance())
-			))
 			.build();
 	}
 	

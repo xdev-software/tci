@@ -1,3 +1,9 @@
+# 2.3.0
+* Modularized ``db-jdbc-orm`` into ``db-jdbc``, ``db-jdbc-spring-orm`` and ``db-jdbc-spring-orm-hibernate`` #330
+  * Packages might be slightly different
+  * In case of doubt migrate to ``db-jdbc-spring-orm-hibernate``
+* Deprecated ``CachedEntityAnnotatedClassNameFinder`` use ``DynamicClassFinder`` instead
+
 # 2.2.4
 * ``oidc-server-mock``
   * Split ``addUser`` into better customizable methods
