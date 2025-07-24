@@ -15,35 +15,21 @@
  */
 package software.xdev.tci.oidc.factory;
 
-import java.time.Duration;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import org.apache.hc.core5.http.HttpStatus;
-import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
-import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
-import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
-
-import software.xdev.tci.envperf.EnvironmentPerformance;
-import software.xdev.tci.factory.prestart.PreStartableTCIFactory;
 import software.xdev.tci.factory.prestart.config.PreStartConfig;
-import software.xdev.tci.misc.ContainerMemory;
 import software.xdev.tci.oidc.OIDCTCI;
 import software.xdev.tci.oidc.containers.OIDCServerContainer;
 
 
-public class OIDCTCIFactory extends PreStartableTCIFactory<OIDCServerContainer, OIDCTCI>
+public class OIDCTCIFactory extends BaseOIDCTCIFactory<OIDCTCIFactory, OIDCServerContainer, OIDCTCI>
 {
-	private static final String DEFAULT_CONTAINER_LOGGER_NAME = "container.oidc";
-	private static final String DEFAULT_CONTAINER_BASE_NAME = "oidc";
-	private static final String DEFAULT_NAME = "OIDC";
-	
 	public OIDCTCIFactory(
 		final BiFunction<OIDCServerContainer, String, OIDCTCI> infraBuilder,
 		final Supplier<OIDCServerContainer> containerBuilder)
 	{
-		super(infraBuilder, containerBuilder, DEFAULT_CONTAINER_BASE_NAME, DEFAULT_CONTAINER_LOGGER_NAME,
-			DEFAULT_NAME);
+		super(infraBuilder, containerBuilder);
 	}
 	
 	public OIDCTCIFactory(
@@ -52,9 +38,7 @@ public class OIDCTCIFactory extends PreStartableTCIFactory<OIDCServerContainer, 
 		final PreStartConfig config,
 		final Timeouts timeouts)
 	{
-		super(
-			infraBuilder, containerBuilder,
-			DEFAULT_CONTAINER_BASE_NAME, DEFAULT_CONTAINER_LOGGER_NAME, DEFAULT_NAME, config, timeouts);
+		super(infraBuilder, containerBuilder, config, timeouts);
 	}
 	
 	public OIDCTCIFactory(
@@ -88,29 +72,9 @@ public class OIDCTCIFactory extends PreStartableTCIFactory<OIDCServerContainer, 
 	{
 		super(
 			infraBuilder,
-			OIDCTCIFactory::createDefaultContainer,
+			BaseOIDCTCIFactory::createDefaultContainer,
 			DEFAULT_CONTAINER_BASE_NAME,
 			DEFAULT_CONTAINER_LOGGER_NAME,
 			DEFAULT_NAME);
-	}
-	
-	@SuppressWarnings({"resource", "checkstyle:MagicNumber"})
-	public static OIDCServerContainer createDefaultContainer()
-	{
-		return new OIDCServerContainer()
-			.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M))
-			.waitingFor(
-				new WaitAllStrategy()
-					.withStartupTimeout(Duration.ofSeconds(40L + 20L * EnvironmentPerformance.cpuSlownessFactor()))
-					.withStrategy(new HostPortWaitStrategy())
-					.withStrategy(
-						new HttpWaitStrategy()
-							.forPort(OIDCServerContainer.PORT)
-							.forPath("/")
-							.forStatusCode(HttpStatus.SC_OK)
-							.withReadTimeout(Duration.ofSeconds(10))
-					)
-			)
-			.withDefaultEnvConfig();
 	}
 }

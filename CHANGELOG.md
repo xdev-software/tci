@@ -1,3 +1,7 @@
+# 2.4.0
+* ``oidc-server-mock``
+  * Improved extensibility by creating abstract base classes
+
 # 2.3.0
 * Modularized ``db-jdbc-orm`` into ``db-jdbc``, ``db-jdbc-spring-orm`` and ``db-jdbc-spring-orm-hibernate`` #330
   * Packages might be slightly different
