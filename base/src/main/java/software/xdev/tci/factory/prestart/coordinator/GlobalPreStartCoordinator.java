@@ -16,7 +16,7 @@
 package software.xdev.tci.factory.prestart.coordinator;
 
 import software.xdev.tci.factory.prestart.PreStartableTCIFactory;
-import software.xdev.tci.serviceloading.TCIServiceLoader;
+import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
 
 
 public interface GlobalPreStartCoordinator extends AutoCloseable
@@ -30,11 +30,11 @@ public interface GlobalPreStartCoordinator extends AutoCloseable
 	
 	static GlobalPreStartCoordinator instance()
 	{
-		return TCIServiceLoader.instance().service(GlobalPreStartCoordinator.class);
+		return TCIServiceLoaderHolder.instance().service(GlobalPreStartCoordinator.class);
 	}
 	
 	static boolean isPresent()
 	{
-		return TCIServiceLoader.instance().isLoaded(GlobalPreStartCoordinator.class);
+		return TCIServiceLoaderHolder.instance().isLoaded(GlobalPreStartCoordinator.class);
 	}
 }

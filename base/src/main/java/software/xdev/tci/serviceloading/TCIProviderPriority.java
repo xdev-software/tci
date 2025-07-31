@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * Priority of a provider for {@link TCIServiceLoader}.
+ * Priority of a provider for {@link TCIServiceLoaderHolder}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

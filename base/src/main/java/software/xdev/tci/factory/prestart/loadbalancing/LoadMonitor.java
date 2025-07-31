@@ -17,7 +17,7 @@ package software.xdev.tci.factory.prestart.loadbalancing;
 
 import java.util.OptionalDouble;
 
-import software.xdev.tci.serviceloading.TCIServiceLoader;
+import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
 
 
 /**
@@ -35,6 +35,6 @@ public interface LoadMonitor
 	
 	static LoadMonitor instance()
 	{
-		return TCIServiceLoader.instance().service(LoadMonitor.class);
+		return TCIServiceLoaderHolder.instance().service(LoadMonitor.class);
 	}
 }

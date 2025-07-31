@@ -9,7 +9,7 @@ import software.xdev.tci.dummyinfra.DummyTCI;
 import software.xdev.tci.dummyinfra.factory.DummyTCIFactory;
 import software.xdev.tci.factory.prestart.config.PreStartConfig;
 import software.xdev.tci.factory.registry.TCIFactoryRegistry;
-import software.xdev.tci.serviceloading.TCIServiceLoader;
+import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
 
 
 class PreStartDemoTest
@@ -23,7 +23,8 @@ class PreStartDemoTest
 	static void beforeAll()
 	{
 		// Force enable PreStarting
-		TCIServiceLoader.instance().forceOverwrite(PreStartConfig.class, new PreStartConfig()
+		TCIServiceLoaderHolder.instance().forceOverwrite(
+			PreStartConfig.class, new PreStartConfig()
 		{
 			@Override
 			public boolean enabled()

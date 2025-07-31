@@ -41,7 +41,7 @@ import software.xdev.tci.misc.ContainerMemory;
 import software.xdev.tci.selenium.BrowserTCI;
 import software.xdev.tci.selenium.containers.SeleniumBrowserWebDriverContainer;
 import software.xdev.tci.selenium.factory.config.BrowserTCIFactoryConfig;
-import software.xdev.tci.serviceloading.TCIServiceLoader;
+import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
 import software.xdev.testcontainers.selenium.containers.recorder.SeleniumRecordingContainer;
 
 
@@ -51,7 +51,7 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 	
 	public BrowserTCIFactory(final MutableCapabilities capabilities)
 	{
-		this(capabilities, TCIServiceLoader.instance().service(BrowserTCIFactoryConfig.class));
+		this(capabilities, TCIServiceLoaderHolder.instance().service(BrowserTCIFactoryConfig.class));
 	}
 	
 	@SuppressWarnings({"resource", "checkstyle:MagicNumber"})
