@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="FORMAT" timestamp="1753966032624">
+    <module artifactId="db-jdbc-spring-orm" groupId="software.xdev.tci" version="2.4.1"/>
+    <files>
+        <file path="src/main/java/software/xdev/tci/db/persistence/SpringEntityManagerControllerFactory.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/persistence/classfinder/AnnotatedClassFinder.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/persistence/classfinder/CachedEntityAnnotatedClassNameFinder.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/persistence/classfinder/DynamicClassFinder.java" result="NOOP"/>
+    </files>
+</licensePluginReport>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="FORMAT" timestamp="1753966025605">
+    <module artifactId="mockserver" groupId="software.xdev.tci" version="2.4.1"/>
+    <files>
+        <file path="src/main/java/software/xdev/tci/mockserver/MockServerTCI.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/mockserver/factory/MockServerTCIFactory.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/mockserver/factory/PreStartableMockServerTCIFactory.java" result="NOOP"/>
+    </files>
+</licensePluginReport>

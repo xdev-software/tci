@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="FORMAT" timestamp="1753966037163">
+    <module artifactId="db-jdbc-spring-orm-hibernate" groupId="software.xdev.tci" version="2.4.1"/>
+    <files>
+        <file path="src/main/java/software/xdev/tci/db/persistence/hibernate/CachingStandardScanner.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/persistence/hibernate/DisableHibernateFormatMapper.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/db/persistence/hibernate/HibernateEntityManagerControllerFactory.java" result="NOOP"/>
+    </files>
+</licensePluginReport>
