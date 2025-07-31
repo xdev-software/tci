@@ -57,6 +57,7 @@ public class TCIServiceLoader
 	 * @implNote This method uses best effort thread safety. It WILL fail when another Thread that didn't inherit from
 	 * the current Thread is causing a deadlock, for example <code>ForkJoinPool.commonPool</code>
 	 */
+	@SuppressWarnings("PMD.AvoidSynchronizedStatement")
 	protected <T> void initService(final Class<T> clazz)
 	{
 		final LinkedHashSet<Class<?>> detectRecursiveInitServices;
