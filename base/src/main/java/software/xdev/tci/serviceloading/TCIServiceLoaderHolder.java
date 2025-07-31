@@ -13,31 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package software.xdev.tci.envperf;
+package software.xdev.tci.serviceloading;
 
-import software.xdev.tci.envperf.impl.TCIEnvironmentPerformance;
-import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
-
-
-/**
- * Describes the Performance of the Environment where TCI is running.
- */
-public final class EnvironmentPerformance
+public final class TCIServiceLoaderHolder
 {
-	/**
-	 * @see TCIEnvironmentPerformance#cpuSlownessFactor()
-	 */
-	public static int cpuSlownessFactor()
+	static final TCIServiceLoader INSTANCE = new TCIServiceLoader();
+	
+	public static TCIServiceLoader instance()
 	{
-		return impl().cpuSlownessFactor();
+		return INSTANCE;
 	}
 	
-	public static TCIEnvironmentPerformance impl()
-	{
-		return TCIServiceLoaderHolder.instance().service(TCIEnvironmentPerformance.class);
-	}
-	
-	private EnvironmentPerformance()
+	private TCIServiceLoaderHolder()
 	{
 	}
 }

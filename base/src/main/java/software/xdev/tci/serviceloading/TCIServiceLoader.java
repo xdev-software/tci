@@ -16,50 +16,116 @@
 package software.xdev.tci.serviceloading;
 
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 
 /**
  * Central point for service loading
  */
-@SuppressWarnings("java:S6548")
-public final class TCIServiceLoader
+@SuppressWarnings({"java:S6548", "java:S2789"}) // Don't force us to write our own Optional!?!
+public class TCIServiceLoader
 {
-	private static final TCIServiceLoader INSTANCE = new TCIServiceLoader();
+	protected final Object globalInitServiceLockHandlerLock = new Object();
+	protected final InheritableThreadLocal<LinkedHashSet<Class<?>>> tlDetectRecursiveInitServices =
+		new InheritableThreadLocal<>();
+	protected final Map<Class<?>, ReentrantLock> servicesLoadingSyncLocks = new ConcurrentHashMap<>();
+	protected final Map<Class<?>, Optional<?>> loadedServices = new ConcurrentHashMap<>();
 	
-	public static TCIServiceLoader instance()
-	{
-		return INSTANCE;
-	}
-	
-	private final Map<Class<?>, Object> loadedServices = new ConcurrentHashMap<>();
-	
-	private TCIServiceLoader()
-	{
-	}
-	
-	@SuppressWarnings("unchecked")
 	public <T> T service(final Class<T> clazz)
 	{
-		return (T)this.loadedServices.computeIfAbsent(
-			clazz,
-			c -> ServiceLoader.load(clazz)
-				.stream()
-				// Get by highest priority
-				.max(Comparator.comparingInt(p ->
-					Optional.ofNullable(p.type().getAnnotation(TCIProviderPriority.class))
-						.map(TCIProviderPriority::value)
-						.orElse(TCIProviderPriority.DEFAULT_PRIORITY)))
-				.map(ServiceLoader.Provider::get)
-				.orElse(null));
+		// Do not use computeIfAbsent here. This might cause "recursive updates" exceptions.
+		// These are usually not recursive, there is just a call here doing another call with a different type
+		// Recursive updates will be detected by initService
+		
+		if(!this.loadedServices.containsKey(clazz))
+		{
+			this.initService(clazz);
+		}
+		
+		return this.loadedServices.get(clazz)
+			.map(clazz::cast)
+			.orElse(null);
+	}
+	
+	/**
+	 * @implNote This method uses best effort thread safety. It WILL fail when another Thread that didn't inherit from
+	 * the current Thread is causing a deadlock, for example <code>ForkJoinPool.commonPool</code>
+	 */
+	@SuppressWarnings("PMD.AvoidSynchronizedStatement")
+	protected <T> void initService(final Class<T> clazz)
+	{
+		final LinkedHashSet<Class<?>> detectRecursiveInitServices;
+		final ReentrantLock lock;
+		synchronized(this.globalInitServiceLockHandlerLock)
+		{
+			detectRecursiveInitServices = Optional.ofNullable(this.tlDetectRecursiveInitServices.get())
+				.map(LinkedHashSet::new)
+				.orElseGet(LinkedHashSet::new);
+			
+			if(detectRecursiveInitServices.contains(clazz))
+			{
+				throw new IllegalStateException("Detected recursive initialization on "
+					+ clazz
+					+ "; chain trying class creation: "
+					+ detectRecursiveInitServices.stream()
+					.map(Class::getName)
+					.collect(Collectors.joining(" -> ")));
+			}
+			
+			detectRecursiveInitServices.add(clazz);
+			this.tlDetectRecursiveInitServices.set(detectRecursiveInitServices);
+			
+			lock = this.servicesLoadingSyncLocks.computeIfAbsent(
+				clazz,
+				ignored -> new ReentrantLock());
+			lock.lock();
+		}
+		
+		try
+		{
+			// Already initialized?
+			if(this.loadedServices.containsKey(clazz))
+			{
+				return;
+			}
+			
+			this.loadedServices.put(clazz, this.loadService(clazz));
+		}
+		finally
+		{
+			synchronized(this.globalInitServiceLockHandlerLock)
+			{
+				detectRecursiveInitServices.remove(clazz);
+				this.tlDetectRecursiveInitServices.set(detectRecursiveInitServices);
+				
+				this.servicesLoadingSyncLocks.remove(clazz);
+				lock.unlock();
+			}
+		}
+	}
+	
+	protected <T> Optional<T> loadService(final Class<T> clazz)
+	{
+		return ServiceLoader.load(clazz)
+			.stream()
+			// Get by highest priority
+			.max(Comparator.comparingInt(p ->
+				Optional.ofNullable(p.type().getAnnotation(TCIProviderPriority.class))
+					.map(TCIProviderPriority::value)
+					.orElse(TCIProviderPriority.DEFAULT_PRIORITY)))
+			.map(ServiceLoader.Provider::get);
 	}
 	
 	public boolean isLoaded(final Class<?> clazz)
 	{
-		return this.loadedServices.get(clazz) != null;
+		final Optional<?> optImpl = this.loadedServices.get(clazz);
+		return optImpl != null && optImpl.isPresent();
 	}
 	
 	/**
@@ -68,8 +134,8 @@ public final class TCIServiceLoader
 	 * WARNING: Usage not recommended. Should only be used as last resort!
 	 * </p>
 	 */
-	public Object forceOverwrite(final Class<?> clazz, final Object value)
+	public void forceOverwrite(final Class<?> clazz, final Object value)
 	{
-		return this.loadedServices.put(clazz, value);
+		this.loadedServices.put(clazz, Optional.ofNullable(value));
 	}
 }

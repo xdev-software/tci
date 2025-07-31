@@ -15,7 +15,7 @@
  */
 package software.xdev.tci.factory.prestart.config;
 
-import software.xdev.tci.serviceloading.TCIServiceLoader;
+import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
 
 
 public interface PreStartConfig
@@ -91,6 +91,6 @@ public interface PreStartConfig
 	
 	static PreStartConfig instance()
 	{
-		return TCIServiceLoader.instance().service(PreStartConfig.class);
+		return TCIServiceLoaderHolder.instance().service(PreStartConfig.class);
 	}
 }

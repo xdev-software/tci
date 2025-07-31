@@ -21,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
 
 import software.xdev.tci.TCI;
 import software.xdev.tci.factory.TCIFactory;
-import software.xdev.tci.serviceloading.TCIServiceLoader;
+import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
 
 
 /**
@@ -45,6 +45,6 @@ public interface TCIFactoryRegistry
 	
 	static TCIFactoryRegistry instance()
 	{
-		return TCIServiceLoader.instance().service(TCIFactoryRegistry.class);
+		return TCIServiceLoaderHolder.instance().service(TCIFactoryRegistry.class);
 	}
 }

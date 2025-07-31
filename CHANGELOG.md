@@ -1,3 +1,6 @@
+# 2.4.1
+* Fixed random "recursive update during ServiceLoading" exception #342
+
 # 2.4.0
 * ``oidc-server-mock``
   * Improved extensibility by creating abstract base classes

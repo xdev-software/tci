@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import software.xdev.tci.factory.TCIFactory;
 import software.xdev.tci.factory.registry.TCIFactoryRegistry;
-import software.xdev.tci.serviceloading.TCIServiceLoader;
+import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
 import software.xdev.tci.tracing.config.TracingConfig;
 
 
@@ -60,7 +60,7 @@ public class TCITracingAgent implements TestExecutionListener
 	@Override
 	public void testPlanExecutionStarted(final TestPlan testPlan)
 	{
-		this.config = TCIServiceLoader.instance().service(TracingConfig.class);
+		this.config = TCIServiceLoaderHolder.instance().service(TracingConfig.class);
 		if(!this.config.enabled())
 		{
 			return;

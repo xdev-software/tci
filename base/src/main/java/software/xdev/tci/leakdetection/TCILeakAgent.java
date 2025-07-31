@@ -37,7 +37,7 @@ import software.xdev.tci.TCI;
 import software.xdev.tci.factory.TCIFactory;
 import software.xdev.tci.factory.registry.TCIFactoryRegistry;
 import software.xdev.tci.leakdetection.config.LeakDetectionConfig;
-import software.xdev.tci.serviceloading.TCIServiceLoader;
+import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
 
 
 /**
@@ -58,7 +58,7 @@ public class TCILeakAgent implements TestExecutionListener
 	@Override
 	public void testPlanExecutionStarted(final TestPlan testPlan)
 	{
-		this.config = TCIServiceLoader.instance().service(LeakDetectionConfig.class);
+		this.config = TCIServiceLoaderHolder.instance().service(LeakDetectionConfig.class);
 		if(!this.config.enabled())
 		{
 			return;
