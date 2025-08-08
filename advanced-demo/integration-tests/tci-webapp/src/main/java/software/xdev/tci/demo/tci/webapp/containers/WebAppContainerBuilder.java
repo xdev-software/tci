@@ -54,7 +54,7 @@ public final class WebAppContainerBuilder
 					"Dockerfile",
 					// Ignore not required test-modules that may have changed
 					// sources only - otherwise the parent pom doesn't find the resources
-					"integration-tests/*/src/**",
+					"integration-tests/**",
 					"**/src/test/**",
 					// Ignore resources that are just used for development
 					"webapp/src/main/resources-dev/**",
