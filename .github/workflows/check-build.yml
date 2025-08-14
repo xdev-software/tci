@@ -20,7 +20,7 @@ on:
       - 'assets/**'
 
 env:
-  PRIMARY_MAVEN_MODULE: ${{ github.event.repository.name }}
+  DEMO_MAVEN_MODULE: ${{ github.event.repository.name }}-demo
 
 jobs:
   build:
@@ -33,7 +33,7 @@ jobs:
         distribution: [temurin]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       
     - name: Set up JDK
       uses: actions/setup-java@v4
@@ -74,7 +74,7 @@ jobs:
         distribution: [temurin]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       
     - name: Set up JDK
       uses: actions/setup-java@v4
@@ -97,7 +97,7 @@ jobs:
         distribution: [temurin]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Set up JDK
       uses: actions/setup-java@v4
