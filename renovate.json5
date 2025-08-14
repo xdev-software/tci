@@ -53,6 +53,14 @@
       "allowedVersions": "<=100"
     },
     {
+      "description": "MariaDB - Ignore non LTS version",
+      "packagePattern": "^mariadb",
+      "datasources": [
+        "docker"
+      ],
+      "allowedVersions": "<=11"
+    },
+    {
       "description": "Group org.testcontainers",
       "matchPackagePatterns": [
         "^org.testcontainers"
