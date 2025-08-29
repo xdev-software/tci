@@ -33,11 +33,11 @@ import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
 public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEntityManagerControllerFactory<SELF>>
 	extends EntityManagerControllerFactory<SELF, MutablePersistenceUnitInfo>
 {
-	public SpringEntityManagerControllerFactory()
+	protected SpringEntityManagerControllerFactory()
 	{
 	}
 	
-	public SpringEntityManagerControllerFactory(final Supplier<Set<String>> entityClassesFinder)
+	protected SpringEntityManagerControllerFactory(final Supplier<Set<String>> entityClassesFinder)
 	{
 		super(entityClassesFinder);
 	}
