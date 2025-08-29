@@ -20,13 +20,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+import org.rnorth.ducttape.timeouts.Timeouts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
+
+import software.xdev.tci.envperf.EnvironmentPerformance;
 
 
 /**
@@ -119,7 +123,7 @@ public class SafeNamedContainerStarter<C extends GenericContainer<?>> implements
 		}
 	}
 	
-	@SuppressWarnings("resource")
+	@SuppressWarnings({"resource", "checkstyle:MagicNumber"})
 	protected void tryCleanupContainerAfterStartFail(final List<String> containerNames)
 	{
 		for(final String containerName : containerNames)
@@ -127,15 +131,20 @@ public class SafeNamedContainerStarter<C extends GenericContainer<?>> implements
 			LOG.info("Start of container[name='{}'] failed; Trying to remove container...", containerName);
 			try
 			{
-				DockerClientFactory.lazyClient()
-					.removeContainerCmd(containerName)
-					.withForce(true)
-					.exec();
+				Timeouts.doWithTimeout(
+					25 + EnvironmentPerformance.cpuSlownessFactor() * 5,
+					TimeUnit.SECONDS,
+					// It is possible for Docker to somehow get stuck here
+					// see https://github.com/xdev-software/tci/issues/370
+					() -> DockerClientFactory.lazyClient()
+						.removeContainerCmd(containerName)
+						.withForce(true)
+						.exec());
 				LOG.info("Removed failed container[name='{}']", containerName);
 			}
 			catch(final Exception ex)
 			{
-				LOG.debug("Unable to cleanup container[name='{}']", containerName, ex);
+				LOG.warn("Unable to cleanup container[name='{}']", containerName, ex);
 			}
 		}
 	}

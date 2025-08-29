@@ -1,3 +1,6 @@
+# 2.5.1
+* Use timeout in ``SafeNamedContainerStarter#tryCleanupContainerAfterStartFail`` to prevent app/thread hang #370
+
 # 2.5.0
 * Improved overall error handling and logging when unexpected errors occur during the start of infra
   * Improved retrying in ``BaseTCIFactory``. Now unexpected problems that require a retry are logged/reported.
