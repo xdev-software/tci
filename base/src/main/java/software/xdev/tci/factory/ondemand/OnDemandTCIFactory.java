@@ -21,7 +21,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.rnorth.ducttape.unreliables.Unreliables;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
@@ -82,9 +81,8 @@ public class OnDemandTCIFactory<C extends GenericContainer<C>, I extends TCI<C>>
 		this.log().info("Getting new infra");
 		final long startTime = System.currentTimeMillis();
 		
-		final I infra = this.registerReturned(Unreliables.retryUntilSuccess(
-			this.getNewTryCount,
-			() -> this.newInternal(network, buildContainerCustomizer)));
+		final I infra = this.getNewWithRetryAndRegisterReturned(
+			() -> this.newInternal(network, buildContainerCustomizer));
 		
 		final long ms = System.currentTimeMillis() - startTime;
 		this.log().info("Got new infra, took {}ms", ms);

@@ -16,9 +16,11 @@
 package software.xdev.tci.db.containers;
 
 import java.sql.Connection;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.rnorth.ducttape.TimeoutException;
+import org.rnorth.ducttape.ratelimits.RateLimiter;
 import org.rnorth.ducttape.ratelimits.RateLimiterBuilder;
 import org.rnorth.ducttape.unreliables.Unreliables;
 import org.testcontainers.containers.ContainerLaunchException;
@@ -29,14 +31,18 @@ import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
 
+import software.xdev.tci.envperf.EnvironmentPerformance;
+
 
 public interface WaitableJDBCContainer extends WaitStrategyTarget
 {
+	@SuppressWarnings("checkstyle:MagicNumber")
 	default WaitStrategy completeJDBCWaitStrategy()
 	{
 		return new WaitAllStrategy()
 			.withStrategy(Wait.defaultWaitStrategy())
-			.withStrategy(new JDBCWaitStrategy());
+			.withStrategy(new JDBCWaitStrategy())
+			.withStartupTimeout(Duration.ofSeconds(40L + EnvironmentPerformance.cpuSlownessFactor() * 20L));
 	}
 	
 	WaitStrategy getWaitStrategy();
@@ -102,15 +108,23 @@ public interface WaitableJDBCContainer extends WaitStrategyTarget
 			);
 		}
 		
-		@SuppressWarnings("unused") // Variable might be used by extension
+		@SuppressWarnings({"unused", "checkstyle:MagicNumber"}) // Parameter might be used by extension
 		protected boolean waitUntilJDBCConnectionValidated(
 			final JdbcDatabaseContainer<?> container,
 			final Connection connection)
 		{
+			final RateLimiter validateJDBCRateLimiter = RateLimiterBuilder.newBuilder()
+				.withRate(50, TimeUnit.MILLISECONDS)
+				.withConstantThroughput()
+				.build();
+			
 			return Unreliables.retryUntilSuccess(
-				Math.max((int)this.startupTimeout.getSeconds() / 2, 1),
+				// If this fails after startupTimeout / 2 (min=3s, max=30s)
+				// it might be possible that the connection is somehow corrupted or broken
+				// -> Build a new connection after that (see waitUntilJDBCValid)
+				Math.min(Math.max((int)this.startupTimeout.getSeconds() / 2, 3), 30),
 				TimeUnit.SECONDS,
-				() -> this.validateJDBCConnection(connection));
+				() -> validateJDBCRateLimiter.getWhenReady(() -> this.validateJDBCConnection(connection)));
 		}
 		
 		@SuppressWarnings("java:S112")

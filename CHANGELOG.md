@@ -1,3 +1,14 @@
+# 2.5.0
+* Improved overall error handling and logging when unexpected errors occur during the start of infra
+  * Improved retrying in ``BaseTCIFactory``. Now unexpected problems that require a retry are logged/reported.
+    * ``BaseTCIFactory#setGetNewTryCount`` was renamed to ``setGetNewTryCount``
+  * Added timeout for ``PreStartableTCIFactory#makeExposedPortsFix``
+    * defaults to ``90s``
+  * ``WaitableJDBCContainer`` increase default timeout (overall timeout was ``30s``, now at least ``60s``)
+    * This also now scales with the ``cpuSlownessFactor``
+  * Log when a commited image is being snapshoted and report lock changes
+* Updated dependencies
+
 # 2.4.1
 * Fixed random "recursive update during ServiceLoading" exception #342
 

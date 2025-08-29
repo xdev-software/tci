@@ -15,7 +15,9 @@
  */
 package software.xdev.tci.factory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -53,7 +55,7 @@ public abstract class BaseTCIFactory<
 	 * This helps with "Random" errors that occur during infra startup. For example when a port allocation fails.
 	 * </p>
 	 */
-	protected int getNewTryCount = 2;
+	protected int getNewAttempts = 2;
 	
 	protected BiFunction<C, String, I> infraBuilder;
 	protected final Supplier<C> containerBuilder;
@@ -129,6 +131,42 @@ public abstract class BaseTCIFactory<
 		});
 	}
 	
+	protected I getNewWithRetryAndRegisterReturned(final Supplier<I> supplier)
+	{
+		return this.registerReturned(this.getNewWithRetry(supplier));
+	}
+	
+	protected I getNewWithRetry(final Supplier<I> supplier)
+	{
+		final List<RuntimeException> failedTries = new ArrayList<>();
+		for(int attempt = 1; attempt <= this.getNewAttempts; attempt++)
+		{
+			try
+			{
+				return supplier.get();
+			}
+			catch(final RuntimeException ex)
+			{
+				if(attempt == this.getNewAttempts)
+				{
+					failedTries.forEach(ex::addSuppressed);
+					this.logger.error("All {}x attempts getting new infra failed", attempt);
+					throw ex;
+				}
+				this.logger.warn(
+					"Unexpected error while getting new infra on attempt {}/{}. "
+						+ "If you encounter this regularly please check "
+						+ "the configured timeouts and container resource limitations. "
+						+ "Retrying now",
+					attempt,
+					this.getNewAttempts,
+					ex);
+				failedTries.add(ex);
+			}
+		}
+		throw new IllegalStateException("attempts (" + this.getNewAttempts + ") is invalid");
+	}
+	
 	protected I registerReturned(final I infra)
 	{
 		this.returnedAndInUse.put(infra, new CompletableFuture<>());
@@ -159,13 +197,22 @@ public abstract class BaseTCIFactory<
 		return this.tracer;
 	}
 	
-	public void setGetNewTryCount(final int getNewTryCount)
+	public void setGetNewAttempts(final int attempts)
 	{
-		if(getNewTryCount <= 0)
+		if(attempts <= 0)
 		{
 			throw new IllegalArgumentException("must be greater than 0");
 		}
-		this.getNewTryCount = getNewTryCount;
+		this.getNewAttempts = attempts;
+	}
+	
+	/**
+	 * @deprecated Use {@link #setGetNewAttempts(int)} instead
+	 */
+	@Deprecated
+	public void setGetNewTryCount(final int attempts)
+	{
+		this.setGetNewAttempts(attempts);
 	}
 	
 	protected Logger log()
