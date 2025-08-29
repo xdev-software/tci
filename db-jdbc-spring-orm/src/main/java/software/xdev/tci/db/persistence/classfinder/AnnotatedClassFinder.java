@@ -93,12 +93,13 @@ public class AnnotatedClassFinder
 		try
 		{
 			final Class<?> clazz = Class.forName(metadataReader.getClassMetadata().getClassName());
-			return annotationClasses.stream()
-				.filter(annotation -> clazz.getAnnotation(annotation) != null)
-				.findFirst()
-				.orElse(null);
+			if(annotationClasses.stream().anyMatch(annotation ->
+				clazz.getAnnotation(annotation) != null))
+			{
+				return clazz;
+			}
 		}
-		catch(final Exception e)
+		catch(final Exception ignored)
 		{
 			// Nothing
 		}
