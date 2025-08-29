@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConf
 @EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class})
 public class Application
 {
+	@SuppressWarnings("PMD.AvoidSystemSetterCall")
 	public static void main(final String[] args)
 	{
 		System.setProperty(
