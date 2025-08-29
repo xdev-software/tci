@@ -160,7 +160,7 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 		RemoteDockerImage image = this.cachedImage.get();
 		if(this.waitForFirstSnapshot && image == null)
 		{
-			LOG.debug("Will wait for first snapshot for {}", container.getClass());
+			LOG.info("Will wait for first snapshot for {}", container.getClass());
 			this.waitForFirstSnapshotLock.lock();
 			image = this.cachedImage.get();
 			if(image == null)
@@ -225,6 +225,8 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 				+ "-"
 				+ this.hashCode();
 			
+			LOG.info("Creating cached image {} for {}", name, container.getContainerName());
+			
 			@SuppressWarnings({"resource", "java:S1874", "deprecation"})
 			final String commitedSha = DockerClientFactory.lazyClient()
 				.commitCmd(container.getContainerId())
@@ -233,7 +235,7 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 				.exec();
 			LOG.info("Created cached image {}/{} for {}", name, commitedSha, container.getContainerName());
 			this.cachedImage.set(new RemoteDockerImage(DockerImageName.parse(name))
-				.withImagePullPolicy(ignored2 -> false));
+				.withImagePullPolicy(ignored -> false));
 			
 			if(afterCommit != null)
 			{
@@ -300,7 +302,7 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 		{
 			this.waitForFirstSnapshotLock.unlock();
 			this.waitForFirstSnapshotContainer.set(null);
-			LOG.debug("Unlocked wait for first snapshot {}", container.getClass());
+			LOG.info("Unlocked wait for first snapshot {}", container.getClass());
 		}
 	}
 }

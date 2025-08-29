@@ -31,7 +31,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.rnorth.ducttape.unreliables.Unreliables;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
@@ -292,8 +291,12 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 						// Fix ports for network attach later
 						if(directAttachNetwork == null && this.fixateExposedPortsIfRequired)
 						{
-							PortFixation.makeExposedPortsFix(container);
+							org.rnorth.ducttape.timeouts.Timeouts.doWithTimeout(
+								(int)this.timeouts.getMakeExposedPortsFixTimeout().toMillis(),
+								TimeUnit.MILLISECONDS,
+								() -> PortFixation.makeExposedPortsFix(container));
 						}
+						
 						this.runIfSnapshotManager(sm -> sm.tryReuse(container));
 						
 						infra.start(this.containerBaseName
@@ -334,12 +337,16 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 		this.log().info("[{}] Getting a new infra; Timeout={}", this.name, this.timeouts.getAcquireTimeout());
 		final long startTime = System.currentTimeMillis();
 		
-		final StartingInfra<I> startingInfra =
-			this.isPreStartingDisabled()
-				? this.bootNew(directAttachNetwork)
-				// Try to use preStarting from queue or else boot a new one
-				: Optional.ofNullable(this.preStartQueue.poll())
-				.orElseGet(() -> this.bootNew(directAttachNetwork));
+		StartingInfra<I> startingInfra = null;
+		if(!this.isPreStartingDisabled())
+		{
+			// Try to use preStarting from queue
+			startingInfra = this.preStartQueue.poll();
+		}
+		if(startingInfra == null)
+		{
+			startingInfra = this.bootNew(directAttachNetwork);
+		}
 		
 		try
 		{
@@ -448,9 +455,7 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 		this.log().info("Getting new infra");
 		final long startTime = System.currentTimeMillis();
 		
-		final I infra = this.registerReturned(Unreliables.retryUntilSuccess(
-			this.getNewTryCount,
-			() -> this.newInternal(network, aliases)));
+		final I infra = this.getNewWithRetryAndRegisterReturned(() -> this.newInternal(network, aliases));
 		
 		final long startTimePostProcess = System.currentTimeMillis();
 		this.postProcessNew(infra);
@@ -546,8 +551,15 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 	
 	public static class Timeouts
 	{
+		private Duration makeExposedPortsFixTimeout = Duration.ofSeconds(90);
 		private Duration acquireTimeout = Duration.ofMinutes(3);
 		private Duration connectToNetworkTimeout = Duration.ofMinutes(3);
+		
+		public Timeouts withMakeExposedPortsFixTimeout(final Duration makeExposedPortsFixTimeout)
+		{
+			this.makeExposedPortsFixTimeout = makeExposedPortsFixTimeout;
+			return this;
+		}
 		
 		public Timeouts withAcquireTimeout(final Duration acquireTimeout)
 		{
@@ -559,6 +571,11 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 		{
 			this.connectToNetworkTimeout = connectToNetworkTimeout;
 			return this;
+		}
+		
+		public Duration getMakeExposedPortsFixTimeout()
+		{
+			return this.makeExposedPortsFixTimeout;
 		}
 		
 		public Duration getAcquireTimeout()
