@@ -37,14 +37,6 @@ public class AnnotatedClassFinder
 {
 	@SuppressWarnings({"java:S1452", "java:S4968"}) // Returned so by stream
 	public List<? extends Class<?>> find(
-		final String basePackage,
-		final Class<? extends Annotation> annotationClazz)
-	{
-		return this.find(Set.of(basePackage), Set.of(annotationClazz));
-	}
-	
-	@SuppressWarnings({"java:S1452", "java:S4968"}) // Returned so by stream
-	public List<? extends Class<?>> find(
 		final Set<String> basePackages,
 		final Set<Class<? extends Annotation>> annotationClasses)
 	{
@@ -101,12 +93,13 @@ public class AnnotatedClassFinder
 		try
 		{
 			final Class<?> clazz = Class.forName(metadataReader.getClassMetadata().getClassName());
-			return annotationClasses.stream()
-				.filter(annotation -> clazz.getAnnotation(annotation) != null)
-				.findFirst()
-				.orElse(null);
+			if(annotationClasses.stream().anyMatch(annotation ->
+				clazz.getAnnotation(annotation) != null))
+			{
+				return clazz;
+			}
 		}
-		catch(final Exception e)
+		catch(final Exception ignored)
 		{
 			// Nothing
 		}

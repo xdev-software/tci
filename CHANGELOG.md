@@ -1,3 +1,6 @@
+# 2.5.2
+* Fix ``AnnotatedClassFinder`` returning the annotation and not the annotated class #373
+
 # 2.5.1
 * Use timeout in ``SafeNamedContainerStarter#tryCleanupContainerAfterStartFail`` to prevent app/thread hang #370
 
