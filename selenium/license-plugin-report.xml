@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="FORMAT" timestamp="1756736203226">
+    <module artifactId="selenium" groupId="software.xdev.tci" version="2.6.0"/>
+    <files>
+        <file path="src/main/java/software/xdev/tci/selenium/BrowserTCI.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/selenium/TestBrowser.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/selenium/containers/SeleniumBrowserWebDriverContainer.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/selenium/factory/BrowserTCIFactory.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/selenium/factory/BrowsersTCIFactory.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/selenium/factory/config/BrowserTCIFactoryConfig.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/selenium/factory/config/DefaultBrowserTCIFactoryConfig.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/selenium/testbase/SeleniumRecordingExtension.java" result="NOOP"/>
+    </files>
+</licensePluginReport>
