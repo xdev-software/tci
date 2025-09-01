@@ -33,6 +33,8 @@ import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
 public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEntityManagerControllerFactory<SELF>>
 	extends EntityManagerControllerFactory<SELF, MutablePersistenceUnitInfo>
 {
+	protected boolean addJarFileUrls;
+	
 	protected SpringEntityManagerControllerFactory()
 	{
 	}
@@ -42,13 +44,29 @@ public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEn
 		super(entityClassesFinder);
 	}
 	
+	/**
+	 * Should JAR files be added to scan for Entities, Converters, etc.?
+	 * <p>
+	 * This might impact performance because by default all JARs are scanned.
+	 * </p>
+	 * <p>
+	 * If possible please use the more performant
+	 * {@link SpringEntityManagerControllerFactory#SpringEntityManagerControllerFactory(Supplier)} instead.
+	 * </p>
+	 */
+	public SELF withAddJarFileUrls(final boolean addJarFileUrls)
+	{
+		this.addJarFileUrls = addJarFileUrls;
+		return this.self();
+	}
+	
 	@Override
 	protected MutablePersistenceUnitInfo createPersistenceUnitInfo()
 	{
 		final MutablePersistenceUnitInfo pui = new MutablePersistenceUnitInfo()
 		{
 			@Override
-			public void addTransformer(final ClassTransformer classTransformer)
+			public void addTransformer(final ClassTransformer ignored)
 			{
 				// Do nothing
 			}
@@ -62,7 +80,10 @@ public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEn
 		pui.setTransactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL);
 		pui.setPersistenceUnitName(this.persistenceUnitName);
 		
-		this.jarFileUrlsToAdd().forEach(pui::addJarFileUrl);
+		if(this.addJarFileUrls)
+		{
+			this.jarFileUrlsToAdd().forEach(pui::addJarFileUrl);
+		}
 		
 		return pui;
 	}
