@@ -1,3 +1,12 @@
+# 2.6.0
+* ``db-jdbc-spring-*``
+  * Added ``DynamicPersistenceClassFinder``
+    * Contains pre-defined methods for adding entities like ``withSearchForPersistenceClasses``
+    * Supersedes ``DynamicClassFinder``
+  * JAR file urls are no longer added automatically for scanning
+    * It's recommended to use ``DynamicPersistenceClassFinder`` as this is roughly 5-10x faster compared to Hibernate's JAR url scanning
+    * If you still require the default scanning use ``.withAddJarFileUrls(true)``
+
 # 2.5.2
 * Fix ``AnnotatedClassFinder`` returning the annotation and not the annotated class #373
 * Removed deprecated ``CachedEntityAnnotatedClassNameFinder``

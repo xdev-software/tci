@@ -5,12 +5,10 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import jakarta.persistence.Entity;
-
 import org.mariadb.jdbc.MariaDbDataSource;
 
 import software.xdev.tci.db.BaseDBTCI;
-import software.xdev.tci.db.persistence.classfinder.DynamicClassFinder;
+import software.xdev.tci.db.persistence.classfinder.DynamicPersistenceClassFinder;
 import software.xdev.tci.db.persistence.hibernate.HibernateEntityManagerControllerFactory;
 import software.xdev.tci.demo.persistence.FlywayInfo;
 import software.xdev.tci.demo.persistence.FlywayMigration;
@@ -25,8 +23,8 @@ public class DBTCI extends BaseDBTCI<DBContainer>
 	@SuppressWarnings("java:S2068") // This is a test calm down
 	public static final String DB_PASSWORD = "test";
 	
-	private static final DynamicClassFinder ENTITY_CLASSES_FINDER = new DynamicClassFinder()
-		.withSearchForAnnotatedClasses(DefaultJPAConfig.ENTITY_PACKAGE, Entity.class);
+	private static final DynamicPersistenceClassFinder ENTITY_CLASSES_FINDER = new DynamicPersistenceClassFinder()
+		.withSearchForPersistenceClasses(DefaultJPAConfig.ENTITY_PACKAGE);
 	
 	public DBTCI(
 		final DBContainer container,

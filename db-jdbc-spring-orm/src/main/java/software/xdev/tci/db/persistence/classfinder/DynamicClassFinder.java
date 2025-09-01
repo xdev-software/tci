@@ -15,106 +15,10 @@
  */
 package software.xdev.tci.db.persistence.classfinder;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-
 /**
- * Used to dynamically search for classes.
- * <p>
- * Utilizes caching and only searches for these classes once.
- * </p>
- * It's recommended to instantiate this in a static field/constant for optimal performance.
+ * @deprecated It's recommended to use {@link DynamicPersistenceClassFinder}
  */
-public class DynamicClassFinder implements Supplier<Set<String>>
+@Deprecated
+public class DynamicClassFinder extends AbstractDynamicClassFinder<DynamicClassFinder>
 {
-	protected Supplier<AnnotatedClassFinder> classFinderProvider = AnnotatedClassFinder::new;
-	protected final Set<AnnotatedClassFinderSearch> annotatedClassFinderSearches = new HashSet<>();
-	protected final Set<String> additionalClasses = new HashSet<>();
-	
-	protected Set<String> cache;
-	
-	public DynamicClassFinder()
-	{
-	}
-	
-	public DynamicClassFinder withClassFinderProvider(
-		final Supplier<AnnotatedClassFinder> classFinderProvider)
-	{
-		this.classFinderProvider = Objects.requireNonNull(classFinderProvider);
-		return this;
-	}
-	
-	public DynamicClassFinder withSearchForAnnotatedClasses(
-		final String basePackage,
-		final Class<? extends Annotation> annotationClazz)
-	{
-		return this.withSearchForAnnotatedClasses(basePackage, Set.of(annotationClazz));
-	}
-	
-	public DynamicClassFinder withSearchForAnnotatedClasses(
-		final Set<String> basePackages,
-		final Class<? extends Annotation> annotationClazz)
-	{
-		return this.withSearchForAnnotatedClasses(basePackages, Set.of(annotationClazz));
-	}
-	
-	public DynamicClassFinder withSearchForAnnotatedClasses(
-		final String basePackage,
-		final Set<Class<? extends Annotation>> annotationClasses)
-	{
-		return this.withSearchForAnnotatedClasses(Set.of(basePackage), annotationClasses);
-	}
-	
-	public DynamicClassFinder withSearchForAnnotatedClasses(
-		final Set<String> basePackages,
-		final Set<Class<? extends Annotation>> annotationClasses)
-	{
-		this.annotatedClassFinderSearches.add(new AnnotatedClassFinderSearch(basePackages, annotationClasses));
-		return this;
-	}
-	
-	public DynamicClassFinder withAdditionalClasses(final Collection<String> classNames)
-	{
-		this.additionalClasses.addAll(classNames);
-		return this;
-	}
-	
-	public DynamicClassFinder withAdditionalClass(final String className)
-	{
-		this.additionalClasses.add(className);
-		return this;
-	}
-	
-	@Override
-	public Set<String> get()
-	{
-		if(this.cache == null)
-		{
-			final AnnotatedClassFinder annotatedClassFinder = this.classFinderProvider.get();
-			this.cache = Stream.concat(
-					this.annotatedClassFinderSearches.stream()
-						.map(search -> annotatedClassFinder.find(search.basePackages(), search.annotationClasses()))
-						.flatMap(List::stream)
-						.distinct()
-						.map(Class::getName),
-					this.additionalClasses.stream())
-				.collect(Collectors.toSet());
-		}
-		return this.cache;
-	}
-	
-	protected record AnnotatedClassFinderSearch(
-		Set<String> basePackages,
-		Set<Class<? extends Annotation>> annotationClasses
-	)
-	{
-	}
 }
