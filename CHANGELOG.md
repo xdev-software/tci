@@ -1,3 +1,19 @@
+# 2.7.0
+* ExecutorService creation is now controlled centrally (`ExecutorServiceCreator`)
+  * All created ExecutorServices now use `VirtualThread`s on Java 21+
+* Use explicitly defined `ExecutorService` - wherever possible
+  * _Context_: `CompletableFuture#runAsync`, `CompletableFuture#supplyAsync` and `parallelStream` use Java's common pool.<br/>
+  However calling these methods is usually done (in TCI) for I/O tasks.<br/>
+  This might exhaust the common pool thus negatively impacting performance.<br/>
+  It was therefore decided to use dedicated pools instead.
+  * Stored in `TCIExecutorServiceHolder`
+  * Utilizes a `CachedThreadPool` (for Java `<` 21)
+    * On Java21+ it uses `VirtualThread`s for better scaling
+* Other minor improvements
+  * Add missing timeout when pulling `SeleniumRecordingContainer`
+  * Removed uses of `String.replaceAll("<Regex>", "")` and compiled pattern instead only once
+* Updated dependencies
+
 # 2.6.0
 * ``db-jdbc-spring-*``
   * Added ``DynamicPersistenceClassFinder``

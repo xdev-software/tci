@@ -18,6 +18,7 @@ package software.xdev.tci.tracing;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 
 public class TCITracer
@@ -41,6 +42,8 @@ public class TCITracer
 	
 	public static class Timed
 	{
+		protected static final Pattern PRETTY_PRINT_DURATION = Pattern.compile("(\\d[HMS])(?!$)");
+		
 		private long countCalled;
 		private long totalMs;
 		
@@ -96,9 +99,8 @@ public class TCITracer
 				return ms + "ms";
 			}
 			// https://stackoverflow.com/a/40487511
-			return Duration.ofMillis(ms).toString()
-				.substring(2)
-				.replaceAll("(\\d[HMS])(?!$)", "$1 ")
+			return PRETTY_PRINT_DURATION.matcher(Duration.ofMillis(ms).toString().substring(2))
+				.replaceAll("$1")
 				.toLowerCase();
 		}
 	}

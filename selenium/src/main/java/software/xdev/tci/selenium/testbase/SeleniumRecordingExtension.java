@@ -17,6 +17,7 @@ package software.xdev.tci.selenium.testbase;
 
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -30,6 +31,8 @@ import software.xdev.tci.selenium.BrowserTCI;
 public abstract class SeleniumRecordingExtension implements AfterTestExecutionCallback
 {
 	private static final Logger LOG = LoggerFactory.getLogger(SeleniumRecordingExtension.class);
+	
+	protected static final Pattern FILE_NAME_ALLOWED_CHARS = Pattern.compile("[^A-Za-z0-9#_-]");
 	
 	protected final Function<ExtensionContext, BrowserTCI> tciExtractor;
 	
@@ -73,8 +76,8 @@ public abstract class SeleniumRecordingExtension implements AfterTestExecutionCa
 					
 					private String cleanForFilename(final String str)
 					{
-						return str.replace(' ', '_')
-							.replaceAll("[^A-Za-z0-9#_-]", "")
+						return FILE_NAME_ALLOWED_CHARS.matcher(str.replace(' ', '_'))
+							.replaceAll("")
 							.toLowerCase();
 					}
 				}, context.getExecutionException());
