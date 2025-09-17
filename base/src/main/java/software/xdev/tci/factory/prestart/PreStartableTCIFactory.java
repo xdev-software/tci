@@ -20,10 +20,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
@@ -39,6 +37,9 @@ import com.github.dockerjava.api.command.ConnectToNetworkCmd;
 import com.github.dockerjava.api.model.ContainerNetwork;
 
 import software.xdev.tci.TCI;
+import software.xdev.tci.concurrent.ExecutorServiceCreator;
+import software.xdev.tci.concurrent.ExecutorServiceCreatorHolder;
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.factory.BaseTCIFactory;
 import software.xdev.tci.factory.prestart.config.PreStartConfig;
 import software.xdev.tci.factory.prestart.coordinator.GlobalPreStartCoordinator;
@@ -161,9 +162,7 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 	// endregion
 	protected final LinkedBlockingQueue<StartingInfra<I>> preStartQueue;
 	
-	protected final AtomicInteger nextThreadId = new AtomicInteger(1);
-	
-	protected final ThreadPoolExecutor executorService;
+	protected final ExecutorService executorService;
 	protected final AtomicInteger preStartCounter = new AtomicInteger(1);
 	
 	protected final Timeouts timeouts;
@@ -210,16 +209,11 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 		
 		final int maxAmountStartingSimultaneously = config.maxStartSimultan(name);
 		
-		final ThreadFactory threadFactory = r ->
-		{
-			final Thread t = new Thread(r);
-			t.setDaemon(true);
-			t.setName("InfraPreStarter-" + this.name + "-" + this.nextThreadId.getAndIncrement());
-			return t;
-		};
+		final String threadNamePrefix = "InfraPreStarter-" + this.name;
+		final ExecutorServiceCreator executorServiceCreator = ExecutorServiceCreatorHolder.instance();
 		this.executorService = maxAmountStartingSimultaneously < 0
-			? (ThreadPoolExecutor)Executors.newCachedThreadPool(threadFactory)
-			: (ThreadPoolExecutor)Executors.newFixedThreadPool(maxAmountStartingSimultaneously, threadFactory);
+			? executorServiceCreator.createUnlimited(threadNamePrefix)
+			: executorServiceCreator.createFixed(threadNamePrefix, maxAmountStartingSimultaneously);
 		
 		this.timeouts = Objects.requireNonNull(timeouts);
 		
@@ -433,7 +427,7 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 		
 		try
 		{
-			CompletableFuture.runAsync(connectToNetworkCmd::exec)
+			CompletableFuture.runAsync(connectToNetworkCmd::exec, TCIExecutorServiceHolder.instance())
 				.get(this.timeouts.getConnectToNetworkTimeout().toMillis(), TimeUnit.MILLISECONDS);
 		}
 		catch(final InterruptedException ie)
@@ -510,7 +504,7 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 					{
 						this.log().warn("[{}] Failed to shutdown infra", this.name, e);
 					}
-				}))
+				}, TCIExecutorServiceHolder.instance()))
 				.toList();
 			stopCFs.forEach(CompletableFuture::join);
 			// De-Ref for GC

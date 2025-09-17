@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 import org.testcontainers.images.RemoteDockerImage;
 
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.factory.TCIFactory;
 import software.xdev.tci.logging.JULtoSLF4JRedirector;
 import software.xdev.tci.selenium.BrowserTCI;
@@ -96,7 +97,7 @@ public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverCo
 				LoggerFactory.getLogger(this.getClass())
 					.warn("Failed to pull {}", SeleniumRecordingContainer.DEFAULT_IMAGE, e);
 			}
-		});
+		}, TCIExecutorServiceHolder.instance());
 		this.alreadyWarmedUp = true;
 	}
 	
@@ -116,7 +117,7 @@ public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverCo
 	public void close()
 	{
 		final List<CompletableFuture<Void>> cfFactories = this.browserFactories.values().stream()
-			.map(f -> CompletableFuture.runAsync(f::close))
+			.map(f -> CompletableFuture.runAsync(f::close, TCIExecutorServiceHolder.instance()))
 			.toList();
 		cfFactories.forEach(CompletableFuture::join);
 	}

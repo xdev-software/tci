@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import software.xdev.tci.TCI;
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.demo.tci.db.DBTCI;
 import software.xdev.tci.demo.tci.db.factory.DBTCIFactory;
 import software.xdev.tci.demo.tci.webapp.WebAppTCI;
@@ -103,10 +104,10 @@ abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 			this.network = LAZY_NETWORK_POOL.getNew();
 			
 			cfOIDC = CompletableFuture.supplyAsync(
-				() -> OIDC_INFRA_FACTORY.getNew(this.network, DNS_NAME_OIDC));
+				() -> OIDC_INFRA_FACTORY.getNew(this.network, DNS_NAME_OIDC), TCIExecutorServiceHolder.instance());
 			
 			cfApp = CompletableFuture.supplyAsync(
-				() -> APP_INFRA_FACTORY.getNew(this.network, DNS_NAME_WEBAPP));
+				() -> APP_INFRA_FACTORY.getNew(this.network, DNS_NAME_WEBAPP), TCIExecutorServiceHolder.instance());
 			
 			this.dbInfra = DB_INFRA_FACTORY.getNew(this.network, DNS_NAME_DB);
 			Optional.ofNullable(onDataBaseMigrated).ifPresent(c -> c.accept(this.dbInfra));
@@ -202,7 +203,7 @@ abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 			{
 				LOG.warn("Failed to stop WebDriver(async)", ex);
 			}
-		});
+		}, TCIExecutorServiceHolder.instance());
 		
 		this.remoteWebDriver = null;
 		this.browserInfra = null;
@@ -236,7 +237,7 @@ abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 			{
 				LOG.error("Failed to stop everything(async)", ex);
 			}
-		});
+		}, TCIExecutorServiceHolder.instance());
 		
 		this.appInfra = null;
 		this.oidcInfra = null;

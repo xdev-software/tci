@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import software.xdev.tci.TCI;
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.factory.TCIFactory;
 
 
@@ -64,7 +65,7 @@ public class DefaultTCIFactoryRegistry implements TCIFactoryRegistry
 	protected CompletableFuture<Void> warmUpFactory(final TCIFactory<?, ?> factory)
 	{
 		this.warmedUpFactories.add(factory);
-		return CompletableFuture.runAsync(factory::warmUp);
+		return CompletableFuture.runAsync(factory::warmUp, TCIExecutorServiceHolder.instance());
 	}
 	
 	@Override
