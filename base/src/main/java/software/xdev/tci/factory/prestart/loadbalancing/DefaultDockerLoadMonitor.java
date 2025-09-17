@@ -22,7 +22,6 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Map;
 import java.util.OptionalDouble;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -34,6 +33,7 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 
+import software.xdev.tci.concurrent.ExecutorServiceCreatorHolder;
 import software.xdev.tci.misc.http.HttpClientCloser;
 import software.xdev.tci.safestart.SafeNamedContainerStarter;
 
@@ -66,13 +66,7 @@ public class DefaultDockerLoadMonitor implements AutoCloseable, LoadMonitor
 			.connectTimeout(Duration.ofSeconds(5))
 			.build();
 		
-		this.scrapeExecutor = Executors.newScheduledThreadPool(1, r ->
-		{
-			final Thread t = new Thread(r);
-			t.setDaemon(true);
-			t.setName("DockerLoadMonitor");
-			return t;
-		});
+		this.scrapeExecutor = ExecutorServiceCreatorHolder.instance().createdSingleScheduled("DockerLoadMonitor");
 		this.scrape();
 		this.scrapeExecutor.scheduleAtFixedRate(this::scrape, 0, 1, TimeUnit.SECONDS);
 	}

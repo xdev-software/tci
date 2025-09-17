@@ -31,6 +31,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 
 import software.xdev.tci.TCI;
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.tracing.TCITracer;
 
 
@@ -128,7 +129,7 @@ public abstract class BaseTCIFactory<
 				this.log().warn("Failed to cleanup infra that failed during startup", stopEx);
 			}
 			this.tracer.timedAdd("infraStartFailCleanup", System.currentTimeMillis() - startTime);
-		});
+		}, TCIExecutorServiceHolder.instance());
 	}
 	
 	protected I getNewWithRetryAndRegisterReturned(final Supplier<I> supplier)

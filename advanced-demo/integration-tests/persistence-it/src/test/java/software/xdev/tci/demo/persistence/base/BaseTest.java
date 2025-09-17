@@ -18,6 +18,7 @@ import org.rnorth.ducttape.unreliables.Unreliables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.dao.DAOInjector;
 import software.xdev.tci.db.persistence.TransactionExecutor;
 import software.xdev.tci.demo.persistence.FlywayInfo;
@@ -136,7 +137,7 @@ abstract class BaseTest
 		if(this.dbInfra != null)
 		{
 			final DBTCI fDbInfra = this.dbInfra;
-			CompletableFuture.runAsync(fDbInfra::stop);
+			CompletableFuture.runAsync(fDbInfra::stop, TCIExecutorServiceHolder.instance());
 			
 			this.dbInfra = null;
 		}

@@ -35,6 +35,7 @@ import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.factory.prestart.PreStartableTCIFactory;
 import software.xdev.tci.factory.prestart.config.PreStartConfig;
 import software.xdev.tci.misc.ContainerMemory;
@@ -149,8 +150,9 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 	protected void postProcessNew(final BrowserTCI infra)
 	{
 		// Start recording container here otherwise there is a lot of blank video
-		final CompletableFuture<Void> cfStartRecorder =
-			CompletableFuture.runAsync(() -> infra.getContainer().startRecordingContainer());
+		final CompletableFuture<Void> cfStartRecorder = CompletableFuture.runAsync(
+			() -> infra.getContainer().startRecordingContainer(),
+			TCIExecutorServiceHolder.instance());
 		
 		// Docker needs a few milliseconds (usually less than 100) to reconfigure its networks
 		// In the meantime existing connections might fail if we go on immediately

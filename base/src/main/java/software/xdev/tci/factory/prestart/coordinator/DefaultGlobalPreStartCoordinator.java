@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import software.xdev.tci.concurrent.ExecutorServiceCreatorHolder;
 import software.xdev.tci.factory.prestart.PreStartableTCIFactory;
 import software.xdev.tci.factory.prestart.config.PreStartConfig;
 import software.xdev.tci.factory.prestart.loadbalancing.LoadMonitor;
@@ -53,13 +53,8 @@ public class DefaultGlobalPreStartCoordinator implements GlobalPreStartCoordinat
 	
 	public DefaultGlobalPreStartCoordinator()
 	{
-		this.preStartScheduler = Executors.newSingleThreadScheduledExecutor(r ->
-		{
-			final Thread t = new Thread(r);
-			t.setDaemon(true);
-			t.setName("Global-InfraPreStarter-Scheduler");
-			return t;
-		});
+		this.preStartScheduler = ExecutorServiceCreatorHolder.instance().createdSingleScheduled(
+			"Global-InfraPreStarter-Scheduler");
 		this.preStartScheduler.scheduleAtFixedRate(
 			this::schedulePreStart,
 			0,

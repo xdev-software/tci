@@ -19,15 +19,15 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import software.xdev.tci.concurrent.ExecutorServiceCreatorHolder;
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.factory.prestart.config.PreStartConfig;
 
 
@@ -60,7 +60,10 @@ public class LazyNetworkPool
 	
 	public LazyNetworkPool(final int size)
 	{
-		this(size, Executors.newCachedThreadPool(defaultThreadFactory()));
+		this(
+			size,
+			ExecutorServiceCreatorHolder.instance().createUnlimited(
+				"LazyNetworkPool-" + POOL_COUNTER.getAndIncrement()));
 	}
 	
 	public LazyNetworkPool(final int size, final Executor executor)
@@ -89,7 +92,7 @@ public class LazyNetworkPool
 			return;
 		}
 		
-		CompletableFuture.runAsync(this::managePoolInternal);
+		CompletableFuture.runAsync(this::managePoolInternal, TCIExecutorServiceHolder.instance());
 	}
 	
 	protected synchronized void managePoolInternal()
@@ -120,18 +123,5 @@ public class LazyNetworkPool
 		this.managePoolAsync();
 		
 		return net;
-	}
-	
-	public static ThreadFactory defaultThreadFactory()
-	{
-		final int poolNumber = POOL_COUNTER.getAndIncrement();
-		
-		final AtomicInteger counter = new AtomicInteger(1);
-		return r -> {
-			final Thread thread = new Thread(r);
-			thread.setDaemon(true);
-			thread.setName("LazyNetworkPool-" + poolNumber + "-" + counter.getAndIncrement());
-			return thread;
-		};
 	}
 }

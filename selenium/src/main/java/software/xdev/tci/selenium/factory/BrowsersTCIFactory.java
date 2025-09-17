@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 import org.testcontainers.images.RemoteDockerImage;
 
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.factory.TCIFactory;
 import software.xdev.tci.logging.JULtoSLF4JRedirector;
 import software.xdev.tci.selenium.BrowserTCI;
@@ -42,6 +44,8 @@ import software.xdev.testcontainers.selenium.containers.recorder.SeleniumRecordi
 public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverContainer, BrowserTCI>
 {
 	protected final Map<String, BrowserTCIFactory> browserFactories = new ConcurrentHashMap<>();
+	protected boolean pullVideoRecordingContainer;
+	
 	protected boolean alreadyWarmedUp;
 	
 	public BrowsersTCIFactory()
@@ -59,6 +63,12 @@ public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverCo
 	public BrowsersTCIFactory(final Map<String, BrowserTCIFactory> browserFactories)
 	{
 		this.browserFactories.putAll(browserFactories);
+	}
+	
+	public BrowsersTCIFactory withPullVideoRecordingContainer(final boolean pullVideoRecordingContainer)
+	{
+		this.pullVideoRecordingContainer = pullVideoRecordingContainer;
+		return this;
 	}
 	
 	@Override
@@ -84,19 +94,29 @@ public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverCo
 		
 		this.browserFactories.values().forEach(BrowserTCIFactory::warmUp);
 		
-		// Pull video recorder
-		CompletableFuture.runAsync(() -> {
-			try
-			{
-				new RemoteDockerImage(SeleniumRecordingContainer.DEFAULT_IMAGE).get();
-			}
-			catch(final Exception e)
-			{
-				LoggerFactory.getLogger(this.getClass())
-					.warn("Failed to pull {}", SeleniumRecordingContainer.DEFAULT_IMAGE, e);
-			}
-		});
+		if(this.pullVideoRecordingContainer)
+		{
+			this.pullRecordingContainerAsync();
+		}
+		
 		this.alreadyWarmedUp = true;
+	}
+	
+	protected void pullRecordingContainerAsync()
+	{
+		CompletableFuture.runAsync(
+			() -> {
+				try
+				{
+					new RemoteDockerImage(SeleniumRecordingContainer.DEFAULT_IMAGE).get(10, TimeUnit.MINUTES);
+				}
+				catch(final Exception e)
+				{
+					LoggerFactory.getLogger(this.getClass())
+						.warn("Failed to pull {}", SeleniumRecordingContainer.DEFAULT_IMAGE, e);
+				}
+			},
+			TCIExecutorServiceHolder.instance());
 	}
 	
 	@SuppressWarnings("resource")
@@ -115,7 +135,7 @@ public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverCo
 	public void close()
 	{
 		final List<CompletableFuture<Void>> cfFactories = this.browserFactories.values().stream()
-			.map(f -> CompletableFuture.runAsync(f::close))
+			.map(f -> CompletableFuture.runAsync(f::close, TCIExecutorServiceHolder.instance()))
 			.toList();
 		cfFactories.forEach(CompletableFuture::join);
 	}
