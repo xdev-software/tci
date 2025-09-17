@@ -44,6 +44,8 @@ import software.xdev.testcontainers.selenium.containers.recorder.SeleniumRecordi
 public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverContainer, BrowserTCI>
 {
 	protected final Map<String, BrowserTCIFactory> browserFactories = new ConcurrentHashMap<>();
+	protected boolean pullVideoRecordingContainer;
+	
 	protected boolean alreadyWarmedUp;
 	
 	public BrowsersTCIFactory()
@@ -61,6 +63,12 @@ public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverCo
 	public BrowsersTCIFactory(final Map<String, BrowserTCIFactory> browserFactories)
 	{
 		this.browserFactories.putAll(browserFactories);
+	}
+	
+	public BrowsersTCIFactory withPullVideoRecordingContainer(final boolean pullVideoRecordingContainer)
+	{
+		this.pullVideoRecordingContainer = pullVideoRecordingContainer;
+		return this;
 	}
 	
 	@Override
@@ -86,19 +94,29 @@ public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverCo
 		
 		this.browserFactories.values().forEach(BrowserTCIFactory::warmUp);
 		
-		// Pull video recorder
-		CompletableFuture.runAsync(() -> {
-			try
-			{
-				new RemoteDockerImage(SeleniumRecordingContainer.DEFAULT_IMAGE).get(10, TimeUnit.MINUTES);
-			}
-			catch(final Exception e)
-			{
-				LoggerFactory.getLogger(this.getClass())
-					.warn("Failed to pull {}", SeleniumRecordingContainer.DEFAULT_IMAGE, e);
-			}
-		}, TCIExecutorServiceHolder.instance());
+		if(this.pullVideoRecordingContainer)
+		{
+			this.pullRecordingContainerAsync();
+		}
+		
 		this.alreadyWarmedUp = true;
+	}
+	
+	protected void pullRecordingContainerAsync()
+	{
+		CompletableFuture.runAsync(
+			() -> {
+				try
+				{
+					new RemoteDockerImage(SeleniumRecordingContainer.DEFAULT_IMAGE).get(10, TimeUnit.MINUTES);
+				}
+				catch(final Exception e)
+				{
+					LoggerFactory.getLogger(this.getClass())
+						.warn("Failed to pull {}", SeleniumRecordingContainer.DEFAULT_IMAGE, e);
+				}
+			},
+			TCIExecutorServiceHolder.instance());
 	}
 	
 	@SuppressWarnings("resource")
