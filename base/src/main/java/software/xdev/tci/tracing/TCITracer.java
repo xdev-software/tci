@@ -100,7 +100,7 @@ public class TCITracer
 			}
 			// https://stackoverflow.com/a/40487511
 			return PRETTY_PRINT_DURATION.matcher(Duration.ofMillis(ms).toString().substring(2))
-				.replaceAll("$1")
+				.replaceAll("$1 ")
 				.toLowerCase();
 		}
 	}

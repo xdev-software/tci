@@ -1,3 +1,6 @@
+# 2.7.1
+* Readd missing whitespace in `TCITracer`
+
 # 2.7.0
 * ExecutorService creation is now controlled centrally (`ExecutorServiceCreator`)
   * All created ExecutorServices now use `VirtualThread`s on Java 21+
