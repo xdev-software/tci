@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="FORMAT" timestamp="1758283214242">
+    <module artifactId="oidc-server-mock" groupId="software.xdev.tci" version="2.7.1"/>
+    <files>
+        <file path="src/main/java/software/xdev/tci/oidc/BaseOIDCTCI.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/oidc/OIDCTCI.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/oidc/containers/BaseOIDCServerContainer.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/oidc/containers/OIDCServerContainer.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/oidc/factory/BaseOIDCTCIFactory.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/tci/oidc/factory/OIDCTCIFactory.java" result="NOOP"/>
+    </files>
+</licensePluginReport>
