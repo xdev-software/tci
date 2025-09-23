@@ -147,7 +147,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.14.0</version>
+				<version>3.14.1</version>
 				<executions>
 					<execution>
 						<id>compile-java-17</id>
@@ -192,7 +192,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.11.3</version>
+				<version>3.12.0</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -250,7 +250,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>flatten-maven-plugin</artifactId>
-						<version>1.7.2</version>
+						<version>1.7.3</version>
 						<configuration>
 							<flattenMode>ossrh</flattenMode>
 						</configuration>
