@@ -1,3 +1,7 @@
+# 2.7.2
+* `LazyNetwork`: Use explicitly defined `ExecutorService`
+* Updated dependencies
+
 # 2.7.1
 * Readd missing whitespace in `TCITracer`
 

@@ -40,6 +40,8 @@ import org.testcontainers.utility.ResourceReaper;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateNetworkCmd;
 
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
+
 
 /**
  * A better implementation of {@link Network} in relation to {@link org.testcontainers.containers.Network.NetworkImpl}.
@@ -88,7 +90,7 @@ public class LazyNetwork implements Network
 	
 	public LazyNetwork create()
 	{
-		return this.create(CompletableFuture::runAsync);
+		return this.create(r -> CompletableFuture.runAsync(r, TCIExecutorServiceHolder.instance()));
 	}
 	
 	public LazyNetwork create(final Function<Runnable, CompletableFuture<Void>> executor)
