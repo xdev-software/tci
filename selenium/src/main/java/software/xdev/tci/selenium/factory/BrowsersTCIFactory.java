@@ -21,32 +21,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.openqa.selenium.MutableCapabilities;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
-import org.testcontainers.images.RemoteDockerImage;
 
 import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.factory.TCIFactory;
-import software.xdev.tci.logging.JULtoSLF4JRedirector;
 import software.xdev.tci.selenium.BrowserTCI;
 import software.xdev.tci.selenium.TestBrowser;
 import software.xdev.tci.selenium.containers.SeleniumBrowserWebDriverContainer;
 import software.xdev.tci.tracing.TCITracer;
-import software.xdev.testcontainers.selenium.containers.recorder.SeleniumRecordingContainer;
 
 
 public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverContainer, BrowserTCI>
 {
 	protected final Map<String, BrowserTCIFactory> browserFactories = new ConcurrentHashMap<>();
-	protected boolean pullVideoRecordingContainer;
-	
-	protected boolean alreadyWarmedUp;
 	
 	public BrowsersTCIFactory()
 	{
@@ -65,58 +57,16 @@ public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverCo
 		this.browserFactories.putAll(browserFactories);
 	}
 	
-	public BrowsersTCIFactory withPullVideoRecordingContainer(final boolean pullVideoRecordingContainer)
+	public BrowsersTCIFactory withPullVideoRecordingContainerOnWarmUp(final boolean pull)
 	{
-		this.pullVideoRecordingContainer = pullVideoRecordingContainer;
+		this.browserFactories.values().forEach(f -> f.withPullVideoRecordingContainerOnWarmUp(pull));
 		return this;
 	}
 	
 	@Override
 	public void warmUp()
 	{
-		if(this.alreadyWarmedUp)
-		{
-			return;
-		}
-		
-		this.warmUpInternal();
-	}
-	
-	protected synchronized void warmUpInternal()
-	{
-		if(this.alreadyWarmedUp)
-		{
-			return;
-		}
-		
-		// Selenium uses JUL
-		JULtoSLF4JRedirector.redirect();
-		
-		this.browserFactories.values().forEach(BrowserTCIFactory::warmUp);
-		
-		if(this.pullVideoRecordingContainer)
-		{
-			this.pullRecordingContainerAsync();
-		}
-		
-		this.alreadyWarmedUp = true;
-	}
-	
-	protected void pullRecordingContainerAsync()
-	{
-		CompletableFuture.runAsync(
-			() -> {
-				try
-				{
-					new RemoteDockerImage(SeleniumRecordingContainer.DEFAULT_IMAGE).get(10, TimeUnit.MINUTES);
-				}
-				catch(final Exception e)
-				{
-					LoggerFactory.getLogger(this.getClass())
-						.warn("Failed to pull {}", SeleniumRecordingContainer.DEFAULT_IMAGE, e);
-				}
-			},
-			TCIExecutorServiceHolder.instance());
+		// No effect - Done in downstream factories
 	}
 	
 	@SuppressWarnings("resource")

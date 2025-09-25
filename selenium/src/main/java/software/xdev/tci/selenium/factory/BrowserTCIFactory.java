@@ -34,20 +34,25 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
+import org.testcontainers.images.RemoteDockerImage;
 
 import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.factory.prestart.PreStartableTCIFactory;
 import software.xdev.tci.factory.prestart.config.PreStartConfig;
+import software.xdev.tci.logging.JULtoSLF4JRedirector;
 import software.xdev.tci.misc.ContainerMemory;
 import software.xdev.tci.selenium.BrowserTCI;
 import software.xdev.tci.selenium.containers.SeleniumBrowserWebDriverContainer;
 import software.xdev.tci.selenium.factory.config.BrowserTCIFactoryConfig;
 import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
+import software.xdev.testcontainers.selenium.containers.browser.BrowserWebDriverContainer;
 import software.xdev.testcontainers.selenium.containers.recorder.SeleniumRecordingContainer;
 
 
 public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWebDriverContainer, BrowserTCI>
 {
+	protected static boolean warmupRecordingContainerPullStarted;
+	protected boolean pullVideoRecordingContainerOnWarmUp;
 	protected final String browserName;
 	
 	public BrowserTCIFactory(final MutableCapabilities capabilities)
@@ -103,6 +108,8 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 			"container.browserwebdriver." + capabilities.getBrowserName(),
 			"Browser-" + capabilities.getBrowserName());
 		this.browserName = capabilities.getBrowserName();
+		this.pullVideoRecordingContainerOnWarmUp =
+			config.recordingMode() != BrowserWebDriverContainer.RecordingMode.SKIP;
 	}
 	
 	public BrowserTCIFactory(
@@ -130,6 +137,53 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 	{
 		super(infraBuilder, containerBuilder, containerBaseName, containerLoggerName, name, config, timeouts);
 		this.browserName = browserName;
+	}
+	
+	public BrowserTCIFactory withPullVideoRecordingContainerOnWarmUp(final boolean pull)
+	{
+		this.pullVideoRecordingContainerOnWarmUp = pull;
+		return this;
+	}
+	
+	@Override
+	protected void warmUpInternal()
+	{
+		// Selenium uses JUL
+		JULtoSLF4JRedirector.redirect();
+		
+		this.pullRecordingContainerOnWarmUpAsync();
+	}
+	
+	protected void pullRecordingContainerOnWarmUpAsync()
+	{
+		if(this.pullVideoRecordingContainerOnWarmUp)
+		{
+			pullRecordingContainerOnWarmUpAsyncDefault();
+		}
+	}
+	
+	protected static synchronized void pullRecordingContainerOnWarmUpAsyncDefault()
+	{
+		if(warmupRecordingContainerPullStarted)
+		{
+			return;
+		}
+		
+		CompletableFuture.runAsync(
+			() -> {
+				try
+				{
+					new RemoteDockerImage(SeleniumRecordingContainer.DEFAULT_IMAGE).get(10, TimeUnit.MINUTES);
+				}
+				catch(final Exception e)
+				{
+					LoggerFactory.getLogger(BrowserTCIFactory.class)
+						.warn("Failed to pull {}", SeleniumRecordingContainer.DEFAULT_IMAGE, e);
+				}
+			},
+			TCIExecutorServiceHolder.instance());
+		
+		warmupRecordingContainerPullStarted = true;
 	}
 	
 	protected static Consumer<String> logBrowserConsoleConsumer(final BrowserConsoleLogLevel level)
