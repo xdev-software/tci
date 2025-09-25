@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="FORMAT" timestamp="1758801895417">
+    <module artifactId="spring-dao-support" groupId="software.xdev.tci" version="2.8.0"/>
+    <files>
+        <file path="src/main/java/software/xdev/tci/dao/DAOInjector.java" result="NOOP"/>
+    </files>
+</licensePluginReport>
