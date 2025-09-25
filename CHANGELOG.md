@@ -1,3 +1,9 @@
+# 2.8.0
+* ``selenium``
+  * Moved warmUp code to correct factory
+  * Warmup will try to download/pre-pull the recording container image if required (as long as `recordingMode != SKIP`)
+  * Behavior can be customized with method `withPullVideoRecordingContainerOnWarmUp`
+
 # 2.7.2
 * `LazyNetwork`: Use explicitly defined `ExecutorService`
 * Updated dependencies
