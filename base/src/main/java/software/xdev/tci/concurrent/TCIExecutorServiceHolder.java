@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutorService;
 
 
 /**
- * Holds the {@link ExecutorService} that can be used like for TCI related work like starting or stopping containers.
+ * Holds the {@link ExecutorService} that can be used for TCI related work like starting or stopping containers.
  * <p>
  * This {@link ExecutorService} should be used in favor of {@link java.util.concurrent.ForkJoinPool#commonPool()} as it
  * guarantees better scalability.
