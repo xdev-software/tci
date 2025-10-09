@@ -2,7 +2,7 @@
 <ruleset name="Default"
 		 xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+		 xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.github.io/ruleset_2_0_0.xsd">
 
 	<description>
 		This ruleset checks the code for discouraged programming constructs.
@@ -204,7 +204,7 @@
 
 	<rule name="AvoidStringBuilderOrBuffer"
 		language="java"
-		message="StringBuilder/ should not be used"
+		message="StringBuilder/StringBuffer should not be used"
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
 		<description>
 			Usually all cases where `StringBuilder` (or the outdated `StringBuffer`) is used are either due to confusing (legacy) logic or may be replaced by a simpler string concatenation.

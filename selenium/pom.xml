@@ -54,7 +54,7 @@
 			<dependency>
 				<groupId>org.seleniumhq.selenium</groupId>
 				<artifactId>selenium-dependencies-bom</artifactId>
-				<version>4.35.0</version>
+				<version>4.36.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -82,7 +82,7 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.13.4</version>
+			<version>6.0.0</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -297,7 +297,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>11.0.1</version>
+								<version>11.1.0</version>
 							</dependency>
 						</dependencies>
 						<configuration>
