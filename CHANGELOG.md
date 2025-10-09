@@ -1,3 +1,6 @@
+# 2.8.2
+* Updated dependencies
+
 # 2.8.1
 * Updated dependencies
 
