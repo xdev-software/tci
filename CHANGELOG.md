@@ -1,3 +1,6 @@
+# 2.8.1
+* Updated dependencies
+
 # 2.8.0
 * ``selenium``
   * Moved warmUp code to correct factory
