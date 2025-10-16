@@ -1,3 +1,6 @@
+# 2.9.0
+* Update to Testcontainers v2
+
 # 2.8.2
 * Updated dependencies
 

@@ -28,8 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.rnorth.ducttape.unreliables.Unreliables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -308,19 +306,5 @@ public class LazyNetwork implements Network
 		return this.deleteNetworkOnCloseTries;
 	}
 	
-	// endregion
-	
-	// region Legacy
-	
-	/**
-	 * @deprecated JUNit4 is effectively dead
-	 */
-	@Deprecated(forRemoval = true)
-	@Override
-	@SuppressWarnings("java:S1133")
-	public Statement apply(final Statement base, final Description description)
-	{
-		return null;
-	}
 	// endregion
 }
