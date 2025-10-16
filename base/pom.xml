@@ -52,22 +52,10 @@
 	<dependencies>
 		<!-- TestContainers -->
 		<dependency>
-			<groupId>software.xdev</groupId>
-			<artifactId>testcontainers-junit4-mock</artifactId>
-			<version>1.0.2</version>
-		</dependency>
-		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>testcontainers</artifactId>
-			<scope>compile</scope>
 			<version>2.0.0</version>
-			<exclusions>
-				<!-- The few classes that testcontainers needs have been extracted -->
-				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-				</exclusion>
-			</exclusions>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Testcontainers is using outdated v1 -->
