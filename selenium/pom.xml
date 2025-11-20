@@ -54,7 +54,7 @@
 			<dependency>
 				<groupId>org.seleniumhq.selenium</groupId>
 				<artifactId>selenium-dependencies-bom</artifactId>
-				<version>4.36.0</version>
+				<version>4.38.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -82,7 +82,7 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>6.0.0</version>
+			<version>6.0.1</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -297,7 +297,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>12.0.1</version>
+								<version>12.1.2</version>
 							</dependency>
 						</dependencies>
 						<configuration>
@@ -335,12 +335,12 @@
 							<dependency>
 								<groupId>net.sourceforge.pmd</groupId>
 								<artifactId>pmd-core</artifactId>
-								<version>7.17.0</version>
+								<version>7.18.0</version>
 							</dependency>
 							<dependency>
 								<groupId>net.sourceforge.pmd</groupId>
 								<artifactId>pmd-java</artifactId>
-								<version>7.17.0</version>
+								<version>7.18.0</version>
 							</dependency>
 						</dependencies>
 					</plugin>
