@@ -60,56 +60,73 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 		this(capabilities, TCIServiceLoaderHolder.instance().service(BrowserTCIFactoryConfig.class));
 	}
 	
-	@SuppressWarnings({"resource", "checkstyle:MagicNumber"})
 	public BrowserTCIFactory(final MutableCapabilities capabilities, final BrowserTCIFactoryConfig config)
 	{
-		super(
-			(c, na) -> new BrowserTCI(c, na, capabilities)
-				.withBidiEnabled(config.bidiEnabled())
-				.withDeactivateCDPIfPossible(config.deactivateCdpIfPossible())
-				.withClientConfig(ClientConfig.defaultConfig()
-					.readTimeout(Duration.ofSeconds(60 + cpuSlownessFactor() * 10L)))
-				.withWebDriverRetryCount(Math.max(Math.min(cpuSlownessFactor(), 5), 1))
-				.withWebDriverRetrySec(25 + cpuSlownessFactor() * 5)
-				.withBrowserConsoleLog(
-					logBrowserConsoleConsumer(config.browserConsoleLogLevel()),
-					config.browserConsoleLogLevel().logLevels()),
-			() -> new SeleniumBrowserWebDriverContainer(capabilities)
-				.withStartRecordingContainerManually(true)
-				.withRecordingDirectory(config.dirForRecords())
-				.withRecordingMode(config.recordingMode())
-				// 2024-04 VNC is no longer required when recording
-				.withDisableVNC(!config.vncEnabled())
-				.withEnableNoVNC(config.vncEnabled())
-				.withRecordingContainerSupplier(t -> new SeleniumRecordingContainer(t)
-					.withFrameRate(10)
-					.withLogConsumer(getLogConsumer("container.browserrecorder." + capabilities.getBrowserName()))
-					.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M)))
-				// Without that a mount volume dialog shows up
-				// https://github.com/testcontainers/testcontainers-java/issues/1670
-				.withSharedMemorySize(ContainerMemory.M2G)
-				.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M1G))
-				.withEnv("SE_SCREEN_WIDTH", "1600")
-				.withEnv("SE_SCREEN_HEIGHT", "900")
-				// By default after 5 mins the session is killed and you can't use the container anymore. Cool or?
-				// https://github.com/SeleniumHQ/docker-selenium?tab=readme-ov-file#grid-url-and-session-timeout
-				.withEnv("SE_NODE_SESSION_TIMEOUT", "3600")
-				// Disable local tracing, as we don't need it
-				// https://github.com/SeleniumHQ/docker-selenium/issues/2355
-				.withEnv("SE_ENABLE_TRACING", "false")
-				// Some (AWS) CPUs are completely overloaded with the default 15s timeout -> increase it
-				.waitingFor(new WaitAllStrategy()
-					.withStrategy(new LogMessageWaitStrategy()
-						.withRegEx(".*(Started Selenium Standalone).*\n")
-						.withStartupTimeout(Duration.ofSeconds(30 + 20L * cpuSlownessFactor())))
-					.withStrategy(new HostPortWaitStrategy())
-					.withStartupTimeout(Duration.ofSeconds(30 + 20L * cpuSlownessFactor()))),
+		this(
+			(c, na) -> createDefaultBrowserTCI(c, na, capabilities, config),
+			() -> createDefaultContainer(capabilities, config),
 			"selenium-" + capabilities.getBrowserName().toLowerCase(),
 			"container.browserwebdriver." + capabilities.getBrowserName(),
-			"Browser-" + capabilities.getBrowserName());
-		this.browserName = capabilities.getBrowserName();
+			"Browser-" + capabilities.getBrowserName(),
+			capabilities.getBrowserName());
 		this.pullVideoRecordingContainerOnWarmUp =
 			config.recordingMode() != BrowserWebDriverContainer.RecordingMode.SKIP;
+	}
+	
+	@SuppressWarnings("checkstyle:MagicNumber")
+	public static BrowserTCI createDefaultBrowserTCI(
+		final SeleniumBrowserWebDriverContainer c,
+		final String networkAlias,
+		final MutableCapabilities capabilities,
+		final BrowserTCIFactoryConfig config)
+	{
+		return new BrowserTCI(c, networkAlias, capabilities)
+			.withBidiEnabled(config.bidiEnabled())
+			.withDeactivateCDPIfPossible(config.deactivateCdpIfPossible())
+			.withClientConfig(ClientConfig.defaultConfig()
+				.readTimeout(Duration.ofSeconds(60 + cpuSlownessFactor() * 10L)))
+			.withWebDriverRetryCount(Math.max(Math.min(cpuSlownessFactor(), 5), 1))
+			.withWebDriverRetrySec(25 + cpuSlownessFactor() * 5)
+			.withBrowserConsoleLog(
+				logBrowserConsoleConsumer(config.browserConsoleLogLevel()),
+				config.browserConsoleLogLevel().logLevels());
+	}
+	
+	@SuppressWarnings({"resource", "checkstyle:MagicNumber"})
+	public static SeleniumBrowserWebDriverContainer createDefaultContainer(
+		final MutableCapabilities capabilities,
+		final BrowserTCIFactoryConfig config)
+	{
+		return new SeleniumBrowserWebDriverContainer(capabilities)
+			.withStartRecordingContainerManually(true)
+			.withRecordingDirectory(config.dirForRecords())
+			.withRecordingMode(config.recordingMode())
+			// 2024-04 VNC is no longer required when recording
+			.withDisableVNC(!config.vncEnabled())
+			.withEnableNoVNC(config.vncEnabled())
+			.withRecordingContainerSupplier(t -> new SeleniumRecordingContainer(t)
+				.withFrameRate(10)
+				.withLogConsumer(getLogConsumer("container.browserrecorder." + capabilities.getBrowserName()))
+				.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M)))
+			// Without that a mount volume dialog shows up
+			// https://github.com/testcontainers/testcontainers-java/issues/1670
+			.withSharedMemorySize(ContainerMemory.M2G)
+			.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M1G))
+			.withEnv("SE_SCREEN_WIDTH", "1600")
+			.withEnv("SE_SCREEN_HEIGHT", "900")
+			// By default after 5 mins the session is killed and you can't use the container anymore. Cool or?
+			// https://github.com/SeleniumHQ/docker-selenium?tab=readme-ov-file#grid-url-and-session-timeout
+			.withEnv("SE_NODE_SESSION_TIMEOUT", "3600")
+			// Disable local tracing, as we don't need it
+			// https://github.com/SeleniumHQ/docker-selenium/issues/2355
+			.withEnv("SE_ENABLE_TRACING", "false")
+			// Some (AWS) CPUs are completely overloaded with the default 15s timeout -> increase it
+			.waitingFor(new WaitAllStrategy()
+				.withStrategy(new LogMessageWaitStrategy()
+					.withRegEx(".*(Started Selenium Standalone).*\n")
+					.withStartupTimeout(Duration.ofSeconds(30 + 20L * cpuSlownessFactor())))
+				.withStrategy(new HostPortWaitStrategy())
+				.withStartupTimeout(Duration.ofSeconds(30 + 20L * cpuSlownessFactor())));
 	}
 	
 	public BrowserTCIFactory(
