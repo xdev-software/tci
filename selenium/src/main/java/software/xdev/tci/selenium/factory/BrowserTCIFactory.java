@@ -92,7 +92,7 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 				config.browserConsoleLogLevel().logLevels());
 	}
 	
-	@SuppressWarnings("resource")
+	@SuppressWarnings({"resource", "checkstyle:MagicNumber"})
 	public static SeleniumBrowserWebDriverContainer createDefaultContainer(
 		final MutableCapabilities capabilities,
 		final BrowserTCIFactoryConfig config)
