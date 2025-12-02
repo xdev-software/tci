@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci</groupId>
 	<artifactId>db-jdbc</artifactId>
-	<version>2.9.3-SNAPSHOT</version>
+	<version>2.9.3</version>
 	<packaging>jar</packaging>
 
 	<name>db-jdbc</name>
@@ -53,7 +53,7 @@
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>base</artifactId>
-			<version>2.9.3-SNAPSHOT</version>
+			<version>2.9.3</version>
 		</dependency>
 
 		<dependency>
