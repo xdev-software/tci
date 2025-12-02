@@ -105,7 +105,6 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 			.withDisableVNC(!config.vncEnabled())
 			.withEnableNoVNC(config.vncEnabled())
 			.withRecordingContainerSupplier(t -> new SeleniumRecordingContainer(t)
-				.withFrameRate(10)
 				.withLogConsumer(getLogConsumer("container.browserrecorder." + capabilities.getBrowserName()))
 				.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M)))
 			// Without that a mount volume dialog shows up
