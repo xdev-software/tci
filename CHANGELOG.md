@@ -1,3 +1,9 @@
+# 2.9.4
+* Selenium
+  * Hide download popup by default in Firefox so that UI is not blocked
+  * Use default framerate (15FPS)
+* Updated dependencies
+
 # 2.9.3
 * Updated dependencies
 
