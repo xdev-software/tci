@@ -26,14 +26,16 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 public enum TestBrowser
 {
 	FIREFOX(() -> {
-		final FirefoxOptions firefoxOptions = new FirefoxOptions();
+		final FirefoxOptions options = new FirefoxOptions();
 		
-		final FirefoxProfile firefoxProfile = new FirefoxProfile();
+		final FirefoxProfile profile = new FirefoxProfile();
 		// Allows to type into console without an annoying SELF XSS popup
-		firefoxProfile.setPreference("devtools.selfxss.count", "100");
-		firefoxOptions.setProfile(firefoxProfile);
+		profile.setPreference("devtools.selfxss.count", "100");
+		// Ignore panel popup on downloads that block top right UI
+		profile.setPreference("browser.download.alwaysOpenPanel", false);
+		options.setProfile(profile);
 		
-		return firefoxOptions;
+		return options;
 	}),
 	CHROME(ChromeOptions::new);
 	
