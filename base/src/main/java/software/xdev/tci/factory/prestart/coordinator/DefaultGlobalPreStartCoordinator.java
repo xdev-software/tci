@@ -47,6 +47,7 @@ public class DefaultGlobalPreStartCoordinator implements GlobalPreStartCoordinat
 	protected final List<PreStartableTCIFactory<?, ?>> factories = Collections.synchronizedList(new ArrayList<>());
 	// Sadly there is no Java Set with an index or a unique list
 	// So we have to keep the factories in order inside a List and ensure the uniqueness with a Set
+	@SuppressWarnings("checkstyle:IllegalIdentifierName")
 	protected final Set<PreStartableTCIFactory<?, ?>> factoriesWeakSet =
 		Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
 	protected final AtomicInteger counter = new AtomicInteger(0);
