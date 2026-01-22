@@ -59,12 +59,12 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<version>6.2.14</version>
+			<version>6.2.15</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
-			<version>6.2.14</version>
+			<version>6.2.15</version>
 		</dependency>
 	</dependencies>
 
