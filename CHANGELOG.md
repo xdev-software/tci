@@ -1,3 +1,6 @@
+# 2.9.5
+* Updated dependencies
+
 # 2.9.4
 * Selenium
   * Hide download popup by default in Firefox so that UI is not blocked
