@@ -1,3 +1,9 @@
+# 3.0.0
+* Updated to Spring Boot 4.x
+* Updated to Spring framework 7.x
+* Updated to Hibernate 7.x
+* Updated to Jakarta Persistence 3.2.0
+
 # 2.9.5
 * Updated dependencies
 
