@@ -23,11 +23,10 @@ package software.xdev.tci.db.persistence;
  * Jakarta EE v3.2's PersistenceConfiguration
  * </a>
  *
- * <p>
- *     Will be removed once Jakarta EE v3.2 is in widespread use.
- * </p>
+ * @deprecated Use {@link jakarta.persistence.PersistenceConfiguration} instead
  */
 //@formatter:on
+@Deprecated(forRemoval = true)
 public final class PersistenceConfigurationCompat
 {
 	public static final String JDBC_DRIVER = "jakarta.persistence.jdbc.driver";

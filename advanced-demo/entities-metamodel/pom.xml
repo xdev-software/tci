@@ -28,7 +28,7 @@
 
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
-			<artifactId>hibernate-jpamodelgen</artifactId>
+			<artifactId>hibernate-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
 	</dependencies>
@@ -84,6 +84,7 @@
 				</executions>
 			</plugin>
 
+			<!-- TODO -->
 			<!-- Can be removed once fix for https://hibernate.atlassian.net/browse/HHH-18863 is released -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
