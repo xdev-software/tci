@@ -59,12 +59,12 @@
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>6.6.41.Final</version>
+			<version>7.2.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-hikaricp</artifactId>
-			<version>6.6.41.Final</version>
+			<version>7.2.1.Final</version>
 		</dependency>
 	</dependencies>
 
