@@ -1,3 +1,14 @@
+# 3.0.0
+* Updated to Spring Boot 4.x
+* Updated to Spring 7.x
+* Updated to Hibernate 7.x
+* Updated to Jakarta Persistence 3.2.0
+* `db-jdbc`
+  * Deprecated `PersistenceConfigurationCompat` use `jakarta.persistence.PersistenceConfiguration` instead
+* `db-jdbc-spring-orm`
+  * Adopt and replace `MutablePersistenceUnitInfo` with `SpringPersistenceUnitInfo`
+* Demo's are not fully working because the underlying framework is not available for Spring Boot 4.x yet
+
 # 2.9.5
 * Updated dependencies
 
