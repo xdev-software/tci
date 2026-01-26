@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceConfiguration;
 import jakarta.persistence.spi.PersistenceUnitInfo;
 
 
@@ -95,10 +96,10 @@ public abstract class EntityManagerControllerFactory<
 	protected Map<String, Object> defaultPropertiesMap()
 	{
 		return new HashMap<>(Map.ofEntries(
-			entry(PersistenceConfigurationCompat.JDBC_DRIVER, this.driverFullClassName),
-			entry(PersistenceConfigurationCompat.JDBC_URL, this.jdbcUrl),
-			entry(PersistenceConfigurationCompat.JDBC_USER, this.username),
-			entry(PersistenceConfigurationCompat.JDBC_PASSWORD, this.password)
+			entry(PersistenceConfiguration.JDBC_DRIVER, this.driverFullClassName),
+			entry(PersistenceConfiguration.JDBC_URL, this.jdbcUrl),
+			entry(PersistenceConfiguration.JDBC_USER, this.username),
+			entry(PersistenceConfiguration.JDBC_PASSWORD, this.password)
 		));
 	}
 	

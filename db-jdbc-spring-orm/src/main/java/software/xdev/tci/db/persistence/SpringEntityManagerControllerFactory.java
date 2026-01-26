@@ -23,15 +23,16 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import jakarta.persistence.PersistenceUnitTransactionType;
 import jakarta.persistence.spi.ClassTransformer;
-import jakarta.persistence.spi.PersistenceUnitTransactionType;
+import jakarta.persistence.spi.PersistenceUnitInfo;
 
-import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
+import org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo;
 
 
 @SuppressWarnings("java:S119")
 public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEntityManagerControllerFactory<SELF>>
-	extends EntityManagerControllerFactory<SELF, MutablePersistenceUnitInfo>
+	extends EntityManagerControllerFactory<SELF, PersistenceUnitInfo>
 {
 	protected boolean addJarFileUrls;
 	
@@ -60,10 +61,10 @@ public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEn
 		return this.self();
 	}
 	
-	@Override
-	protected MutablePersistenceUnitInfo createPersistenceUnitInfo()
+	protected SpringPersistenceUnitInfo createSpringPersistenceUnitInfo()
 	{
-		final MutablePersistenceUnitInfo pui = new MutablePersistenceUnitInfo()
+		// noinspection DataFlowIssue - ClassLoader can be null! Look at the init method!
+		final SpringPersistenceUnitInfo pui = new SpringPersistenceUnitInfo((ClassLoader)null)
 		{
 			@Override
 			public void addTransformer(final ClassTransformer ignored)
@@ -86,6 +87,12 @@ public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEn
 		}
 		
 		return pui;
+	}
+	
+	@Override
+	protected PersistenceUnitInfo createPersistenceUnitInfo()
+	{
+		return this.createSpringPersistenceUnitInfo().asStandardPersistenceUnitInfo();
 	}
 	
 	protected Collection<URL> jarFileUrlsToAdd()

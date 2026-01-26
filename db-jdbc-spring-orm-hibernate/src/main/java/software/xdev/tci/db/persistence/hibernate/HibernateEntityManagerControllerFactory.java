@@ -27,7 +27,7 @@ import org.hibernate.cfg.JdbcSettings;
 import org.hibernate.cfg.PersistenceSettings;
 import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
 import org.hibernate.jpa.HibernatePersistenceProvider;
-import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
+import org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo;
 
 import software.xdev.tci.db.persistence.SpringEntityManagerControllerFactory;
 
@@ -70,11 +70,11 @@ public class HibernateEntityManagerControllerFactory
 	}
 	
 	@Override
-	protected MutablePersistenceUnitInfo createPersistenceUnitInfo()
+	protected SpringPersistenceUnitInfo createSpringPersistenceUnitInfo()
 	{
-		final MutablePersistenceUnitInfo pui = super.createPersistenceUnitInfo();
-		pui.setPersistenceProviderClassName(HibernatePersistenceProvider.class.getName());
-		return pui;
+		final SpringPersistenceUnitInfo spui = super.createSpringPersistenceUnitInfo();
+		spui.setPersistenceProviderClassName(HibernatePersistenceProvider.class.getName());
+		return spui;
 	}
 	
 	@Override

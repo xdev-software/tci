@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci</groupId>
 	<artifactId>spring-dao-support</artifactId>
-	<version>2.9.6-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>spring-dao-support</name>
@@ -53,7 +53,7 @@
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>db-jdbc</artifactId>
-			<version>2.9.6-SNAPSHOT</version>
+			<version>3.0.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
-			<version>6.2.15</version>
+			<version>7.0.3</version>
 		</dependency>
 
 		<dependency>
