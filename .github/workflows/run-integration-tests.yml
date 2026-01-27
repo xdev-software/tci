@@ -28,7 +28,7 @@ jobs:
       fail-fast: false
       matrix:
         java: [21]
-        project: [persistence-it] #, webapp-it]
+        project: [persistence-it, webapp-it]
         parallel: [0, 2]
         pre-start: [false, true]
     runs-on: ubuntu-latest

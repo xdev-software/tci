@@ -1,3 +1,7 @@
+# 3.0.1
+* Fixated OIDC Server Mock version to latest minor (`1.2`) to prevent possible future random test failures
+* Updated demo / integration tests framework
+
 # 3.0.0
 * Updated to Spring Boot 4.x
 * Updated to Spring 7.x

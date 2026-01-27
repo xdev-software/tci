@@ -15,8 +15,16 @@
  */
 package software.xdev.tci.oidc.containers;
 
+import org.testcontainers.utility.DockerImageName;
+
+
 public class OIDCServerContainer extends BaseOIDCServerContainer<OIDCServerContainer>
 {
+	public OIDCServerContainer(final DockerImageName image)
+	{
+		super(image);
+	}
+	
 	public OIDCServerContainer()
 	{
 		super();
