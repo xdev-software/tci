@@ -30,7 +30,7 @@ public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, We
 					// ACTUATOR
 					.withActuator(
 						WebAppTCI.ACTUATOR_USERNAME,
-						// PW = admin SHA256
+						// PW = admin in SHA256
 						"8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918")
 					// Configure for Tests
 					.withDisableHTTPS();

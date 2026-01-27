@@ -5,14 +5,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfiguration;
 
 
 @SuppressWarnings({"checkstyle:HideUtilityClassConstructor", "PMD.UseUtilityClass"})
 @SpringBootApplication(exclude = {ErrorMvcAutoConfiguration.class})
-@EnableAutoConfiguration
 public class Application
 {
 	@SuppressWarnings("PMD.AvoidSystemSetterCall")
