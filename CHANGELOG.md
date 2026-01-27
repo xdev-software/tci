@@ -1,5 +1,5 @@
 # 3.0.1
-* Fixated OIDC Server Mock version to latest minor (`1.2`) to prevent future random test failures
+* Fixated OIDC Server Mock version to latest minor (`1.2`) to prevent possible future random test failures
 * Updated demo / integration tests framework
 
 # 3.0.0
