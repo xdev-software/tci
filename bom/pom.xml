@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci</groupId>
 	<artifactId>bom</artifactId>
-	<version>3.0.2</version>
+	<version>3.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>bom</name>
@@ -51,47 +51,47 @@
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
 				<artifactId>base</artifactId>
-				<version>3.0.2</version>
+				<version>3.0.3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
 				<artifactId>db-jdbc</artifactId>
-				<version>3.0.2</version>
+				<version>3.0.3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
 				<artifactId>db-jdbc-spring-orm</artifactId>
-				<version>3.0.2</version>
+				<version>3.0.3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
 				<artifactId>db-jdbc-spring-orm-hibernate</artifactId>
-				<version>3.0.2</version>
+				<version>3.0.3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
 				<artifactId>jul-to-slf4j</artifactId>
-				<version>3.0.2</version>
+				<version>3.0.3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
 				<artifactId>mockserver</artifactId>
-				<version>3.0.2</version>
+				<version>3.0.3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
 				<artifactId>oidc-server-mock</artifactId>
-				<version>3.0.2</version>
+				<version>3.0.3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
 				<artifactId>selenium</artifactId>
-				<version>3.0.2</version>
+				<version>3.0.3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
 				<artifactId>spring-dao-support</artifactId>
-				<version>3.0.2</version>
+				<version>3.0.3-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
