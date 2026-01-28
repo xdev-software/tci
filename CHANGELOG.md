@@ -1,3 +1,6 @@
+# 3.0.2
+* Fix doubled values for `ContainerMemory`
+
 # 3.0.1
 * Fixated OIDC Server Mock version to latest minor (`1.2`) to prevent possible future random test failures
 * Updated demo / integration tests framework
