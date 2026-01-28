@@ -22,7 +22,7 @@ public final class ContainerMemory
 {
 	// NOTE: Names of constants can't start with numbers -> Prefixed with M
 	// Docker uses 1024 as conversion
-	public static final long M64M = 128 * 1024L * 1024L;
+	public static final long M64M = 64 * 1024L * 1024L;
 	public static final long M128M = M64M * 2;
 	public static final long M256M = M128M * 2;
 	public static final long M512M = M256M * 2;
