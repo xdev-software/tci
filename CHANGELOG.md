@@ -1,3 +1,7 @@
+# 3.0.3
+* `EntityManagerController`
+  * Make it possible to configure `closeEntityManagerOnCleanupWithoutCheck`
+
 # 3.0.2
 * Fix doubled values for `ContainerMemory`
 
