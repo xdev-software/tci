@@ -526,7 +526,7 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 		CompletableFuture<Void> startFuture,
 		boolean requiresNetworkConnect)
 	{
-		public StartingInfra
+		protected StartingInfra
 		{
 			Objects.requireNonNull(infra);
 			Objects.requireNonNull(startFuture);
@@ -536,7 +536,7 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 	
 	protected record DirectNetworkAttachInfo(Network network, List<String> aliases)
 	{
-		public DirectNetworkAttachInfo
+		protected DirectNetworkAttachInfo
 		{
 			Objects.requireNonNull(network);
 		}

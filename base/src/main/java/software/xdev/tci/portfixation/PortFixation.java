@@ -168,7 +168,7 @@ public final class PortFixation
 	}
 	
 	@SuppressWarnings("java:S2160") // Not needed
-	static class GetPortContainer extends GenericContainer<GetPortContainer>
+	protected static class GetPortContainer extends GenericContainer<GetPortContainer>
 	{
 		protected static final Logger LOG = DockerLoggerFactory.getLogger("container.getport");
 		protected static final DockerImageName IMAGE = DockerImageName.parse("alpine:3");
@@ -176,7 +176,7 @@ public final class PortFixation
 		
 		protected final Map<InternetProtocol, Set<ExposedPort>> ports;
 		
-		public GetPortContainer(final Map<InternetProtocol, Integer> protocolAmounts)
+		protected GetPortContainer(final Map<InternetProtocol, Integer> protocolAmounts)
 		{
 			super(IMAGE);
 			// Create a netcat server listener so that the startup check succeeds
@@ -202,7 +202,7 @@ public final class PortFixation
 			return List.of(BASE_PORT); // Report only the base port as only this port listens
 		}
 		
-		public Map<InternetProtocol, List<Integer>> getPorts()
+		protected Map<InternetProtocol, List<Integer>> getPorts()
 		{
 			return this.ports.entrySet().stream()
 				.collect(Collectors.toMap(
@@ -224,7 +224,7 @@ public final class PortFixation
 	
 	
 	@FunctionalInterface
-	interface TriConsumer<T, U, V>
+	protected interface TriConsumer<T, U, V>
 	{
 		void accept(T t, U u, V v);
 	}
