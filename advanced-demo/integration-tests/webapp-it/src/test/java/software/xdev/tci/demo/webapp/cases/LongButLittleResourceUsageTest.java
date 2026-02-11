@@ -15,7 +15,7 @@ import software.xdev.tci.selenium.TestBrowser;
 // These tests were written to show the advantages of PreStarting
 class LongButLittleResourceUsageTest extends InfraPerCaseTest
 {
-	public static Stream<Arguments> simulatedLongTest()
+	static Stream<Arguments> simulatedLongTest()
 	{
 		return IntStream.rangeClosed(0, 2)
 			.boxed()

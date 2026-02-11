@@ -7,12 +7,12 @@
 	<parent>
 		<groupId>software.xdev.tci.demo</groupId>
 		<artifactId>advanced-demo</artifactId>
-		<version>3.0.4-SNAPSHOT</version>
+		<version>3.1.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>software.xdev.tci.demo.it</groupId>
 	<artifactId>integration-tests</artifactId>
-	<version>3.0.4-SNAPSHOT</version>
+	<version>3.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -28,13 +28,13 @@
 			<dependency>
 				<groupId>software.xdev.tci.demo.it</groupId>
 				<artifactId>tci-db</artifactId>
-				<version>3.0.4-SNAPSHOT</version>
+				<version>3.1.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>software.xdev.tci.demo.it</groupId>
 				<artifactId>tci-webapp</artifactId>
-				<version>3.0.4-SNAPSHOT</version>
+				<version>3.1.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
@@ -93,7 +93,7 @@
 			<dependency>
 				<groupId>software.xdev</groupId>
 				<artifactId>testcontainers-advanced-imagebuilder</artifactId>
-				<version>2.4.0</version>
+				<version>2.4.1</version>
 			</dependency>
 
 			<!-- Utility for proxies in tests -->

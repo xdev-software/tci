@@ -54,7 +54,7 @@ public class CachingStandardScanner extends StandardScanner
 			ignored -> super.scan(environment, options, parameters));
 	}
 	
-	record ScanKey(
+	protected record ScanKey(
 		URL getRootUrl,
 		List<URL> getNonRootUrls,
 		List<String> getExplicitlyListedClassNames,
@@ -63,7 +63,7 @@ public class CachingStandardScanner extends StandardScanner
 		boolean canDetectUnlistedClassesInRoot,
 		ScanParameters parameters)
 	{
-		public ScanKey(
+		protected ScanKey(
 			final ScanEnvironment environment,
 			final ScanOptions options,
 			final ScanParameters parameters)

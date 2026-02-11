@@ -15,7 +15,7 @@ import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
 class PreStartDemoTest
 {
 	private static final Logger LOG = LoggerFactory.getLogger(PreStartDemoTest.class);
-	public static final int START_COUNT = 5;
+	static final int START_COUNT = 5;
 	
 	static DummyTCIFactory dummyFactory;
 	

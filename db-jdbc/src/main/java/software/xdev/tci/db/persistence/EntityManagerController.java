@@ -39,33 +39,9 @@ public class EntityManagerController implements AutoCloseable
 	protected final List<EntityManager> activeEms = Collections.synchronizedList(new ArrayList<>());
 	protected final EntityManagerFactory emf;
 	
-	protected boolean closeEntityManagerOnCleanupWithoutCheck = true;
-	
 	public EntityManagerController(final EntityManagerFactory emf)
 	{
 		this.emf = Objects.requireNonNull(emf);
-	}
-	
-	/**
-	 * Should it be assumed that each {@link EntityManager} was NOT closed and the {@link EntityManager#isOpen()}
-	 * can be
-	 * skipped?
-	 * <p>
-	 * Setting this to {@code true} improves performance.
-	 * </p>
-	 * <p>
-	 * {@code true} by default as Entity Managers are assumed to be container(=framework) managed <br/>and not
-	 * application(=developer) managed and "randomly" closed during operations.
-	 * </p>
-	 * <p>
-	 * Setting this option to {@code false} usually indicates major design flaws in the corresponding code.
-	 * </p>
-	 */
-	public EntityManagerController closeEntityManagerOnCleanupWithoutCheck(
-		final boolean closeEntityManagerOnCleanupWithoutCheck)
-	{
-		this.closeEntityManagerOnCleanupWithoutCheck = closeEntityManagerOnCleanupWithoutCheck;
-		return this;
 	}
 	
 	/**
@@ -99,7 +75,8 @@ public class EntityManagerController implements AutoCloseable
 					em.getTransaction().rollback();
 				}
 				
-				if(this.closeEntityManagerOnCleanupWithoutCheck || !em.isOpen())
+				// EclipseLink will crash if close is called on an already closed EntityManager
+				if(!em.isOpen())
 				{
 					em.close();
 				}

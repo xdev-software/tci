@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import software.xdev.tci.demo.tci.webapp.WebAppTCI;
 import software.xdev.tci.demo.tci.webapp.containers.WebAppContainer;
 import software.xdev.tci.demo.tci.webapp.containers.WebAppContainerBuilder;
+import software.xdev.tci.envperf.EnvironmentPerformance;
 import software.xdev.tci.factory.prestart.PreStartableTCIFactory;
 import software.xdev.tci.misc.ContainerMemory;
 
@@ -16,6 +17,7 @@ public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, We
 	
 	protected static String appImageName;
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public WebAppTCIFactory(final Consumer<WebAppContainer> additionalContainerBuilder)
 	{
 		super(
@@ -23,7 +25,7 @@ public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, We
 			() -> {
 				final WebAppContainer container = new WebAppContainer(getAppImageName(), true)
 					.withDefaultWaitStrategy(
-						Duration.ofMinutes(1),
+						Duration.ofSeconds(40L + 20L * EnvironmentPerformance.cpuSlownessFactor()),
 						WebAppTCI.ACTUATOR_USERNAME,
 						WebAppTCI.ACTUATOR_PASSWORD)
 					.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M1G))

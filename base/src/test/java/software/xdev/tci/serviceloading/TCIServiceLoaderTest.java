@@ -117,7 +117,7 @@ class TCIServiceLoaderTest
 	{
 		private final Map<Class<?>, Supplier<Object>> predefinedImpls;
 		
-		public MockTCIServiceLoader(final Map<Class<?>, Supplier<Object>> predefinedImpls)
+		protected MockTCIServiceLoader(final Map<Class<?>, Supplier<Object>> predefinedImpls)
 		{
 			this.predefinedImpls = predefinedImpls;
 		}
@@ -166,7 +166,7 @@ class TCIServiceLoaderTest
 	
 	static class RecursiveServiceA extends BaseRecursiveService
 	{
-		public RecursiveServiceA(final MockTCIServiceLoader mockTCIServiceLoader, final boolean async)
+		RecursiveServiceA(final MockTCIServiceLoader mockTCIServiceLoader, final boolean async)
 		{
 			super(mockTCIServiceLoader, async, RecursiveServiceB.class);
 		}
@@ -175,11 +175,11 @@ class TCIServiceLoaderTest
 	
 	static class RecursiveServiceB extends BaseRecursiveService
 	{
-		public RecursiveServiceB()
+		RecursiveServiceB()
 		{
 		}
 		
-		public RecursiveServiceB(final MockTCIServiceLoader mockTCIServiceLoader, final boolean async)
+		RecursiveServiceB(final MockTCIServiceLoader mockTCIServiceLoader, final boolean async)
 		{
 			super(mockTCIServiceLoader, async, RecursiveServiceA.class);
 		}
@@ -188,7 +188,7 @@ class TCIServiceLoaderTest
 	
 	static class RecursiveServiceSelf extends BaseRecursiveService
 	{
-		public RecursiveServiceSelf(final MockTCIServiceLoader mockTCIServiceLoader, final boolean async)
+		RecursiveServiceSelf(final MockTCIServiceLoader mockTCIServiceLoader, final boolean async)
 		{
 			super(mockTCIServiceLoader, async, RecursiveServiceSelf.class);
 		}

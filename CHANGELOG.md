@@ -1,3 +1,11 @@
+# 3.1.0
+* `EntityManagerController`
+  * Now always checks if the EntityManager is already closed
+    * This was changed because the Jakarta EE does not specify how an already closed EntityManager should behave
+      * for example Hibernate doesn't care when you call call close multiple times as it checks for that while EclipseLink does not and crashes
+  * Removed `closeEntityManagerOnCleanupWithoutCheck`
+* Updated dependencies
+
 # 3.0.3
 * `EntityManagerController`
   * Make it possible to configure `closeEntityManagerOnCleanupWithoutCheck`
@@ -186,7 +194,7 @@
         * [``docker container commit``](https://docs.docker.com/reference/cli/docker/container/commit/)
             * Only snapshots storage - no in-memory data, processes, etc.
             * Volumes are not snapshoted due to [limitations](https://github.com/moby/moby/issues/43190) in Docker
-        * Other implementation like [CRIU](https://criu.org) may be available in the future once Docker adds support for them
+        * Other implementation like CRIU may be available in the future once Docker adds support for them
 
 # 1.1.3
 * Migrated deployment to _Sonatype Maven Central Portal_ [#155](https://github.com/xdev-software/standard-maven-template/issues/155)
