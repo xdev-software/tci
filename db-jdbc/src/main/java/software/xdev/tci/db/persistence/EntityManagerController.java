@@ -75,7 +75,7 @@ public class EntityManagerController implements AutoCloseable
 					em.getTransaction().rollback();
 				}
 				
-				// EclipseLink will crash if close is called on a already closed EntityManager
+				// EclipseLink will crash if close is called on an already closed EntityManager
 				if(!em.isOpen())
 				{
 					em.close();
