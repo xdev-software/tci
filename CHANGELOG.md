@@ -193,7 +193,7 @@
         * [``docker container commit``](https://docs.docker.com/reference/cli/docker/container/commit/)
             * Only snapshots storage - no in-memory data, processes, etc.
             * Volumes are not snapshoted due to [limitations](https://github.com/moby/moby/issues/43190) in Docker
-        * Other implementation like [CRIU](https://criu.org) may be available in the future once Docker adds support for them
+        * Other implementation like CRIU may be available in the future once Docker adds support for them
 
 # 1.1.3
 * Migrated deployment to _Sonatype Maven Central Portal_ [#155](https://github.com/xdev-software/standard-maven-template/issues/155)
