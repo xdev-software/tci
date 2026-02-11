@@ -31,7 +31,7 @@ class LazyNetworkTest
 		NETWORK_POOL.managePoolAsync();
 	}
 	
-	public static Stream<Arguments> networkComparison()
+	static Stream<Arguments> networkComparison()
 	{
 		return Stream.<Supplier<Network>>of(
 			Network::newNetwork,

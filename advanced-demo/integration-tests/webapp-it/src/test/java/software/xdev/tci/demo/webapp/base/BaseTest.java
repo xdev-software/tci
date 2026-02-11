@@ -38,7 +38,7 @@ import software.xdev.tci.tracing.TCITracer;
 
 
 @ExtendWith(BaseTest.WebclientTCSTSeleniumIntegrationTestExtension.class)
-abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
+public abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BaseTest.class);
 	

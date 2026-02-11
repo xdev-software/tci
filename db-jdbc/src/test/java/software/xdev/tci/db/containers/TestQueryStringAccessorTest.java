@@ -52,7 +52,7 @@ class TestQueryStringAccessorTest
 	{
 		private final String testQueryString;
 		
-		public MockJDBCContainer(final Future<String> image, final String testQueryString)
+		MockJDBCContainer(final Future<String> image, final String testQueryString)
 		{
 			super(image);
 			this.testQueryString = testQueryString;
