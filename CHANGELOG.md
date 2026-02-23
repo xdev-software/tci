@@ -1,3 +1,7 @@
+# 3.2.0
+* Deprecated `SeleniumRecordingExtension`
+  * Use `SeleniumRecorder` and `FileSystemFriendlyName` instead
+
 # 3.1.0
 * `EntityManagerController`
   * Now always checks if the EntityManager is already closed
