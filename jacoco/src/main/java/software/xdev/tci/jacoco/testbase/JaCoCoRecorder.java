@@ -146,7 +146,7 @@ public class JaCoCoRecorder
 				}
 				catch(final Exception ex)
 				{
-					LOG.warn("Unable to copy execution data file", ex);
+					LOG.warn("Unable to copy JaCoCo execution data file", ex);
 				}
 			},
 			TCIExecutorServiceHolder.instance()
