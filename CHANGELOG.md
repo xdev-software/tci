@@ -1,9 +1,13 @@
+# 3.2.1
+* Fix typo in BOM
+
 # 3.2.0
 * New module: `jacoco`
   * Support recording Code Coverage files and extracting them from the corresponding containers
   * See the documentation of the module for more details
 * Deprecated `SeleniumRecordingExtension`
   * Use `SeleniumRecorder` and `FileSystemFriendlyName` instead
+* Updated dependencies
 
 # 3.1.0
 * `EntityManagerController`
