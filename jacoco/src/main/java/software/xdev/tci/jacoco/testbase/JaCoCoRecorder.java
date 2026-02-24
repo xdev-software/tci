@@ -91,58 +91,73 @@ public class JaCoCoRecorder
 			return CompletableFuture.completedFuture(null);
 		}
 		
+		final GenericContainer<?> container = optTCI.orElseThrow().getContainer();
+		if(container == null)
+		{
+			LOG.debug("No container available");
+			return CompletableFuture.completedFuture(null);
+		}
+		
+		final String containerPath =
+			jaCoCoExecutionDataFilePathInContainer == null
+				&& container instanceof final JaCoCoAwareContainer jaCoCoAwareContainer
+				? jaCoCoAwareContainer.jaCoCoExecutionDataFilePathInContainer()
+				: jaCoCoExecutionDataFilePathInContainer;
+		if(containerPath == null)
+		{
+			LOG.warn(
+				"Unabled to determine container path for {}. "
+					+ "Forgot to implement JaCoCoAwareContainer or to specify parameter?",
+				container);
+			return CompletableFuture.completedFuture(null);
+		}
+		
 		return CompletableFuture.runAsync(
-			() -> {
-				final GenericContainer<?> container = optTCI.orElseThrow().getContainer();
-				if(container == null)
-				{
-					LOG.debug("No container available");
-					return;
-				}
-				
-				if(container.isRunning())
-				{
-					// Shutdown container so that jacoco agent dumps the execution data file
-					try
-					{
-						DockerClientFactory.lazyClient().stopContainerCmd(container.getContainerId()).exec();
-					}
-					catch(final Exception ex)
-					{
-						LOG.debug("Failed to stop container", ex);
-					}
-				}
-				
-				try
-				{
-					LOG.debug("Trying to extract JaCoCo execution data file");
-					
-					final String containerPath =
-						jaCoCoExecutionDataFilePathInContainer == null
-							&& container instanceof final JaCoCoAwareContainer jaCoCoAwareContainer
-							? jaCoCoAwareContainer.jaCoCoExecutionDataFilePathInContainer()
-							: jaCoCoExecutionDataFilePathInContainer;
-					
-					container.copyFileFromContainer(
-						containerPath,
-						is -> {
-							Files.copy(
-								is,
-								this.resolveDirForExecutionDataFiles(variantName)
-									.resolve(
-										fileSystemFriendlyNameSupplier.get() + this.config.executionDataFileSuffix()),
-								StandardCopyOption.REPLACE_EXISTING);
-							return null;
-						});
-					LOG.debug("Finished extraction of JaCoCo execution data file");
-				}
-				catch(final Exception ex)
-				{
-					LOG.debug("Unable to copy execution data file", ex);
-				}
-			},
+			() -> this.stopContainerAndCopy(fileSystemFriendlyNameSupplier, variantName, container, containerPath),
 			TCIExecutorServiceHolder.instance()
 		);
+	}
+	
+	protected void stopContainerAndCopy(
+		final Supplier<String> fileSystemFriendlyNameSupplier,
+		final String variantName,
+		final GenericContainer<?> container,
+		final String containerPath)
+	{
+		if(container.isRunning())
+		{
+			// Shutdown container so that jacoco agent dumps the execution data file
+			try
+			{
+				DockerClientFactory.lazyClient().stopContainerCmd(container.getContainerId()).exec();
+			}
+			catch(final Exception ex)
+			{
+				LOG.warn("Failed to stop container", ex);
+			}
+		}
+		
+		try
+		{
+			LOG.debug("Trying to extract JaCoCo execution data file");
+			
+			container.copyFileFromContainer(
+				containerPath,
+				is -> {
+					Files.copy(
+						is,
+						this.resolveDirForExecutionDataFiles(variantName)
+							.resolve(
+								fileSystemFriendlyNameSupplier.get() + this.config.executionDataFileSuffix()),
+						StandardCopyOption.REPLACE_EXISTING);
+					return null;
+				});
+			LOG.debug("Finished extraction of JaCoCo execution data file");
+		}
+		catch(final Exception ex)
+		{
+			LOG.warn("Unable to copy JaCoCo execution data file", ex);
+		}
 	}
 	
 	protected Path resolveDirForExecutionDataFiles(final String variantName)

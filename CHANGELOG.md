@@ -1,3 +1,7 @@
+# 3.2.3
+* `jacoco`
+  * Improved logging and error handling
+
 # 3.2.2
 * Fix typo in BOM
 
