@@ -39,6 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ !(github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/')) }}
     permissions:
+      contents: read
       checks: write # JaCoCo Coverage Report check
     steps:
     - uses: actions/checkout@v6
