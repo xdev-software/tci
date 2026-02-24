@@ -33,7 +33,7 @@ class LongButLittleResourceUsageTest extends InfraPerCaseTest
 		
 		try
 		{
-			Thread.sleep(20_000);
+			Thread.sleep(10_000);
 		}
 		catch(final InterruptedException iex)
 		{
