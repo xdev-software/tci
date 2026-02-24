@@ -123,7 +123,7 @@ public class JaCoCoRecorder
 					}
 					catch(final Exception ex)
 					{
-						LOG.debug("Failed to stop container", ex);
+						LOG.warn("Failed to stop container", ex);
 					}
 				}
 				
