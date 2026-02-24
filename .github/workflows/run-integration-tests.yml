@@ -35,6 +35,7 @@ jobs:
           - project: webapp-it
             jacoco: true
             video: true
+    name: "run-integration-tests (${{matrix.project}} ${{matrix.parallel}} ${{matrix.pre-start}} ${{matrix.java}})"
     runs-on: ubuntu-latest
     if: ${{ !(github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/')) }}
     steps:
