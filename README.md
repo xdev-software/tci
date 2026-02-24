@@ -20,8 +20,12 @@ Modules for XDEV's Testcontainer Infrastructure Framework
   * Data-generation template
   * Improved JDBC Container wait strategy
   * Predefined implementations for [Spring-ORM](./db-jdbc-spring-orm/) and [Hibernate](./db-jdbc-spring-orm-hibernate/)
+* [jacoco](./jacoco/)
+  * Allows for recording of JaCoCo code coverage files with Java containers
 * [jul-to-slf4j](./jul-to-slf4j/)
   * Logging Adapter to redirect JUL to SLF4J
+* [junit-jupiter-api-support](./junit-jupiter-api-support/)
+  * Support for JUnit 5+ (Jupiter) API
 * [mockserver](./mockserver/)
   * Predefined implementation for [Mockserver](https://github.com/xdev-software/mockserver-neolight)
 * [oidc-server-mock](./oidc-server-mock/)

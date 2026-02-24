@@ -1,4 +1,7 @@
 # 3.2.0
+* New module: `jacoco`
+  * Support recording Code Coverage files and extracting them from the corresponding containers
+  * See the documentation of the module for more details
 * Deprecated `SeleniumRecordingExtension`
   * Use `SeleniumRecorder` and `FileSystemFriendlyName` instead
 
