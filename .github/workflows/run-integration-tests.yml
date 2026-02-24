@@ -59,7 +59,7 @@ jobs:
       run: |
         ./mvnw -B test \
         -pl "advanced-demo/integration-tests/${{ matrix.project }}" -am \
-        -P run-it ${{ matrix.jacoco && ',jacoco' || '' }} \
+        -P run-it${{ matrix.jacoco && ',jacoco' || '' }} \
         ${{ matrix.pre-start && '-Dinfra-pre-start.enabled=1 ' || '' }} \
         ${{ matrix.parallel > 0 && format('-Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent -Djunit.jupiter.execution.parallel.config.strategy=fixed -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2 -Djunit.jupiter.execution.parallel.config.fixed.max-pool-size={0} ', matrix.parallel) || '' }}
 
