@@ -27,13 +27,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [21]
+        project: [persistence-it, webapp-it]
         parallel: [0, 2]
         pre-start: [false, true]
+        java: [21]
         include:
-          - project: persistence-it
-            jacoco: false
-            video: false
           - project: webapp-it
             jacoco: true
             video: true
