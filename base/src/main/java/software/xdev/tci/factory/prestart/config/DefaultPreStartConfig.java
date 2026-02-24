@@ -15,6 +15,8 @@
  */
 package software.xdev.tci.factory.prestart.config;
 
+import java.util.Optional;
+
 import software.xdev.tci.config.DefaultConfig;
 
 
@@ -30,8 +32,6 @@ import software.xdev.tci.config.DefaultConfig;
  */
 public class DefaultPreStartConfig extends DefaultConfig implements PreStartConfig
 {
-	protected static final String PROPERTY_PREFIX = "infra-pre-start.";
-	
 	protected static final String KEEP_READY = "keep-ready";
 	protected static final String MAX_START_SIMULTAN = "max-start-simultan";
 	protected static final String DIRECT_NETWORK_ATTACH_IF_POSSIBLE = "direct-network-attach-if-possible";
@@ -59,36 +59,38 @@ public class DefaultPreStartConfig extends DefaultConfig implements PreStartConf
 	@SuppressWarnings("checkstyle:MagicNumber")
 	public DefaultPreStartConfig()
 	{
-		this.enabled = this.getBool(PROPERTY_PREFIX + "enabled", DEFAULT_ENABLED);
+		this.enabled = this.resolveBool("enabled", DEFAULT_ENABLED);
 		
 		this.keepReady = this.enabled
-			? this.getInt(
-			PROPERTY_PREFIX + KEEP_READY,
-			() -> this.getInt(JUNIT_JUPITER_EXECUTION_PARALLEL_CONFIG_FIXED_MAX_POOL_SIZE, 1))
+			? this.resolveInt(
+			KEEP_READY,
+			() -> this.getSystemPropertyInt(JUNIT_JUPITER_EXECUTION_PARALLEL_CONFIG_FIXED_MAX_POOL_SIZE, 1))
 			: 0;
 		this.maxStartSimultan = this.enabled
-			? this.getInt(
-			PROPERTY_PREFIX + MAX_START_SIMULTAN,
-			() -> this.getInt(JUNIT_JUPITER_EXECUTION_PARALLEL_CONFIG_FIXED_MAX_POOL_SIZE, 1))
+			? this.resolveInt(
+			MAX_START_SIMULTAN,
+			() -> this.getSystemPropertyInt(JUNIT_JUPITER_EXECUTION_PARALLEL_CONFIG_FIXED_MAX_POOL_SIZE, 1))
 			: -1;
 		this.directNetworkAttachIfPossible =
-			this.getBool(
-				PROPERTY_PREFIX + DIRECT_NETWORK_ATTACH_IF_POSSIBLE,
-				DEFAULT_DIRECT_NETWORK_ATTACH_IF_POSSIBLE);
+			this.resolveBool(DIRECT_NETWORK_ATTACH_IF_POSSIBLE, DEFAULT_DIRECT_NETWORK_ATTACH_IF_POSSIBLE);
 		this.fixateExposedPortsIfRequired =
-			this.getBool(
-				PROPERTY_PREFIX + FIXATE_EXPOSED_PORTS_IF_REQUIRED,
-				DEFAULT_FIXATE_EXPOSED_PORTS_IF_REQUIRED);
+			this.resolveBool(FIXATE_EXPOSED_PORTS_IF_REQUIRED, DEFAULT_FIXATE_EXPOSED_PORTS_IF_REQUIRED);
 		
 		this.coordinatorIdleCPUPercent = this.enabled
-			? this.getInt(PROPERTY_PREFIX + COORDINATOR_IDLE_CPU_PERCENT, DEFAULT_COORDINATOR_IDLE_CPU_PERCENT)
+			? this.resolveInt(COORDINATOR_IDLE_CPU_PERCENT, DEFAULT_COORDINATOR_IDLE_CPU_PERCENT)
 			: -1;
 		this.coordinatorSchedulePeriodMs = this.enabled
-			? this.getInt(PROPERTY_PREFIX + COORDINATOR_SCHEDULE_PERIOD_MS, DEFAULT_COORDINATOR_SCHEDULE_PERIOD_MS)
+			? this.resolveInt(COORDINATOR_SCHEDULE_PERIOD_MS, DEFAULT_COORDINATOR_SCHEDULE_PERIOD_MS)
 			: -1;
 		
 		this.detectEndingTests = this.enabled
-			&& this.getBool(PROPERTY_PREFIX + DETECT_ENDING_TESTS, DEFAULT_DETECT_ENDING_TESTS);
+			&& this.resolveBool(DETECT_ENDING_TESTS, DEFAULT_DETECT_ENDING_TESTS);
+	}
+	
+	@Override
+	public String propertyNamePrefix()
+	{
+		return "infra-pre-start";
 	}
 	
 	@Override
@@ -101,7 +103,7 @@ public class DefaultPreStartConfig extends DefaultConfig implements PreStartConf
 	public int keepReady(final String preStartName)
 	{
 		return Math.max(0, this.enabled()
-			? this.getInt(PROPERTY_PREFIX + preStartName + "." + KEEP_READY, this.keepReady)
+			? this.resolveInt(preStartName + "." + KEEP_READY, this.keepReady)
 			: this.keepReady);
 	}
 	
@@ -109,7 +111,7 @@ public class DefaultPreStartConfig extends DefaultConfig implements PreStartConf
 	public int maxStartSimultan(final String preStartName)
 	{
 		return this.enabled()
-			? this.getInt(PROPERTY_PREFIX + preStartName + "." + MAX_START_SIMULTAN, this.maxStartSimultan)
+			? this.resolveInt(preStartName + "." + MAX_START_SIMULTAN, this.maxStartSimultan)
 			: this.maxStartSimultan;
 	}
 	
@@ -117,8 +119,8 @@ public class DefaultPreStartConfig extends DefaultConfig implements PreStartConf
 	public boolean directNetworkAttachIfPossible(final String preStartName)
 	{
 		return this.enabled()
-			? this.getBool(
-			PROPERTY_PREFIX + preStartName + "." + DIRECT_NETWORK_ATTACH_IF_POSSIBLE,
+			? this.resolveBool(
+			preStartName + "." + DIRECT_NETWORK_ATTACH_IF_POSSIBLE,
 			this.directNetworkAttachIfPossible)
 			: this.directNetworkAttachIfPossible;
 	}
@@ -127,8 +129,8 @@ public class DefaultPreStartConfig extends DefaultConfig implements PreStartConf
 	public boolean fixateExposedPortsIfRequired(final String preStartName)
 	{
 		return this.enabled()
-			? this.getBool(
-			PROPERTY_PREFIX + preStartName + "." + FIXATE_EXPOSED_PORTS_IF_REQUIRED,
+			? this.resolveBool(
+			preStartName + "." + FIXATE_EXPOSED_PORTS_IF_REQUIRED,
 			this.fixateExposedPortsIfRequired)
 			: this.fixateExposedPortsIfRequired;
 	}
@@ -149,5 +151,21 @@ public class DefaultPreStartConfig extends DefaultConfig implements PreStartConf
 	public boolean detectEndingTests()
 	{
 		return this.detectEndingTests;
+	}
+	
+	protected int getSystemPropertyInt(final String property, final int defaultVal)
+	{
+		return Optional.ofNullable(System.getProperty(property))
+			.map(s -> {
+				try
+				{
+					return Integer.parseInt(s);
+				}
+				catch(final NumberFormatException nfe)
+				{
+					return null;
+				}
+			})
+			.orElse(defaultVal);
 	}
 }

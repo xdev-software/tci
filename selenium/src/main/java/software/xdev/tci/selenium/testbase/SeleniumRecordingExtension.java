@@ -29,7 +29,7 @@ import software.xdev.tci.selenium.BrowserTCI;
 
 
 /**
- * @deprecated Use {@link SeleniumRecorder} instead
+ * @deprecated Use {@link SeleniumRecorder} instead.
  */
 @Deprecated(forRemoval = true)
 public abstract class SeleniumRecordingExtension implements AfterTestExecutionCallback
@@ -47,9 +47,9 @@ public abstract class SeleniumRecordingExtension implements AfterTestExecutionCa
 	@Override
 	public void afterTestExecution(final ExtensionContext context)
 	{
-		new SeleniumRecorder(LOG).afterTest(
+		new SeleniumRecorder(LOG).afterTestAsync(
 			context,
 			Optional.ofNullable(this.tciExtractor.apply(context)),
-			new FileSystemFriendlyName(context));
+			new FileSystemFriendlyName(context)).join();
 	}
 }

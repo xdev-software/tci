@@ -49,6 +49,11 @@
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
+				<artifactId>jacoco</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>software.xdev.tci</groupId>
 				<artifactId>oidc-server-mock</artifactId>
 				<version>${project.version}</version>
 			</dependency>

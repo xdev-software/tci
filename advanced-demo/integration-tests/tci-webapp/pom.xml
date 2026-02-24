@@ -17,6 +17,10 @@
 			<artifactId>base</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>software.xdev.tci</groupId>
+			<artifactId>jacoco</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>software.xdev</groupId>
 			<artifactId>testcontainers-advanced-imagebuilder</artifactId>
 		</dependency>

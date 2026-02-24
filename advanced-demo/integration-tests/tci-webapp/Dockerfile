@@ -74,6 +74,9 @@ RUN mv webapp/target/webapp.jar app.jar \
 
 FROM jre-minimized
 
+ARG JACOCO_AGENT_ENABLED
+ARG JACOCO_AGENT_VERSION="0.8.14"
+
 ARG user=app
 ARG group=app
 ARG uid=1000
@@ -84,7 +87,13 @@ ARG APP_DIR=/opt/app
 RUN mkdir -p ${APP_DIR} \
   && chown ${uid}:${gid} ${APP_DIR} \
   && addgroup -g ${gid} ${group} \
-  && adduser -h "$APP_DIR" -u ${uid} -G ${group} -s /bin/bash -D ${user}
+  && adduser -h "$APP_DIR" -u ${uid} -G ${group} -s /bin/bash -D ${user}; \
+  # Download JaCoCoAgent if required
+  if [ "$JACOCO_AGENT_ENABLED" = "1" ]; then \
+    mkdir -p /jacoco/report \
+    && chown $uid:$gid /jacoco/report \
+    && wget https://repo.maven.apache.org/maven2/org/jacoco/org.jacoco.agent/$JACOCO_AGENT_VERSION/org.jacoco.agent-$JACOCO_AGENT_VERSION-runtime.jar -O /jacoco/agent.jar; \
+  fi
 
 WORKDIR ${APP_DIR}
 
@@ -101,8 +110,9 @@ COPY --from=builder --chown=${user}:${group} /builder/extracted/snapshot-depende
 RUN true
 COPY --from=builder --chown=${user}:${group} /builder/extracted/application/ ./
 
+ENV JAVA_JACOCO_OPTS=${JACOCO_AGENT_ENABLED:+"-javaagent:/jacoco/agent.jar=destfile=/jacoco/report/jacoco.exec"}
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 -Djava.awt.headless=true"
 
 EXPOSE 8080
 
-CMD [ "/bin/sh", "-c", "java $JAVA_OPTS -jar /opt/app/app.jar" ]
+CMD [ "/bin/sh", "-c", "java $JAVA_OPTS $JAVA_JACOCO_OPTS -jar /opt/app/app.jar" ]

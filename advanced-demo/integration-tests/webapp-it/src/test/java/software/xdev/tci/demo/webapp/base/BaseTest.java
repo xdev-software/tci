@@ -28,6 +28,7 @@ import software.xdev.tci.demo.tci.db.factory.DBTCIFactory;
 import software.xdev.tci.demo.tci.webapp.WebAppTCI;
 import software.xdev.tci.demo.tci.webapp.factory.WebAppTCIFactory;
 import software.xdev.tci.factory.registry.TCIFactoryRegistry;
+import software.xdev.tci.jacoco.testbase.JaCoCoRecorder;
 import software.xdev.tci.junit.jupiter.FileSystemFriendlyName;
 import software.xdev.tci.network.LazyNetworkPool;
 import software.xdev.tci.oidc.OIDCTCI;
@@ -301,13 +302,23 @@ public abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 			final Optional<Throwable> executionExceptionOpt = context.getExecutionException();
 			executionExceptionOpt.ifPresent(throwable -> LOG.error("Test-Failure", throwable));
 			
-			new SeleniumRecorder().afterTest(
-				context,
-				context.getTestInstance()
-					.filter(BaseTest.class::isInstance)
-					.map(BaseTest.class::cast)
-					.map(BaseTest::browserInfra),
-				new FileSystemFriendlyName(context));
+			final FileSystemFriendlyName fileSystemFriendlyName = new FileSystemFriendlyName(context);
+			
+			CompletableFuture.allOf(
+				new SeleniumRecorder().afterTestAsync(
+					context,
+					context.getTestInstance()
+						.filter(BaseTest.class::isInstance)
+						.map(BaseTest.class::cast)
+						.map(BaseTest::browserInfra),
+					fileSystemFriendlyName),
+				JaCoCoRecorder.instance().afterTestAsync(
+					context.getTestInstance()
+						.filter(BaseTest.class::isInstance)
+						.map(BaseTest.class::cast)
+						.map(BaseTest::appInfra),
+					fileSystemFriendlyName)
+			).join();
 		}
 	}
 	

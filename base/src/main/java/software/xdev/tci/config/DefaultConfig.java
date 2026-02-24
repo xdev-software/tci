@@ -15,36 +15,40 @@
  */
 package software.xdev.tci.config;
 
+import java.util.Locale;
 import java.util.Optional;
-import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 
 
 public abstract class DefaultConfig
 {
-	protected boolean getBool(final String property, final boolean defaultValue)
+	protected abstract String propertyNamePrefix();
+	
+	protected Optional<String> resolve(final String propertyName)
 	{
-		return this.getBool(property, () -> defaultValue);
+		final String fullPropertyName = this.propertyNamePrefix() + "." + propertyName;
+		return Optional.ofNullable(System.getenv(fullPropertyName
+				.replace(".", "_")
+				.toUpperCase(Locale.ROOT)))
+			.or(() -> Optional.ofNullable(System.getProperty(fullPropertyName)));
 	}
 	
-	protected boolean getBool(
-		final String property,
-		final BooleanSupplier defaultValueSupplier)
+	protected boolean resolveBool(final String propertyName, final boolean defaultVal)
 	{
-		return Optional.ofNullable(System.getProperty(property))
-			.map(v -> "1".equals(v) || Boolean.parseBoolean(v))
-			.orElseGet(defaultValueSupplier::getAsBoolean);
+		return this.resolve(propertyName)
+			.map(s -> "1".equals(s) || Boolean.parseBoolean(s))
+			.orElse(defaultVal);
 	}
 	
-	protected int getInt(final String property, final int defaultValue)
+	protected int resolveInt(final String propertyName, final int defaultVal)
 	{
-		return this.getInt(property, () -> defaultValue);
+		return this.resolveInt(propertyName, () -> defaultVal);
 	}
 	
-	protected int getInt(final String property, final IntSupplier defaultValueSupplier)
+	protected int resolveInt(final String propertyName, final IntSupplier defaultValueSupplier)
 	{
-		return Optional.ofNullable(System.getProperty(property))
+		return this.resolve(propertyName)
 			.map(s -> {
 				try
 				{
@@ -58,14 +62,9 @@ public abstract class DefaultConfig
 			.orElseGet(defaultValueSupplier::getAsInt);
 	}
 	
-	protected long getLong(final String property, final long defaultValue)
+	protected long resolveLong(final String propertyName, final LongSupplier defaultValueSupplier)
 	{
-		return this.getLong(property, () -> defaultValue);
-	}
-	
-	protected long getLong(final String property, final LongSupplier defaultValueSupplier)
-	{
-		return Optional.ofNullable(System.getProperty(property))
+		return this.resolve(propertyName)
 			.map(s -> {
 				try
 				{

@@ -11,6 +11,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import software.xdev.tci.jacoco.testbase.config.JaCoCoConfig;
 import software.xdev.testcontainers.imagebuilder.AdvancedImageFromDockerFile;
 import software.xdev.testcontainers.imagebuilder.compat.DockerfileCOPYParentsEmulator;
 import software.xdev.testcontainers.imagebuilder.transfer.fcm.FileLinesContentModifier;
@@ -99,6 +100,11 @@ public final class WebAppContainerBuilder
 							return original.size() == created.size();
 						}
 					}));
+		
+		if(JaCoCoConfig.instance().enabled())
+		{
+			builder.withBuildArg("JACOCO_AGENT_ENABLED", "1");
+		}
 		
 		try
 		{

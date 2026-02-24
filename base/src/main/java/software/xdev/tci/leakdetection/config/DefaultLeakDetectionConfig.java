@@ -22,16 +22,20 @@ import software.xdev.tci.config.DefaultConfig;
 
 public class DefaultLeakDetectionConfig extends DefaultConfig implements LeakDetectionConfig
 {
-	protected static final String PROPERTY_PREFIX = "leak-detection.";
-	
 	protected final boolean enabled;
 	protected final Duration defaultStopTimeout;
 	
 	public DefaultLeakDetectionConfig()
 	{
-		this.enabled = this.getBool(PROPERTY_PREFIX + "enabled", DEFAULT_ENABLED);
+		this.enabled = this.resolveBool("enabled", DEFAULT_ENABLED);
 		this.defaultStopTimeout = Duration.ofMillis(
-			this.getLong(PROPERTY_PREFIX + "stop-timeout-ms", DEFAULT_STOP_TIMEOUT::toMillis));
+			this.resolveLong("stop-timeout-ms", DEFAULT_STOP_TIMEOUT::toMillis));
+	}
+	
+	@Override
+	protected String propertyNamePrefix()
+	{
+		return "leak-detection";
 	}
 	
 	@Override

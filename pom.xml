@@ -20,6 +20,7 @@
 		<module>db-jdbc</module>
 		<module>db-jdbc-spring-orm</module>
 		<module>db-jdbc-spring-orm-hibernate</module>
+		<module>jacoco</module>
 		<module>jul-to-slf4j</module>
 		<module>junit-jupiter-api-support</module>
 		<module>mockserver</module>
