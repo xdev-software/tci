@@ -100,6 +100,20 @@ public class JaCoCoRecorder
 					return;
 				}
 				
+				final String containerPath =
+					jaCoCoExecutionDataFilePathInContainer == null
+						&& container instanceof final JaCoCoAwareContainer jaCoCoAwareContainer
+						? jaCoCoAwareContainer.jaCoCoExecutionDataFilePathInContainer()
+						: jaCoCoExecutionDataFilePathInContainer;
+				if(containerPath == null)
+				{
+					LOG.warn(
+						"Unabled to determine container path for {}. "
+							+ "Forgot to implement JaCoCoAwareContainer or to specify parameter?",
+						container);
+					return;
+				}
+				
 				if(container.isRunning())
 				{
 					// Shutdown container so that jacoco agent dumps the execution data file
@@ -117,12 +131,6 @@ public class JaCoCoRecorder
 				{
 					LOG.debug("Trying to extract JaCoCo execution data file");
 					
-					final String containerPath =
-						jaCoCoExecutionDataFilePathInContainer == null
-							&& container instanceof final JaCoCoAwareContainer jaCoCoAwareContainer
-							? jaCoCoAwareContainer.jaCoCoExecutionDataFilePathInContainer()
-							: jaCoCoExecutionDataFilePathInContainer;
-					
 					container.copyFileFromContainer(
 						containerPath,
 						is -> {
@@ -138,7 +146,7 @@ public class JaCoCoRecorder
 				}
 				catch(final Exception ex)
 				{
-					LOG.debug("Unable to copy execution data file", ex);
+					LOG.warn("Unable to copy execution data file", ex);
 				}
 			},
 			TCIExecutorServiceHolder.instance()
