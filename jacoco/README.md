@@ -1,7 +1,7 @@
 # JaCoCo
 
 Provides support for [JaCoCo](https://github.com/jacoco/jacoco) Code Coverage in combination with Java containers.
-* Allows for recording of code coverage files
+* Allows for recording and extraction of code coverage files from containers
 * Support for Testcontainers API
 
 NOTE: Using this is a bit complex as it also requires some changes to the java application in the container.<br/>
