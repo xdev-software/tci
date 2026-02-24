@@ -82,7 +82,7 @@ jobs:
     - name: Aggregate WebApp JaCoCo report
       if: ${{ matrix.jacoco && always() }}
       run: |
-        ./mvnw -B jacoco-aggregator-maven-plugin:report-aggregate-all -pl "advanced-demo/webapp" -am
+        ./mvnw -B jacoco-aggregator:report-aggregate-all -pl "advanced-demo/webapp" -am
 
     - name: Upload WebApp JaCoCo report
       if: ${{ matrix.jacoco && always() }}
