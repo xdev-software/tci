@@ -40,6 +40,8 @@ jobs:
     name: "run-integration-tests (${{matrix.project}}, ${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})"
     runs-on: ubuntu-latest
     if: ${{ !(github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/')) }}
+    permissions:
+      checks: write # JaCoCo Coverage Report check
     steps:
     - uses: actions/checkout@v6
 
