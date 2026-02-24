@@ -99,7 +99,7 @@ jobs:
       uses: PavanMudigonda/jacoco-reporter@4fc6bf270fe893e8dda5467e432253a6961345b8 # v5.0
       with:
         coverage_results_path: advanced-demo/target/site/jacoco-aggregate/jacoco.xml
-        coverage_report_name: WebApp Coverage
+        coverage_report_name: WebApp Coverage (${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})
         coverage_report_title: JaCoCo
         github_token: ${{ secrets.GITHUB_TOKEN }}
     
