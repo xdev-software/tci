@@ -1,0 +1,116 @@
+name: Run integration tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ develop ]
+    paths-ignore: 
+      - '**.md'
+      - '.config/**'
+      - '.github/**'
+      - '.idea/**'
+      - 'assets/**'
+  pull_request:
+    branches: [ develop ]
+    paths-ignore: 
+      - '**.md'
+      - '.config/**'
+      - '.github/**'
+      - '.idea/**'
+      - 'assets/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  run-integration-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [persistence-it, webapp-it]
+        parallel: [0, 2]
+        pre-start: [false, true]
+        java: [21]
+        include:
+          - project: webapp-it
+            jacoco: true
+            video: true
+    name: "run-integration-tests (${{matrix.project}}, ${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})"
+    runs-on: ubuntu-latest
+    if: ${{ !(github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/')) }}
+    permissions:
+      contents: read
+      checks: write # JaCoCo Coverage Report check
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up JDK
+      uses: actions/setup-java@v5
+      with:
+        distribution: temurin
+        java-version: ${{ matrix.java }}
+
+    - name: Cache Maven
+      uses: actions/cache@v5
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-mvn-it-build-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-mvn-it-build-
+          ${{ runner.os }}-mvn-build-
+
+    - name: Test
+      run: |
+        ./mvnw -B test \
+        -pl "advanced-demo/integration-tests/${{ matrix.project }}" -am \
+        -P run-it${{ matrix.jacoco && ',jacoco' || '' }} \
+        ${{ matrix.pre-start && '-Dinfra-pre-start.enabled=1 ' || '' }} \
+        ${{ matrix.parallel > 0 && format('-Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent -Djunit.jupiter.execution.parallel.config.strategy=fixed -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2 -Djunit.jupiter.execution.parallel.config.fixed.max-pool-size={0} ', matrix.parallel) || '' }}
+
+    # Replace '/' with '-'
+    - name: Normalize project name
+      env:
+        PROJECT: ${{ matrix.project }}
+      run: echo PROJECT_NORMALIZED=${PROJECT/\//-} >> $GITHUB_ENV
+
+    - name: Upload videos of test failures
+      if: ${{ matrix.video && failure() }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-fail-videos-${{ matrix.java }}-${{ env.PROJECT_NORMALIZED }}-${{ matrix.parallel }}-${{ matrix.pre-start }}
+        path: advanced-demo/integration-tests/${{ matrix.project }}/target/records
+        if-no-files-found: ignore
+
+    - name: Aggregate WebApp JaCoCo report
+      if: ${{ matrix.jacoco && !cancelled() }}
+      # Important: Also run compile (if not already done) so that we have all class files - otherwise the report will be incomplete
+      run: |
+        ./mvnw -B compile jacoco-aggregator:report-aggregate-all -pl "advanced-demo/webapp" -am -T2C
+
+    - name: Upload WebApp JaCoCo report
+      if: ${{ matrix.jacoco && !cancelled() }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: webapp-jacoco-report-${{ matrix.java }}-${{ env.PROJECT_NORMALIZED }}-${{ matrix.parallel }}-${{ matrix.pre-start }}
+        path: advanced-demo/target/site/jacoco-aggregate
+        if-no-files-found: ignore
+
+    - name: WebApp JaCoCo Code Coverage Report
+      if: ${{ matrix.jacoco && !cancelled() }}
+      id: jacoco_reporter
+      uses: PavanMudigonda/jacoco-reporter@4fc6bf270fe893e8dda5467e432253a6961345b8 # v5.0
+      with:
+        coverage_results_path: advanced-demo/target/site/jacoco-aggregate/jacoco.xml
+        coverage_report_name: WebApp Coverage (${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})
+        coverage_report_title: JaCoCo
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Add WebApp JaCoCo report to workflow run summary
+      if: ${{ matrix.jacoco && !cancelled() }}
+      run: |
+        echo "| Outcome | Value |" >> $GITHUB_STEP_SUMMARY
+        echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+        echo "| Code Coverage % | ${{ steps.jacoco_reporter.outputs.coverage_percentage }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| :heavy_check_mark: Number of Lines Covered | ${{ steps.jacoco_reporter.outputs.covered_lines }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| :x: Number of Lines Missed | ${{ steps.jacoco_reporter.outputs.missed_lines }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Total Number of Lines | ${{ steps.jacoco_reporter.outputs.total_lines }} |" >> $GITHUB_STEP_SUMMARY
