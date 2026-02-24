@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci</groupId>
 	<artifactId>root</artifactId>
-	<version>3.1.1-SNAPSHOT</version>
+	<version>3.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<organization>
@@ -20,7 +20,9 @@
 		<module>db-jdbc</module>
 		<module>db-jdbc-spring-orm</module>
 		<module>db-jdbc-spring-orm-hibernate</module>
+		<module>jacoco</module>
 		<module>jul-to-slf4j</module>
+		<module>junit-jupiter-api-support</module>
 		<module>mockserver</module>
 		<module>oidc-server-mock</module>
 		<module>selenium</module>

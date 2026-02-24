@@ -8,9 +8,11 @@ import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 
+import software.xdev.tci.jacoco.containers.JaCoCoAwareContainer;
+
 
 @SuppressWarnings("java:S2160")
-public class WebAppContainer extends GenericContainer<WebAppContainer>
+public class WebAppContainer extends GenericContainer<WebAppContainer> implements JaCoCoAwareContainer
 {
 	public static final int DEFAULT_HTTP_PORT = 8080;
 	

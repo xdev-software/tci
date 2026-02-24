@@ -16,18 +16,17 @@
 package software.xdev.tci.selenium.factory.config;
 
 import java.nio.file.Path;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import software.xdev.tci.config.DefaultConfig;
 import software.xdev.tci.selenium.factory.BrowserTCIFactory;
 import software.xdev.testcontainers.selenium.containers.browser.BrowserWebDriverContainer;
 
 
-public class DefaultBrowserTCIFactoryConfig implements BrowserTCIFactoryConfig
+public class DefaultBrowserTCIFactoryConfig extends DefaultConfig implements BrowserTCIFactoryConfig
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultBrowserTCIFactoryConfig.class);
 	
@@ -47,20 +46,10 @@ public class DefaultBrowserTCIFactoryConfig implements BrowserTCIFactoryConfig
 	protected Boolean deactivateCdpIfPossible;
 	protected BrowserTCIFactory.BrowserConsoleLogLevel browserConsoleLogLevel;
 	
-	protected Optional<String> resolve(final String propertyName)
+	@Override
+	protected String propertyNamePrefix()
 	{
-		final String fullPropertyName = "tci.selenium." + propertyName;
-		return Optional.ofNullable(System.getenv(fullPropertyName
-				.replace(".", "_")
-				.toUpperCase(Locale.ENGLISH)))
-			.or(() -> Optional.ofNullable(System.getProperty(fullPropertyName)));
-	}
-	
-	protected boolean resolveBool(final String propertyName, final boolean defaultVal)
-	{
-		return this.resolve(propertyName)
-			.map(s -> "1".equals(s) || Boolean.parseBoolean(s))
-			.orElse(defaultVal);
+		return "tci.selenium";
 	}
 	
 	@Override
@@ -86,7 +75,7 @@ public class DefaultBrowserTCIFactoryConfig implements BrowserTCIFactoryConfig
 			this.dirForRecords = Path.of(this.resolve(RECORD_DIR).orElse(DEFAULT_RECORD_DIR));
 			final boolean wasCreated = this.dirForRecords.toFile().mkdirs();
 			LOG.info(
-				"Default Directory for records='{}', created={}", this.dirForRecords.toAbsolutePath(),
+				"Default directory for records='{}', created={}", this.dirForRecords.toAbsolutePath(),
 				wasCreated);
 		}
 		
