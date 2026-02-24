@@ -83,12 +83,12 @@ jobs:
         if-no-files-found: ignore
 
     - name: Aggregate WebApp JaCoCo report
-      if: ${{ matrix.jacoco && always() }}
+      if: ${{ matrix.jacoco && !cancelled() }}
       run: |
         ./mvnw -B jacoco-aggregator:report-aggregate-all -pl "advanced-demo/webapp" -am
 
     - name: Upload WebApp JaCoCo report
-      if: ${{ matrix.jacoco && always() }}
+      if: ${{ matrix.jacoco && !cancelled() }}
       uses: actions/upload-artifact@v6
       with:
         name: webapp-jacoco-report-${{ matrix.java }}-${{ env.PROJECT_NORMALIZED }}-${{ matrix.parallel }}-${{ matrix.pre-start }}
@@ -96,7 +96,7 @@ jobs:
         if-no-files-found: ignore
 
     - name: WebApp JaCoCo Code Coverage Report
-      if: ${{ matrix.jacoco && always() }}
+      if: ${{ matrix.jacoco && !cancelled() }}
       id: jacoco_reporter
       uses: PavanMudigonda/jacoco-reporter@4fc6bf270fe893e8dda5467e432253a6961345b8 # v5.0
       with:
@@ -106,7 +106,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Add WebApp JaCoCo report to workflow run summary
-      if: ${{ matrix.jacoco && always() }}
+      if: ${{ matrix.jacoco && !cancelled() }}
       run: |
         echo "| Outcome | Value |" >> $GITHUB_STEP_SUMMARY
         echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
