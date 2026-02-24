@@ -82,8 +82,9 @@ jobs:
 
     - name: Aggregate WebApp JaCoCo report
       if: ${{ matrix.jacoco && !cancelled() }}
+      # Important: Also run compile (if not already done) so that we have all class files - otherwise the report will be incomplete
       run: |
-        ./mvnw -B jacoco-aggregator:report-aggregate-all -pl "advanced-demo/webapp" -am
+        ./mvnw -B compile jacoco-aggregator:report-aggregate-all -pl "advanced-demo/webapp" -am -T2C
 
     - name: Upload WebApp JaCoCo report
       if: ${{ matrix.jacoco && !cancelled() }}
