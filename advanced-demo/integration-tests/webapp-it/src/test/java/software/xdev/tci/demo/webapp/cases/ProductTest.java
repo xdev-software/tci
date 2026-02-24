@@ -1,6 +1,8 @@
 package software.xdev.tci.demo.webapp.cases;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -50,7 +52,8 @@ class ProductTest extends InfraPerCaseTest
 		// First element contains response body
 		final String responseText = liveResponseTable.findElements(By.className("microlight")).get(0).getText();
 		// Id should be 2 as another product was created before
-		Assertions.assertEquals("""
+		assertEquals(
+			"""
 			{
 			  "id": 2,
 			  "name": "TEST-ABC"
@@ -58,7 +61,7 @@ class ProductTest extends InfraPerCaseTest
 		
 		this.dbInfra().useNewEntityManager(em -> {
 			final ProductDAO productDAO = new ProductDAO(em);
-			Assertions.assertNotNull(productDAO.findByName("TEST-ABC"));
+			assertNotNull(productDAO.findByName("TEST-ABC"));
 		});
 	}
 }

@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -27,17 +28,19 @@ import software.xdev.tci.demo.tci.db.factory.DBTCIFactory;
 import software.xdev.tci.demo.tci.webapp.WebAppTCI;
 import software.xdev.tci.demo.tci.webapp.factory.WebAppTCIFactory;
 import software.xdev.tci.factory.registry.TCIFactoryRegistry;
+import software.xdev.tci.jacoco.testbase.JaCoCoRecorder;
+import software.xdev.tci.junit.jupiter.FileSystemFriendlyName;
 import software.xdev.tci.network.LazyNetworkPool;
 import software.xdev.tci.oidc.OIDCTCI;
 import software.xdev.tci.oidc.factory.OIDCTCIFactory;
 import software.xdev.tci.selenium.BrowserTCI;
 import software.xdev.tci.selenium.TestBrowser;
 import software.xdev.tci.selenium.factory.BrowsersTCIFactory;
-import software.xdev.tci.selenium.testbase.SeleniumRecordingExtension;
+import software.xdev.tci.selenium.testbase.SeleniumRecorder;
 import software.xdev.tci.tracing.TCITracer;
 
 
-@ExtendWith(BaseTest.WebclientTCSTSeleniumIntegrationTestExtension.class)
+@ExtendWith(BaseTest.TCSTSeleniumIntegrationTestExtension.class)
 public abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BaseTest.class);
@@ -281,20 +284,10 @@ public abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 		return this.appInfra.getInternalHTTPEndpoint();
 	}
 	
-	public static class WebclientTCSTSeleniumIntegrationTestExtension
-		extends SeleniumRecordingExtension
-		implements BeforeTestExecutionCallback
+	public static class TCSTSeleniumIntegrationTestExtension
+		implements BeforeTestExecutionCallback, AfterTestExecutionCallback
 	{
-		private static final Logger LOG = LoggerFactory.getLogger(WebclientTCSTSeleniumIntegrationTestExtension.class);
-		
-		public WebclientTCSTSeleniumIntegrationTestExtension()
-		{
-			super(context -> context.getTestInstance()
-				.filter(BaseTest.class::isInstance)
-				.map(BaseTest.class::cast)
-				.map(BaseTest::browserInfra)
-				.orElse(null));
-		}
+		private static final Logger LOG = LoggerFactory.getLogger(TCSTSeleniumIntegrationTestExtension.class);
 		
 		@Override
 		public void beforeTestExecution(final ExtensionContext context)
@@ -303,13 +296,29 @@ public abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 		}
 		
 		@Override
-		public void afterTestExecution(final ExtensionContext context) throws Exception
+		public void afterTestExecution(final ExtensionContext context)
 		{
 			LOG.info("^^^^^^--END TEST--^^^^^^");
 			final Optional<Throwable> executionExceptionOpt = context.getExecutionException();
 			executionExceptionOpt.ifPresent(throwable -> LOG.error("Test-Failure", throwable));
 			
-			super.afterTestExecution(context);
+			final FileSystemFriendlyName fileSystemFriendlyName = new FileSystemFriendlyName(context);
+			
+			CompletableFuture.allOf(
+				new SeleniumRecorder().afterTestAsync(
+					context,
+					context.getTestInstance()
+						.filter(BaseTest.class::isInstance)
+						.map(BaseTest.class::cast)
+						.map(BaseTest::browserInfra),
+					fileSystemFriendlyName),
+				JaCoCoRecorder.instance().afterTestAsync(
+					context.getTestInstance()
+						.filter(BaseTest.class::isInstance)
+						.map(BaseTest.class::cast)
+						.map(BaseTest::appInfra),
+					fileSystemFriendlyName)
+			).join();
 		}
 	}
 	

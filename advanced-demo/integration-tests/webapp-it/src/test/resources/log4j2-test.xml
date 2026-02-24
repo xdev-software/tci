@@ -21,6 +21,8 @@
 		<!-- Problem: "Failed to validate connection... cannot be called on a closed connection"
 			is partially shown after container is connected onto new network -->
 		<logger name="com.zaxxer.hikari.pool.PoolBase" level="ERROR"/>
+		<!-- Spam: "WebDriver augmented with BiDi interface; connection will not be verified until first use" -->
+		<logger name="org.openqa.selenium.bidi.BiDiProvider" level="WARN"/>
 
 		<!-- *** Container: WARN = OFF, INFO = ALL *** -->
 		<logger name="container.db" level="WARN"/>

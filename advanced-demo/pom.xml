@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci.demo</groupId>
 	<artifactId>advanced-demo</artifactId>
-	<version>3.1.1-SNAPSHOT</version>
+	<version>3.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<organization>
@@ -21,7 +21,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<org.springframework.boot.version>4.0.2</org.springframework.boot.version>
+		<org.springframework.boot.version>4.0.3</org.springframework.boot.version>
 	</properties>
 
 	<modules>
@@ -38,19 +38,19 @@
 			<dependency>
 				<groupId>software.xdev.tci.demo</groupId>
 				<artifactId>entities</artifactId>
-				<version>3.1.1-SNAPSHOT</version>
+				<version>3.2.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>software.xdev.tci.demo</groupId>
 				<artifactId>entities-metamodel</artifactId>
-				<version>3.1.1-SNAPSHOT</version>
+				<version>3.2.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>software.xdev.tci.demo</groupId>
 				<artifactId>persistence</artifactId>
-				<version>3.1.1-SNAPSHOT</version>
+				<version>3.2.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
@@ -70,7 +70,7 @@
 			<dependency>
 				<groupId>org.junit</groupId>
 				<artifactId>junit-bom</artifactId>
-				<version>6.0.2</version>
+				<version>6.0.3</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -137,7 +137,13 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.5.4</version>
+					<version>3.5.5</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.4.0</version>
 				</plugin>
 
 				<plugin>
@@ -178,6 +184,13 @@
 					<groupId>io.github.git-commit-id</groupId>
 					<artifactId>git-commit-id-maven-plugin</artifactId>
 					<version>9.0.2</version>
+				</plugin>
+
+				<!-- Correctly aggregates without requiring a dedicated aggregator module -->
+				<plugin>
+					<groupId>io.github.olamy.maven.plugins</groupId>
+					<artifactId>jacoco-aggregator-maven-plugin</artifactId>
+					<version>1.0.4</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
