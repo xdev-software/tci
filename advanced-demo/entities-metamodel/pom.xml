@@ -12,8 +12,6 @@
 	<artifactId>entities-metamodel</artifactId>
 
 	<properties>
-		<metamodel.sourceDir>${project.basedir}/../entities/src/main/java</metamodel.sourceDir>
-		<project.generated.sources>${project.basedir}/src/gen/java/</project.generated.sources>
 		<!-- Ignore auto generated code -->
 		<sonar.exclusions>
 			src/gen/java/**
@@ -28,6 +26,6 @@
 	</dependencies>
 
 	<build>
-		<sourceDirectory>${project.generated.sources}</sourceDirectory>
+		<sourceDirectory>${project.basedir}/src/gen/java/</sourceDirectory>
 	</build>
 </project>
