@@ -1,3 +1,9 @@
+# 3.3.0
+* Updated [`testcontainers-selenium`](https://github.com/xdev-software/testcontainers-selenium) to v2
+  * Files are now recorded BY DEFAULT as `.mkv` (was `.mp4`)
+* Improve customizability of `BrowserTCIFactory` by introducing `createDefaultRecordingContainer`
+* Updated dependencies
+
 # 3.2.3
 * `jacoco`
   * Improved logging and error handling

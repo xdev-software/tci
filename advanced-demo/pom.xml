@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci.demo</groupId>
 	<artifactId>advanced-demo</artifactId>
-	<version>3.2.4-SNAPSHOT</version>
+	<version>3.3.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<organization>
@@ -38,19 +38,19 @@
 			<dependency>
 				<groupId>software.xdev.tci.demo</groupId>
 				<artifactId>entities</artifactId>
-				<version>3.2.4-SNAPSHOT</version>
+				<version>3.3.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>software.xdev.tci.demo</groupId>
 				<artifactId>entities-metamodel</artifactId>
-				<version>3.2.4-SNAPSHOT</version>
+				<version>3.3.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>software.xdev.tci.demo</groupId>
 				<artifactId>persistence</artifactId>
-				<version>3.2.4-SNAPSHOT</version>
+				<version>3.3.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
@@ -62,7 +62,7 @@
 			<dependency>
 				<groupId>org.springdoc</groupId>
 				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-				<version>3.0.1</version>
+				<version>3.0.2</version>
 			</dependency>
 
 			<!-- Tests -->
@@ -143,7 +143,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
-					<version>3.4.0</version>
+					<version>3.5.0</version>
 				</plugin>
 
 				<plugin>
@@ -156,20 +156,6 @@
 							<arg>-proc:none</arg>
 						</compilerArgs>
 					</configuration>
-				</plugin>
-
-				<!-- Required for generating JPA classes -->
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>3.6.1</version>
-				</plugin>
-
-				<!-- Required for generating JPA classes -->
-				<plugin>
-					<groupId>org.bsc.maven</groupId>
-					<artifactId>maven-processor-plugin</artifactId>
-					<version>5.1</version>
 				</plugin>
 
 				<!-- Spring -->
@@ -209,7 +195,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>13.2.0</version>
+								<version>13.3.0</version>
 							</dependency>
 						</dependencies>
 						<configuration>
@@ -250,12 +236,12 @@
 							<dependency>
 								<groupId>net.sourceforge.pmd</groupId>
 								<artifactId>pmd-core</artifactId>
-								<version>7.21.0</version>
+								<version>7.22.0</version>
 							</dependency>
 							<dependency>
 								<groupId>net.sourceforge.pmd</groupId>
 								<artifactId>pmd-java</artifactId>
-								<version>7.21.0</version>
+								<version>7.22.0</version>
 							</dependency>
 						</dependencies>
 					</plugin>
