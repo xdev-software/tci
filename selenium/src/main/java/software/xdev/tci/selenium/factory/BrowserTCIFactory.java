@@ -104,9 +104,8 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 			// 2024-04 VNC is no longer required when recording
 			.withDisableVNC(!config.vncEnabled())
 			.withEnableNoVNC(config.vncEnabled())
-			.withRecordingContainerSupplier(t -> new SeleniumRecordingContainer(t)
-				.withLogConsumer(getLogConsumer("container.browserrecorder." + capabilities.getBrowserName()))
-				.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M)))
+			.withRecordingContainerSupplier(browserContainer ->
+				createDefaultRecordingContainer(browserContainer, capabilities))
 			// Without that a mount volume dialog shows up
 			// https://github.com/testcontainers/testcontainers-java/issues/1670
 			.withSharedMemorySize(ContainerMemory.M2G)
@@ -126,6 +125,15 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 					.withStartupTimeout(Duration.ofSeconds(30 + 20L * cpuSlownessFactor())))
 				.withStrategy(new HostPortWaitStrategy())
 				.withStartupTimeout(Duration.ofSeconds(30 + 20L * cpuSlownessFactor())));
+	}
+	
+	public static SeleniumRecordingContainer createDefaultRecordingContainer(
+		final SeleniumBrowserWebDriverContainer browserContainer,
+		final MutableCapabilities capabilities)
+	{
+		return new SeleniumRecordingContainer(browserContainer)
+			.withLogConsumer(getLogConsumer("container.browserrecorder." + capabilities.getBrowserName()))
+			.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M));
 	}
 	
 	public BrowserTCIFactory(
