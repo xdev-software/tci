@@ -72,14 +72,14 @@
 			<dependency>
 				<groupId>org.seleniumhq.selenium</groupId>
 				<artifactId>selenium-dependencies-bom</artifactId>
-				<version>4.41.0</version>
+				<version>4.43.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.testcontainers</groupId>
 				<artifactId>testcontainers-bom</artifactId>
-				<version>2.0.3</version>
+				<version>2.0.4</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -98,7 +98,7 @@
 			<dependency>
 				<groupId>software.xdev</groupId>
 				<artifactId>testcontainers-advanced-imagebuilder</artifactId>
-				<version>2.4.1</version>
+				<version>2.5.0</version>
 			</dependency>
 
 			<!-- Utility for proxies in tests -->
