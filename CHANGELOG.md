@@ -1,3 +1,6 @@
+# 3.3.1
+* Updated dependencies
+
 # 3.3.0
 * Updated [`testcontainers-selenium`](https://github.com/xdev-software/testcontainers-selenium) to v2
   * Files are now recorded BY DEFAULT as `.mkv` (was `.mp4`)
