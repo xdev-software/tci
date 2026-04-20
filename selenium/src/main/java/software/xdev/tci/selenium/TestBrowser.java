@@ -1,0 +1,53 @@
+/*
+ * Copyright © 2025 XDEV Software (https://xdev.software)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package software.xdev.tci.selenium;
+
+import java.util.function.Supplier;
+
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
+
+
+public enum TestBrowser
+{
+	FIREFOX(() -> {
+		final FirefoxOptions options = new FirefoxOptions();
+		
+		final FirefoxProfile profile = new FirefoxProfile();
+		// Allows to type into console without an annoying SELF XSS popup
+		profile.setPreference("devtools.selfxss.count", "100");
+		// Ignore panel popup on downloads that block top right UI
+		profile.setPreference("browser.download.alwaysOpenPanel", false);
+		options.setProfile(profile);
+		
+		return options;
+	}),
+	CHROME(ChromeOptions::new);
+	
+	private final Supplier<MutableCapabilities> capabilityFactory;
+	
+	TestBrowser(final Supplier<MutableCapabilities> driverFactory)
+	{
+		this.capabilityFactory = driverFactory;
+	}
+	
+	public Supplier<MutableCapabilities> getCapabilityFactory()
+	{
+		return this.capabilityFactory;
+	}
+}
