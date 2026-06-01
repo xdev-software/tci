@@ -74,7 +74,8 @@
       "description": "Group org.junit",
       "matchPackagePatterns": [
         "^org.junit:junit-bom",
-        "^org.junit.jupiter"
+        "^org.junit.jupiter",
+        "^org.junit.platform:junit-platform-launcher"
       ],
       "datasources": [
         "maven"
