@@ -74,7 +74,8 @@
       "description": "Group org.junit",
       "matchPackagePatterns": [
         "^org.junit:junit-bom",
-        "^org.junit.jupiter"
+        "^org.junit.jupiter",
+        "^org.junit.platform:junit-platform-launcher"
       ],
       "datasources": [
         "maven"
@@ -100,6 +101,16 @@
         "maven"
       ],
       "groupName": "org.hibernate.orm"
+    },
+    {
+      "description": "Group org.slf4j",
+      "matchPackagePatterns": [
+        "^org.slf4j"
+      ],
+      "datasources": [
+        "maven"
+      ],
+      "groupName": "org.slf4j"
     }
   ]
 }
