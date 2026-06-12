@@ -99,7 +99,7 @@ jobs:
     - name: WebApp JaCoCo Code Coverage Report
       if: ${{ matrix.jacoco && success() }}
       id: jacoco_reporter
-      uses: PavanMudigonda/jacoco-reporter@e8b54bfea6a667d1a68624dae8a06ba31670667d # v5.1
+      uses: PavanMudigonda/jacoco-reporter@865836ba1c886171b18ca8c19e49807882a434e6 # v5.2
       with:
         coverage_results_path: advanced-demo/target/site/jacoco-aggregate/jacoco.xml
         coverage_report_name: WebApp Coverage (${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})
