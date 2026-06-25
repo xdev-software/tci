@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="All in persistence-it-eclipse-link" type="JUnit" factoryName="JUnit">
+  <configuration default="false" name="All in persistence-it-eclipselink" type="JUnit" factoryName="JUnit">
     <module name="persistence-it-eclipselink" />
     <option name="PACKAGE_NAME" value="software.xdev.tci.demo.persistence" />
     <option name="MAIN_CLASS_NAME" value="" />
