@@ -24,12 +24,6 @@
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>software.xdev.tci</groupId>
-			<artifactId>db-jdbc-spring-orm-hibernate</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<profiles>

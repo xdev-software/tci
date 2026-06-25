@@ -23,6 +23,12 @@
 			<type>test-jar</type>
 			<classifier>tests</classifier>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>software.xdev.tci</groupId>
+					<artifactId>db-jdbc-spring-orm-hibernate</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

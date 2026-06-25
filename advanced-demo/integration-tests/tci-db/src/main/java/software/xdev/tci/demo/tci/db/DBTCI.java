@@ -10,6 +10,7 @@ import org.mariadb.jdbc.MariaDbDataSource;
 
 import software.xdev.tci.db.BaseDBTCI;
 import software.xdev.tci.db.persistence.classfinder.DynamicPersistenceClassFinder;
+import software.xdev.tci.db.persistence.hibernate.HibernateEntityManagerControllerFactory;
 import software.xdev.tci.demo.persistence.FlywayInfo;
 import software.xdev.tci.demo.persistence.FlywayMigration;
 import software.xdev.tci.demo.persistence.config.DefaultJPAConfig;
@@ -29,7 +30,7 @@ public class DBTCI extends BaseDBTCI<DBContainer>
 	private static final EntityManagerControllerFactoryProvider EMCF_PROVIDER =
 		ServiceLoader.load(EntityManagerControllerFactoryProvider.class)
 			.findFirst()
-			.orElseThrow();
+			.orElseGet(() -> HibernateEntityManagerControllerFactory::new);
 	
 	public DBTCI(
 		final DBContainer container,
