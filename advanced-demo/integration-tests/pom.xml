@@ -17,6 +17,8 @@
 
 	<modules>
 		<module>persistence-it</module>
+		<module>persistence-it-eclipselink</module>
+		<module>persistence-it-hibernate</module>
 		<module>tci-db</module>
 		<module>tci-webapp</module>
 		<module>webapp-it</module>
@@ -25,6 +27,14 @@
 	<dependencyManagement>
 		<dependencies>
 			<!-- Internal -->
+			<dependency>
+				<groupId>software.xdev.tci.demo.it</groupId>
+				<artifactId>persistence-it</artifactId>
+				<version>3.4.0-SNAPSHOT</version>
+				<type>test-jar</type>
+				<classifier>tests</classifier>
+			</dependency>
+
 			<dependency>
 				<groupId>software.xdev.tci.demo.it</groupId>
 				<artifactId>tci-db</artifactId>
@@ -40,6 +50,16 @@
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
 				<artifactId>base</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>software.xdev.tci</groupId>
+				<artifactId>db-jdbc-spring-orm</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>software.xdev.tci</groupId>
+				<artifactId>db-jdbc-spring-orm-eclipselink</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
