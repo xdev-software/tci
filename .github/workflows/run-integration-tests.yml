@@ -38,6 +38,7 @@ jobs:
           - project: persistence-it-eclipselink
             parallel: 2
             pre-start: true
+            java: 21
     name: "run-integration-tests (${{matrix.project}}, ${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})"
     runs-on: ubuntu-latest
     if: ${{ !(github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/')) }}
