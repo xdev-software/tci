@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.spi.PersistenceUnitInfo;
 
+import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo;
 
@@ -31,6 +32,8 @@ import software.xdev.tci.db.persistence.SpringEntityManagerControllerFactory;
 public class EclipseLinkEntityManagerControllerFactory
 	extends SpringEntityManagerControllerFactory<EclipseLinkEntityManagerControllerFactory>
 {
+	// Disabled (false) by default as it's not used by the default created SpringPersistenceUnitInfo anyway
+	protected boolean weavingEnabled;
 	protected ClassLoader persistenceUnitInfoCl = this.getClass().getClassLoader();
 	
 	public EclipseLinkEntityManagerControllerFactory()
@@ -42,7 +45,13 @@ public class EclipseLinkEntityManagerControllerFactory
 		super(entityClassesFinder);
 	}
 	
-	public EclipseLinkEntityManagerControllerFactory setPersistenceUnitInfoCl(final ClassLoader persistenceUnitInfoCl)
+	public EclipseLinkEntityManagerControllerFactory withWeavingEnabled(final boolean weavingEnabled)
+	{
+		this.weavingEnabled = weavingEnabled;
+		return this;
+	}
+	
+	public EclipseLinkEntityManagerControllerFactory withPersistenceUnitInfoCl(final ClassLoader persistenceUnitInfoCl)
 	{
 		this.persistenceUnitInfoCl = persistenceUnitInfoCl;
 		return this;
@@ -62,6 +71,17 @@ public class EclipseLinkEntityManagerControllerFactory
 		spui.setPersistenceUnitRootUrl(this.getClass().getResource(""));
 		spui.setPersistenceProviderClassName(PersistenceProvider.class.getName());
 		return spui;
+	}
+	
+	@Override
+	protected Map<String, Object> buildProperties()
+	{
+		final Map<String, Object> properties = super.buildProperties();
+		if(!this.weavingEnabled)
+		{
+			properties.put(PersistenceUnitProperties.WEAVING, false);
+		}
+		return properties;
 	}
 	
 	@Override
