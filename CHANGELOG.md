@@ -2,6 +2,7 @@
 * `db-jdbc-spring-orm`
   * Removed deprecated `DynamicClassFinder` - Use `DynamicPersistenceClassFinder` instead
   * Improved customization options
+* Updated dependencies
 
 # 3.3.2
 * Updated dependencies
