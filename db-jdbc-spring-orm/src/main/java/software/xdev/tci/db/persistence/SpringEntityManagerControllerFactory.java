@@ -61,10 +61,15 @@ public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEn
 		return this.self();
 	}
 	
-	protected SpringPersistenceUnitInfo createSpringPersistenceUnitInfo()
+	@SuppressWarnings("java:S4449") // can't add annotations to source code that we do not control
+	protected SpringPersistenceUnitInfo instantiateSpringPersistenceUnitInfo()
 	{
-		// noinspection DataFlowIssue - ClassLoader can be null! Look at the init method!
-		final SpringPersistenceUnitInfo pui = new SpringPersistenceUnitInfo((ClassLoader)null)
+		// This is the default implementation for Spring Boot + Hibernate
+		// It might not work with other persistence frameworks, e.g. EclipseLink
+		
+		// ClassLoader is never needed by Hibernate
+		// noinspection DataFlowIssue - ClassLoader can be null! Look at the init method
+		return new SpringPersistenceUnitInfo((ClassLoader)null)
 		{
 			@Override
 			public void addTransformer(final ClassTransformer ignored)
@@ -75,9 +80,15 @@ public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEn
 			@Override
 			public ClassLoader getNewTempClassLoader()
 			{
+				// Never needed
 				return null;
 			}
 		};
+	}
+	
+	protected SpringPersistenceUnitInfo createSpringPersistenceUnitInfo()
+	{
+		final SpringPersistenceUnitInfo pui = this.instantiateSpringPersistenceUnitInfo();
 		pui.setTransactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL);
 		pui.setPersistenceUnitName(this.persistenceUnitName);
 		

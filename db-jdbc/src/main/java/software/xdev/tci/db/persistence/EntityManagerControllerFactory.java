@@ -111,9 +111,14 @@ public abstract class EntityManagerControllerFactory<
 			persistenceUnitInfo.getManagedClassNames().addAll(this.entityClassesFinder.get());
 		}
 		
-		return new EntityManagerController(this.createEntityManagerFactory(
+		return this.createEntityManagerController(this.createEntityManagerFactory(
 			persistenceUnitInfo,
 			this.buildProperties()));
+	}
+	
+	protected EntityManagerController createEntityManagerController(final EntityManagerFactory factory)
+	{
+		return new EntityManagerController(factory);
 	}
 	
 	protected Map<String, Object> buildProperties()
