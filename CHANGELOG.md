@@ -1,4 +1,8 @@
 # 3.4.0
+* Added (experimental) support for EclipseLink
+* New module: `db-jdbc-spring-orm-eclipselink`
+  * Basically the same as `db-jdbc-spring-orm-hibernate` but with EclipseLink
+  * Currently experimental as most users use Hibernate as (default) ORM
 * `db-jdbc-spring-orm`
   * Removed deprecated `DynamicClassFinder` - Use `DynamicPersistenceClassFinder` instead
   * Improved customization options
@@ -89,7 +93,7 @@
 * Updated dependencies
 
 # 2.8.0
-* ``selenium``
+* `selenium`
   * Moved warmUp code to correct factory
   * Warmup will try to download/pre-pull the recording container image if required (as long as `recordingMode != SKIP`)
   * Behavior can be customized with method `withPullVideoRecordingContainerOnWarmUp`
@@ -118,30 +122,30 @@
 * Updated dependencies
 
 # 2.6.0
-* ``db-jdbc-spring-*``
-  * Added ``DynamicPersistenceClassFinder``
-    * Contains pre-defined methods for adding entities like ``withSearchForPersistenceClasses``
-    * Supersedes ``DynamicClassFinder``
+* `db-jdbc-spring-*`
+  * Added `DynamicPersistenceClassFinder`
+    * Contains pre-defined methods for adding entities like `withSearchForPersistenceClasses`
+    * Supersedes `DynamicClassFinder`
   * JAR file urls are no longer added automatically for scanning
-    * It's recommended to use ``DynamicPersistenceClassFinder`` as this is roughly 5-10x faster compared to Hibernate's JAR url scanning
-    * If you still require the default scanning use ``.withAddJarFileUrls(true)``
+    * It's recommended to use `DynamicPersistenceClassFinder` as this is roughly 5-10x faster compared to Hibernate's JAR url scanning
+    * If you still require the default scanning use `.withAddJarFileUrls(true)`
 * Updated dependencies
 
 # 2.5.2
-* Fix ``AnnotatedClassFinder`` returning the annotation and not the annotated class #373
-* Removed deprecated ``CachedEntityAnnotatedClassNameFinder``
+* Fix `AnnotatedClassFinder` returning the annotation and not the annotated class #373
+* Removed deprecated `CachedEntityAnnotatedClassNameFinder`
 
 # 2.5.1
-* Use timeout in ``SafeNamedContainerStarter#tryCleanupContainerAfterStartFail`` to prevent app/thread hang #370
+* Use timeout in `SafeNamedContainerStarter#tryCleanupContainerAfterStartFail` to prevent app/thread hang #370
 
 # 2.5.0
 * Improved overall error handling and logging when unexpected errors occur during the start of infra
-  * Improved retrying in ``BaseTCIFactory``. Now unexpected problems that require a retry are logged/reported.
-    * ``BaseTCIFactory#setGetNewTryCount`` was renamed to ``setGetNewTryCount``
-  * Added timeout for ``PreStartableTCIFactory#makeExposedPortsFix``
-    * defaults to ``90s``
-  * ``WaitableJDBCContainer`` increase default timeout (overall timeout was ``30s``, now at least ``60s``)
-    * This also now scales with the ``cpuSlownessFactor``
+  * Improved retrying in `BaseTCIFactory`. Now unexpected problems that require a retry are logged/reported.
+    * `BaseTCIFactory#setGetNewTryCount` was renamed to `setGetNewTryCount`
+  * Added timeout for `PreStartableTCIFactory#makeExposedPortsFix`
+    * defaults to `90s`
+  * `WaitableJDBCContainer` increase default timeout (overall timeout was `30s`, now at least `60s`)
+    * This also now scales with the `cpuSlownessFactor`
   * Log when a commited image is being snapshoted and report lock changes
 * Updated dependencies
 
@@ -149,49 +153,49 @@
 * Fixed random "recursive update during ServiceLoading" exception #342
 
 # 2.4.0
-* ``oidc-server-mock``
+* `oidc-server-mock`
   * Improved extensibility by creating abstract base classes
 
 # 2.3.0
-* Modularized ``db-jdbc-orm`` into ``db-jdbc``, ``db-jdbc-spring-orm`` and ``db-jdbc-spring-orm-hibernate`` #330
+* Modularized `db-jdbc-orm` into `db-jdbc`, `db-jdbc-spring-orm` and `db-jdbc-spring-orm-hibernate` #330
   * Packages might be slightly different
-  * In case of doubt migrate to ``db-jdbc-spring-orm-hibernate``
-* Deprecated ``CachedEntityAnnotatedClassNameFinder`` use ``DynamicClassFinder`` instead
+  * In case of doubt migrate to `db-jdbc-spring-orm-hibernate`
+* Deprecated `CachedEntityAnnotatedClassNameFinder` use `DynamicClassFinder` instead
 
 # 2.2.4
-* ``oidc-server-mock``
-  * Split ``addUser`` into better customizable methods
+* `oidc-server-mock`
+  * Split `addUser` into better customizable methods
 
 # 2.2.3
-* ``oidc-server-mock``
-  * Make it easier to define extend from ``OIDCTCIFactory``
-* Updated ``org.springframework`` to latest version
+* `oidc-server-mock`
+  * Make it easier to define extend from `OIDCTCIFactory`
+* Updated `org.springframework` to latest version
 
 # 2.2.2
-* Use ``ConcurrentHashMap`` instead of ``Collections.synchronizedMap(new HashMap<>())`` to prevent ``ConcurrentModification`` in recursive ``computeIfAbsent`` calls
+* Use `ConcurrentHashMap` instead of `Collections.synchronizedMap(new HashMap<>())` to prevent `ConcurrentModification` in recursive `computeIfAbsent` calls
 
 # 2.2.1
 * Improve default leak detection stop timeout
 
 # 2.2.0
 * Leak-Detection: Automatically wait until infra is stopped #308
-  * This should no longer require you to manually implement a ``LeakDetectionAsyncReaper`` and ``REAP_CFS``
+  * This should no longer require you to manually implement a `LeakDetectionAsyncReaper` and `REAP_CFS`
 * Made it possible to configure default leak-detection with environment variables and properties
 * Updated dependencies
 
 # 2.1.1
-* Selenium (Docker) 4.34+: Correctly detect and replace cdp/bidiUrl (was ``127.0.0.1``, now ``localhost``)
+* Selenium (Docker) 4.34+: Correctly detect and replace cdp/bidiUrl (was `127.0.0.1`, now `localhost`)
 * Updated dependencies
 
 # 2.1.0
-* ``CommitedImageSnapshotManager``
-  * ``waitForFirstSnapshot``
+* `CommitedImageSnapshotManager`
+  * `waitForFirstSnapshot`
     * Waits for the first snapshot to be created
     * Significantly reduces resource usage and prevents bottlenecks in most use cases
     * Enabled by default
-  * ``commitedImagePrefix``
+  * `commitedImagePrefix`
     * Let's you control the prefix of the commited/snapshotted image
-    * Default value: ``commited-cache``
+    * Default value: `commited-cache`
 * Minor performance improvements
 
 # 2.0.4
@@ -210,11 +214,11 @@
 > [!WARNING]
 > This release contains breaking changes
 
-* ⚠ Renamed ``tci-base`` to ``tci``
-* ⚠ Moved maven coordinates ``software.xdev:tci-base`` to ``software.xdev.tci:base``
+* ⚠ Renamed `tci-base` to `tci`
+* ⚠ Moved maven coordinates `software.xdev:tci-base` to `software.xdev.tci:base`
 * Added common modules, like selenium, db-jdbc-orm, mockserver, ... #208
   * Updated demo accordingly
-* Added ``EnvironmentPerformance`` which currently tracks ``cpuSlownessFactor``
+* Added `EnvironmentPerformance` which currently tracks `cpuSlownessFactor`
 * Refactoring and code cleanup
 
 # 1.2.0
@@ -224,7 +228,7 @@
             * Without snapshot: ~10s
             * With snapshot: ~5s (~50% faster)
     * Implementations:
-        * [``docker container commit``](https://docs.docker.com/reference/cli/docker/container/commit/)
+        * [`docker container commit`](https://docs.docker.com/reference/cli/docker/container/commit/)
             * Only snapshots storage - no in-memory data, processes, etc.
             * Volumes are not snapshoted due to [limitations](https://github.com/moby/moby/issues/43190) in Docker
         * Other implementation like CRIU may be available in the future once Docker adds support for them
@@ -234,10 +238,10 @@
 
 # 1.1.2
 * Update docs
-* Fix ``ContainerMemory#M8G`` being the same as ``ContainerMemory#M4G``
+* Fix `ContainerMemory#M8G` being the same as `ContainerMemory#M4G`
 
 # 1.1.1
-* Added ``ContainerMemory`` utility class as it's needed in most projects
+* Added `ContainerMemory` utility class as it's needed in most projects
 * Updated dependencies
 
 # 1.1.0
@@ -255,10 +259,10 @@
 * Updated dependencies
 
 # 1.0.3
-* Fix ``ConcurrentModificationException`` due to missing synchronized blocks
+* Fix `ConcurrentModificationException` due to missing synchronized blocks
 * Don't warmUp already warmed up factories again on coordinator level
-* Correctly register factories to ``GlobalPreStartCoordinator``
-* Document ``warmUp``
+* Correctly register factories to `GlobalPreStartCoordinator`
+* Document `warmUp`
 * Updated dependencies
 
 # 1.0.2
