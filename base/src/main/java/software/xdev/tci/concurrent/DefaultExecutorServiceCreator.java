@@ -19,7 +19,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class DefaultExecutorServiceCreator implements ExecutorServiceCreator
@@ -44,11 +43,8 @@ public class DefaultExecutorServiceCreator implements ExecutorServiceCreator
 	
 	private static ThreadFactory factory(final String threadNamePrefix)
 	{
-		final AtomicInteger nextThreadId = new AtomicInteger(0);
-		return r -> {
-			final Thread t = new Thread(r, threadNamePrefix + "-" + nextThreadId.getAndIncrement());
-			t.setDaemon(true);
-			return t;
-		};
+		return Thread.ofVirtual()
+			.name(threadNamePrefix + "-", 0)
+			.factory();
 	}
 }

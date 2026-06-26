@@ -1,3 +1,6 @@
+# 3.4.1
+* Remove dedicated code for Java 17 (no longer needed because Java 21 is the minimum)
+
 # 3.4.0
 * Added (experimental) support for EclipseLink
 * New module: `db-jdbc-spring-orm-eclipselink`

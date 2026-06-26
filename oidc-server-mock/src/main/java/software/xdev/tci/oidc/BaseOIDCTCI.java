@@ -39,7 +39,6 @@ import org.rnorth.ducttape.unreliables.Unreliables;
 
 import software.xdev.tci.TCI;
 import software.xdev.tci.envperf.EnvironmentPerformance;
-import software.xdev.tci.misc.http.HttpClientCloser;
 import software.xdev.tci.oidc.containers.BaseOIDCServerContainer;
 import software.xdev.tci.oidc.containers.OIDCServerContainer;
 
@@ -114,15 +113,12 @@ public abstract class BaseOIDCTCI<
 		return this.getContainer().getExternalHttpBaseEndPoint();
 	}
 	
-	@SuppressWarnings("PMD.UseTryWithResources") // Java 17 support
 	public void warmUpWellKnownJWKsEndpoint()
 	{
 		final int slownessFactor = EnvironmentPerformance.cpuSlownessFactor();
-		final HttpClient httpClient = HttpClient.newBuilder()
+		try(final HttpClient httpClient = HttpClient.newBuilder()
 			.connectTimeout(Duration.ofSeconds(1L + slownessFactor))
-			.build();
-		
-		try
+			.build())
 		{
 			Unreliables.retryUntilSuccess(
 				5 + slownessFactor,
@@ -133,10 +129,6 @@ public abstract class BaseOIDCTCI<
 						.GET()
 						.build(),
 					HttpResponse.BodyHandlers.discarding()));
-		}
-		finally
-		{
-			HttpClientCloser.close(httpClient);
 		}
 	}
 	
