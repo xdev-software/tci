@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>software.xdev.tci.demo.it</groupId>
 		<artifactId>integration-tests</artifactId>
-		<version>3.3.3-SNAPSHOT</version>
+		<version>3.4.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>webapp-it</artifactId>
 
@@ -23,6 +23,7 @@
 			<artifactId>tci-db</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>oidc-server-mock</artifactId>
@@ -69,7 +70,7 @@
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>0.8.14</version>
+						<version>0.8.15</version>
 						<executions>
 							<execution>
 								<id>merge-webapp</id>

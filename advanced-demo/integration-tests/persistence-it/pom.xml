@@ -7,60 +7,40 @@
 	<parent>
 		<groupId>software.xdev.tci.demo.it</groupId>
 		<artifactId>integration-tests</artifactId>
-		<version>3.3.3-SNAPSHOT</version>
+		<version>3.4.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>persistence-it</artifactId>
-
-	<properties>
-		<!-- by default run no tests -->
-		<skipTests>true</skipTests>
-	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>software.xdev.tci.demo</groupId>
 			<artifactId>persistence</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>software.xdev.tci.demo.it</groupId>
 			<artifactId>tci-db</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>spring-dao-support</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j2-impl</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<profiles>
-		<profile>
-			<id>run-it</id>
-			<properties>
-				<skipTests>false</skipTests>
-			</properties>
-		</profile>
-	</profiles>
 
 	<build>
 		<pluginManagement>
@@ -69,8 +49,20 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<configuration>
-						<skipTests>${skipTests}</skipTests>
+						<!-- Tests are executed by orm variants -->
+						<skipTests>true</skipTests>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<executions>
+						<execution>
+							<goals>
+								<goal>test-jar</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>

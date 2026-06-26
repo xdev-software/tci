@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci</groupId>
 	<artifactId>spring-dao-support</artifactId>
-	<version>3.3.3-SNAPSHOT</version>
+	<version>3.4.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>spring-dao-support</name>
@@ -53,7 +53,7 @@
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>db-jdbc</artifactId>
-			<version>3.3.3-SNAPSHOT</version>
+			<version>3.4.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -65,13 +65,13 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
-			<version>7.0.7</version>
+			<version>7.0.8</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
-			<version>3.31.0-GA</version>
+			<version>3.32.0-GA</version>
 		</dependency>
 
 		<!-- Tests -->
@@ -252,7 +252,7 @@
 					<plugin>
 						<groupId>org.sonatype.central</groupId>
 						<artifactId>central-publishing-maven-plugin</artifactId>
-						<version>0.10.0</version>
+						<version>0.11.0</version>
 						<extensions>true</extensions>
 						<configuration>
 							<publishingServerId>sonatype-central-portal</publishingServerId>
@@ -274,7 +274,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>13.5.0</version>
+								<version>13.6.0</version>
 							</dependency>
 						</dependencies>
 						<configuration>

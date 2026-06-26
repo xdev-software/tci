@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci</groupId>
 	<artifactId>junit-jupiter-api-support</artifactId>
-	<version>3.3.3-SNAPSHOT</version>
+	<version>3.4.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>junit-jupiter-api-support</name>
@@ -221,7 +221,7 @@
 					<plugin>
 						<groupId>org.sonatype.central</groupId>
 						<artifactId>central-publishing-maven-plugin</artifactId>
-						<version>0.10.0</version>
+						<version>0.11.0</version>
 						<extensions>true</extensions>
 						<configuration>
 							<publishingServerId>sonatype-central-portal</publishingServerId>
@@ -243,7 +243,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>13.5.0</version>
+								<version>13.6.0</version>
 							</dependency>
 						</dependencies>
 						<configuration>

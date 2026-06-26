@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci</groupId>
 	<artifactId>selenium</artifactId>
-	<version>3.3.3-SNAPSHOT</version>
+	<version>3.4.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>selenium</name>
@@ -54,7 +54,7 @@
 			<dependency>
 				<groupId>org.seleniumhq.selenium</groupId>
 				<artifactId>selenium-dependencies-bom</artifactId>
-				<version>4.44.0</version>
+				<version>4.45.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -65,18 +65,18 @@
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>base</artifactId>
-			<version>3.3.3-SNAPSHOT</version>
+			<version>3.4.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>jul-to-slf4j</artifactId>
-			<version>3.3.3-SNAPSHOT</version>
+			<version>3.4.0-SNAPSHOT</version>
 		</dependency>
 		<!-- Can be removed once SeleniumRecordingExtension is gone -->
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>junit-jupiter-api-support</artifactId>
-			<version>3.3.3-SNAPSHOT</version>
+			<version>3.4.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -274,7 +274,7 @@
 					<plugin>
 						<groupId>org.sonatype.central</groupId>
 						<artifactId>central-publishing-maven-plugin</artifactId>
-						<version>0.10.0</version>
+						<version>0.11.0</version>
 						<extensions>true</extensions>
 						<configuration>
 							<publishingServerId>sonatype-central-portal</publishingServerId>
@@ -296,7 +296,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>13.5.0</version>
+								<version>13.6.0</version>
 							</dependency>
 						</dependencies>
 						<configuration>

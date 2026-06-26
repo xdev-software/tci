@@ -76,7 +76,7 @@ public class EntityManagerController implements AutoCloseable
 				}
 				
 				// EclipseLink will crash if close is called on an already closed EntityManager
-				if(!em.isOpen())
+				if(em.isOpen())
 				{
 					em.close();
 				}

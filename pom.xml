@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci</groupId>
 	<artifactId>root</artifactId>
-	<version>3.3.3-SNAPSHOT</version>
+	<version>3.4.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<organization>
@@ -19,6 +19,7 @@
 		<module>base</module>
 		<module>db-jdbc</module>
 		<module>db-jdbc-spring-orm</module>
+		<module>db-jdbc-spring-orm-eclipselink</module>
 		<module>db-jdbc-spring-orm-hibernate</module>
 		<module>jacoco</module>
 		<module>jul-to-slf4j</module>
@@ -76,7 +77,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>13.5.0</version>
+								<version>13.6.0</version>
 							</dependency>
 						</dependencies>
 						<configuration>

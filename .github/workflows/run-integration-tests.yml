@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [persistence-it, webapp-it]
+        project: [persistence-it-hibernate, webapp-it]
         parallel: [0, 2]
         pre-start: [false, true]
         java: [21]
@@ -35,6 +35,10 @@ jobs:
           - project: webapp-it
             jacoco: true
             video: true
+          - project: persistence-it-eclipselink
+            parallel: 2
+            pre-start: true
+            java: 21
     name: "run-integration-tests (${{matrix.project}}, ${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})"
     runs-on: ubuntu-latest
     if: ${{ !(github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/')) }}
@@ -42,7 +46,7 @@ jobs:
       contents: read
       checks: write # JaCoCo Coverage Report check
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Set up JDK
       uses: actions/setup-java@v5
@@ -51,7 +55,7 @@ jobs:
         java-version: ${{ matrix.java }}
 
     - name: Cache Maven
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-mvn-it-build-${{ hashFiles('**/pom.xml') }}
