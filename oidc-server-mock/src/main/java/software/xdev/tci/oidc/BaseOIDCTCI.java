@@ -113,7 +113,6 @@ public abstract class BaseOIDCTCI<
 		return this.getContainer().getExternalHttpBaseEndPoint();
 	}
 	
-	@SuppressWarnings("PMD.UseTryWithResources") // Java 17 support
 	public void warmUpWellKnownJWKsEndpoint()
 	{
 		final int slownessFactor = EnvironmentPerformance.cpuSlownessFactor();
