@@ -2,6 +2,7 @@ package software.xdev.tci.demo.tci.db;
 
 import java.sql.Driver;
 import java.sql.SQLException;
+import java.util.ServiceLoader;
 
 import javax.sql.DataSource;
 
@@ -26,6 +27,11 @@ public class DBTCI extends BaseDBTCI<DBContainer>
 	private static final DynamicPersistenceClassFinder ENTITY_CLASSES_FINDER = new DynamicPersistenceClassFinder()
 		.withSearchForPersistenceClasses(DefaultJPAConfig.ENTITY_PACKAGE);
 	
+	private static final EntityManagerControllerFactoryProvider EMCF_PROVIDER =
+		ServiceLoader.load(EntityManagerControllerFactoryProvider.class)
+			.findFirst()
+			.orElseGet(() -> HibernateEntityManagerControllerFactory::new);
+	
 	public DBTCI(
 		final DBContainer container,
 		final String networkAlias,
@@ -35,7 +41,7 @@ public class DBTCI extends BaseDBTCI<DBContainer>
 			container,
 			networkAlias,
 			migrateAndInitializeEMC,
-			() -> new HibernateEntityManagerControllerFactory(ENTITY_CLASSES_FINDER));
+			() -> EMCF_PROVIDER.create(ENTITY_CLASSES_FINDER));
 		this.withDatabase(DB_DATABASE)
 			.withUsername(DB_USERNAME)
 			.withPassword(DB_PASSWORD);

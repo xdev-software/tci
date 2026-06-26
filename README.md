@@ -19,7 +19,7 @@ Modules for XDEV's Testcontainer Infrastructure Framework
   * Common code for db infra, including JDBC
   * Data-generation template
   * Improved JDBC Container wait strategy
-  * Predefined implementations for [Spring-ORM](./db-jdbc-spring-orm/) and [Hibernate](./db-jdbc-spring-orm-hibernate/)
+  * Predefined implementations for [Spring-ORM](./db-jdbc-spring-orm/), [Hibernate](./db-jdbc-spring-orm-hibernate/) and [EclipseLink](./db-jdbc-spring-orm-eclipselink/)
 * [jacoco](./jacoco/)
   * Allows for recording of JaCoCo code coverage files with Java containers
 * [jul-to-slf4j](./jul-to-slf4j/)
