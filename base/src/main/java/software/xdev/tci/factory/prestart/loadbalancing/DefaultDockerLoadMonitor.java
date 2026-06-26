@@ -34,7 +34,6 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 
 import software.xdev.tci.concurrent.ExecutorServiceCreatorHolder;
-import software.xdev.tci.misc.http.HttpClientCloser;
 import software.xdev.tci.safestart.SafeNamedContainerStarter;
 
 
@@ -161,7 +160,7 @@ public class DefaultDockerLoadMonitor implements AutoCloseable, LoadMonitor
 			this.scrapeExecutor.shutdown();
 		}
 		
-		HttpClientCloser.close(this.httpClient);
+		this.httpClient.close();
 		
 		this.nodeExporterContainer.stop();
 	}
