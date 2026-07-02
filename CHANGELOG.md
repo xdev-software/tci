@@ -1,7 +1,7 @@
 # 3.5.0
 * `db-jdbc-spring-orm` & implementations
   * No longer use `setPersistenceProviderClassName` because it has no effect
-  * By default create `PersistenceProvider` only once to make it possible to cache redundant calls
+  * Performance: Reuse `PersistenceProvider`
 
 # 3.4.1
 * Remove dedicated code for Java 17 (no longer needed because Java 21 is the minimum)
