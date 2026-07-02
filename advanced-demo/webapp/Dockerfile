@@ -45,6 +45,9 @@ RUN java -Djarmode=tools -jar app.jar extract --layers --destination extracted
 
 FROM jre-minimized
 
+ARG JACOCO_AGENT_ENABLED
+ARG JACOCO_AGENT_VERSION="0.8.14"
+
 ARG user=app
 ARG group=app
 ARG uid=1000
@@ -55,7 +58,13 @@ ARG APP_DIR=/opt/app
 RUN mkdir -p ${APP_DIR} \
   && chown ${uid}:${gid} ${APP_DIR} \
   && addgroup -g ${gid} ${group} \
-  && adduser -h "$APP_DIR" -u ${uid} -G ${group} -s /bin/bash -D ${user}
+  && adduser -h "$APP_DIR" -u ${uid} -G ${group} -s /bin/bash -D ${user}; \
+  # Download JaCoCoAgent if required
+  if [ "$JACOCO_AGENT_ENABLED" = "1" ]; then \
+    mkdir -p /jacoco/report \
+    && chown $uid:$gid /jacoco/report \
+    && wget https://repo.maven.apache.org/maven2/org/jacoco/org.jacoco.agent/$JACOCO_AGENT_VERSION/org.jacoco.agent-$JACOCO_AGENT_VERSION-runtime.jar -O /jacoco/agent.jar; \
+  fi
 
 WORKDIR ${APP_DIR}
 
