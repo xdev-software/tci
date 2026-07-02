@@ -20,20 +20,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.spi.PersistenceUnitInfo;
-
 import org.hibernate.cfg.JdbcSettings;
 import org.hibernate.cfg.PersistenceSettings;
 import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
 import org.hibernate.jpa.HibernatePersistenceProvider;
-import org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo;
 
 import software.xdev.tci.db.persistence.SpringEntityManagerControllerFactory;
 
 
 public class HibernateEntityManagerControllerFactory
-	extends SpringEntityManagerControllerFactory<HibernateEntityManagerControllerFactory>
+	extends SpringEntityManagerControllerFactory<HibernatePersistenceProvider, HibernateEntityManagerControllerFactory>
 {
 	protected String connectionProviderClassName = HikariCPConnectionProvider.class.getName();
 	protected boolean disableHibernateFormatter = true;
@@ -70,14 +66,6 @@ public class HibernateEntityManagerControllerFactory
 	}
 	
 	@Override
-	protected SpringPersistenceUnitInfo createSpringPersistenceUnitInfo()
-	{
-		final SpringPersistenceUnitInfo spui = super.createSpringPersistenceUnitInfo();
-		spui.setPersistenceProviderClassName(HibernatePersistenceProvider.class.getName());
-		return spui;
-	}
-	
-	@Override
 	protected Map<String, Object> buildProperties()
 	{
 		final Map<String, Object> properties = super.buildProperties();
@@ -95,10 +83,8 @@ public class HibernateEntityManagerControllerFactory
 	}
 	
 	@Override
-	protected EntityManagerFactory createEntityManagerFactory(
-		final PersistenceUnitInfo pui,
-		final Map<String, Object> properties)
+	protected HibernatePersistenceProvider createDefaultPersistenceProvider()
 	{
-		return new HibernatePersistenceProvider().createContainerEntityManagerFactory(pui, properties);
+		return new HibernatePersistenceProvider();
 	}
 }
