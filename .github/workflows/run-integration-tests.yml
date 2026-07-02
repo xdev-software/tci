@@ -84,6 +84,8 @@ jobs:
         ${{ matrix.parallel > 0 && format('-Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent -Djunit.jupiter.execution.parallel.config.strategy=fixed -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2 -Djunit.jupiter.execution.parallel.config.fixed.max-pool-size={0} ', matrix.parallel) || '' }}
 
     - name: Create docker image cache
+      # Cache can't be saved when it's already present
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         echo "Images before pruning" && docker image ls
         docker image prune -af --filter "until=2160h"
@@ -100,6 +102,7 @@ jobs:
         ls -lha ~/.cache/docker
 
     - name: Save docker image cache
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/cache/save@v6
       with:
         path: ~/.cache/docker/
@@ -160,6 +163,8 @@ jobs:
         ${{ matrix.parallel > 0 && format('-Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent -Djunit.jupiter.execution.parallel.config.strategy=fixed -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2 -Djunit.jupiter.execution.parallel.config.fixed.max-pool-size={0} ', matrix.parallel) || '' }}
 
     - name: Create docker image cache
+      # Cache can't be saved when it's already present
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         echo "Images before pruning" && docker image ls
         docker image prune -af --filter "until=2160h"
@@ -176,6 +181,7 @@ jobs:
         ls -lha ~/.cache/docker
 
     - name: Save docker image cache
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/cache/save@v6
       with:
         path: ~/.cache/docker/
