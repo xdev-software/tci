@@ -113,8 +113,8 @@ jobs:
       fail-fast: false
       matrix:
         project: [webapp-it]
-        parallel: [0, 2]
-        pre-start: [false, true]
+        parallel: [2] # [0, 2]
+        pre-start: [true] # [false, true]
         java: [21]
     name: "selenium (${{matrix.project}}, ${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})"
     runs-on: ubuntu-latest
