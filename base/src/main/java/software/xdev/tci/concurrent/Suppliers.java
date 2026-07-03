@@ -16,6 +16,7 @@
 package software.xdev.tci.concurrent;
 
 import java.util.Objects;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 
@@ -59,7 +60,7 @@ public final class Suppliers
 	@SuppressWarnings("java:S3077")
 	static class NonSerializableMemoizingSupplier<T> implements Supplier<T>
 	{
-		private final Object lock = new Object();
+		private final ReentrantLock lock = new ReentrantLock();
 		
 		@SuppressWarnings("UnnecessaryLambda") // Must be a fixed singleton object
 		private static final Supplier<Void> SUCCESSFULLY_COMPUTED =
@@ -67,6 +68,7 @@ public final class Suppliers
 				throw new IllegalStateException(); // Should never get called.
 			};
 		
+		@SuppressWarnings("PMD.AvoidUsingVolatile")
 		private volatile Supplier<T> delegate;
 		// "value" does not need to be volatile; visibility piggy-backs on volatile read of "delegate".
 		private T value;
@@ -83,7 +85,8 @@ public final class Suppliers
 			// Because Supplier is read-heavy, we use the "double-checked locking" pattern.
 			if(this.delegate != SUCCESSFULLY_COMPUTED)
 			{
-				synchronized(this.lock)
+				this.lock.lock();
+				try
 				{
 					if(this.delegate != SUCCESSFULLY_COMPUTED)
 					{
@@ -92,6 +95,10 @@ public final class Suppliers
 						this.delegate = (Supplier<T>)SUCCESSFULLY_COMPUTED;
 						return t;
 					}
+				}
+				finally
+				{
+					this.lock.unlock();
 				}
 			}
 			// This is safe because we checked `delegate`.
