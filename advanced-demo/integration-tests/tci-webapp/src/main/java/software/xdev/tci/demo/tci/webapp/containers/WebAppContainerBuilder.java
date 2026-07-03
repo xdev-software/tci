@@ -3,14 +3,15 @@ package software.xdev.tci.demo.tci.webapp.containers;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.jacoco.testbase.config.JaCoCoConfig;
 import software.xdev.testcontainers.imagebuilder.AdvancedImageFromDockerFile;
 import software.xdev.testcontainers.imagebuilder.compat.DockerfileCOPYParentsEmulator;
@@ -30,7 +31,7 @@ public final class WebAppContainerBuilder
 	{
 	}
 	
-	public static synchronized String getBuiltImageName()
+	public static synchronized String getBuiltImageName(final boolean tagIntermediate)
 	{
 		if(builtImageName != null)
 		{
@@ -42,80 +43,96 @@ public final class WebAppContainerBuilder
 		final AdvancedImageFromDockerFile builder =
 			new AdvancedImageFromDockerFile("webapp-it-local", false)
 				.withLoggerForBuild(LOG_CONTAINER_BUILD)
-				.withPostGitIgnoreLines(
-					// Ignore git-folder, as it will be provided in the Dockerfile
-					".git/**",
-					// Ignore other unused folders and extensions
-					"*.iml",
-					"*.cmd",
-					"*.md",
-					"_dev_infra/**",
-					"_resource_metrics/**",
-					// Ignore other Dockerfiles (our required file will always be transferred)
-					"Dockerfile",
-					// Ignore not required test-modules that may have changed
-					// sources only - otherwise the parent pom doesn't find the resources
-					"integration-tests/**",
-					"**/src/test/**",
-					// Ignore resources that are just used for development
-					"webapp/src/main/resources-dev/**",
-					// Most files from these folders need to be ignored -> Down there for highest prio
-					"node_modules",
-					"target")
 				.withDockerFilePath(Paths.get("../../integration-tests/tci-webapp/Dockerfile"))
 				.withBaseDir(Paths.get("../../"))
-				// File is in root directory - we can't access it
-				.withBaseDirRelativeIgnoreFile(null)
-				.withDockerFileLinesModifier(new DockerfileCOPYParentsEmulator())
-				.withTransferArchiveTARCompressorCustomizer(c -> c
-					// Rewrite parent pom to exclude integration tests
-					// This way changes in test pom's cause no redownload of dependencies
-					.withContentModifier(new FileLinesContentModifier()
-					{
-						@Override
-						public boolean shouldApply(
-							final Path sourcePath,
-							final String targetPath,
-							final TarArchiveEntry tarArchiveEntry)
+				.withCreateTransferFilesCache(tagIntermediate)
+				.configureFilesToTransferHandler(h -> h
+					.withPostGitIgnoreLines(
+						// Ignore git-folder, as it will be provided in the Dockerfile
+						".git/**",
+						// Ignore other unused folders and extensions
+						"*.iml",
+						"*.cmd",
+						"*.md",
+						"_dev_infra/**",
+						"_resource_metrics/**",
+						// Ignore other Dockerfiles (our required file will always be transferred)
+						"Dockerfile",
+						// Ignore not required test-modules that may have changed
+						// sources only - otherwise the parent pom doesn't find the resources
+						"integration-tests/**",
+						"**/src/test/**",
+						// Ignore resources that are just used for development
+						"webapp/src/main/resources-dev/**",
+						// Most files from these folders need to be ignored -> Down there for highest prio
+						"node_modules",
+						"target")
+					// File is in root directory - we can't access it
+					.withBaseDirRelativeIgnoreFile(null)
+					.withDockerFileLinesModifier(new DockerfileCOPYParentsEmulator())
+					.withTransferArchiveTARCompressorCustomizer(c -> c
+						// Rewrite parent pom to exclude integration tests
+						// This way changes in test pom's cause no redownload of dependencies
+						.withContentModifier(new FileLinesContentModifier()
 						{
-							return "pom.xml".equals(targetPath);
-						}
-						
-						@Override
-						public List<String> modify(
-							final List<String> lines,
-							final Path sourcePath,
-							final String targetPath,
-							final TarArchiveEntry tarArchiveEntry) throws IOException
-						{
-							return lines.stream()
-								// Remove integration tests module
-								.filter(s -> !s.contains("<module>integration-tests"))
-								.toList();
-						}
-						
-						@Override
-						public boolean isIdentical(final List<String> original, final List<String> created)
-						{
-							return original.size() == created.size();
-						}
-					}));
+							@Override
+							public boolean shouldApply(
+								final Path sourcePath,
+								final String targetPath,
+								final TarArchiveEntry tarArchiveEntry)
+							{
+								return "pom.xml".equals(targetPath);
+							}
+							
+							@Override
+							public List<String> modify(
+								final List<String> lines,
+								final Path sourcePath,
+								final String targetPath,
+								final TarArchiveEntry tarArchiveEntry) throws IOException
+							{
+								return lines.stream()
+									// Remove integration tests module
+									.filter(s -> !s.contains("<module>integration-tests"))
+									.toList();
+							}
+							
+							@Override
+							public boolean isIdentical(final List<String> original, final List<String> created)
+							{
+								return original.size() == created.size();
+							}
+						}))
+				);
 		
 		if(JaCoCoConfig.instance().enabled())
 		{
 			builder.withBuildArg("JACOCO_AGENT_ENABLED", "1");
 		}
 		
-		try
-		{
-			builtImageName = builder.get(5, TimeUnit.MINUTES);
-		}
-		catch(final TimeoutException tex)
-		{
-			throw new IllegalStateException("Timed out", tex);
-		}
+		builtImageName = builder.build(Duration.ofMinutes(5));
 		
 		LOG.info("Built Image; Name ='{}'", builtImageName);
+		
+		if(tagIntermediate)
+		{
+			CompletableFuture.runAsync(
+				() -> {
+					try
+					{
+						builder.copyForIntermediateTag("webapp-it-local-builder", "builder")
+							.build(Duration.ofMinutes(1));
+						builder.cleanCreatedTransferFilesCache();
+						
+						LOG.info("Tagged intermediate image");
+					}
+					catch(final Exception ex)
+					{
+						LOG.warn("Tagging intermediate target failed", ex);
+					}
+				},
+				TCIExecutorServiceHolder.instance());
+		}
 		
 		return builtImageName;
 	}
