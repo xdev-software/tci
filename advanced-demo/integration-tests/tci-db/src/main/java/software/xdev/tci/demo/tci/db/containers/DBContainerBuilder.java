@@ -21,7 +21,7 @@ public final class DBContainerBuilder
 	{
 	}
 	
-	public static synchronized String getImageName()
+	public static String getImageName()
 	{
 		LOG.info("Building Webapp-db-DockerImage...");
 		

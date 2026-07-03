@@ -25,7 +25,7 @@ public class DBTCIFactory extends BaseDBTCIFactory<DBContainer, DBTCI>
 	{
 		super(
 			(c, n) -> new DBTCI(c, n, migrateAndInitializeEMC),
-			() -> new DBContainer(DBContainerBuilder.getImageName())
+			() -> new DBContainer(IMAGE_NAME_SUPPLIER.get())
 				.withDatabaseName(DBTCI.DB_DATABASE)
 				.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M)));
 		this.withSnapshotManager(new CommitedImageSnapshotManager("/var/lib/mysql"));
@@ -34,7 +34,7 @@ public class DBTCIFactory extends BaseDBTCIFactory<DBContainer, DBTCI>
 	@Override
 	protected void warmUpInternal()
 	{
-		DBContainerBuilder.getImageName();
+		IMAGE_NAME_SUPPLIER.get();
 		super.warmUpInternal();
 	}
 }
