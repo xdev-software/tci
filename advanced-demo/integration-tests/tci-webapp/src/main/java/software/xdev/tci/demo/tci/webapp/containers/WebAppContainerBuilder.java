@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.slf4j.Logger;
@@ -113,8 +114,10 @@ public final class WebAppContainerBuilder
 				() -> {
 					try
 					{
-						builder.copyForIntermediateTag("webapp-it-local-builder", "builder")
-							.build(Duration.ofMinutes(1));
+						Stream.of("jre-base", "jre-minimized", "builder")
+							.forEach(target -> builder.copyForIntermediateTag(target)
+								.build(Duration.ofMinutes(1)));
+						
 						builder.cleanCreatedTransferFilesCache();
 						
 						LOG.info("Tagged intermediate image");
