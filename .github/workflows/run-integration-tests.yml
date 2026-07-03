@@ -169,6 +169,7 @@ jobs:
       run: |
         echo "Images before pruning" && docker image ls -a
         docker image prune -af --filter "until=2160h"
+        # docker image prune -f
         echo "Currently available images" && docker image ls -a
 
         echo "Will NOT cache images" && docker image ls -a -f="label=org.testcontainers.sessionId"
