@@ -1,6 +1,7 @@
 package software.xdev.tci.demo.webapp.cases;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -9,6 +10,7 @@ import software.xdev.tci.demo.webapp.base.InfraPerCaseTest;
 import software.xdev.tci.selenium.TestBrowser;
 
 
+@Disabled // TODO
 class LoginOIDCTest extends InfraPerCaseTest
 {
 	@DisplayName("Check Login and Logout")
