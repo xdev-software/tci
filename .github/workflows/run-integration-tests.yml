@@ -150,7 +150,7 @@ jobs:
     - name: Load docker image cache
       run: |
         echo "Deleting preinstalled images" && docker image ls
-        docker image prune -af
+        docker image prune -af > /dev/null
 
         cat ~/.cache/docker/images.tar | docker load && echo "Restored docker image cache" && docker image ls || true
 
