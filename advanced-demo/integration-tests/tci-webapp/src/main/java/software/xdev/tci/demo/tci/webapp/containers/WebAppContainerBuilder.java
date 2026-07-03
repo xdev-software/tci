@@ -25,19 +25,12 @@ public final class WebAppContainerBuilder
 	private static final Logger LOG_CONTAINER_BUILD =
 		LoggerFactory.getLogger("container.build.webapp");
 	
-	private static String builtImageName;
-	
 	private WebAppContainerBuilder()
 	{
 	}
 	
-	public static synchronized String getBuiltImageName(final boolean tagIntermediate)
+	public static String getImageName(final boolean tagIntermediate)
 	{
-		if(builtImageName != null)
-		{
-			return builtImageName;
-		}
-		
 		LOG.info("Building WebApp-DockerImage...");
 		
 		final AdvancedImageFromDockerFile builder =
@@ -110,9 +103,9 @@ public final class WebAppContainerBuilder
 			builder.withBuildArg("JACOCO_AGENT_ENABLED", "1");
 		}
 		
-		builtImageName = builder.build(Duration.ofMinutes(5));
+		final String imageName = builder.build(Duration.ofMinutes(5));
 		
-		LOG.info("Built Image; Name ='{}'", builtImageName);
+		LOG.info("Built Image; Name ='{}'", imageName);
 		
 		if(tagIntermediate)
 		{
@@ -134,6 +127,6 @@ public final class WebAppContainerBuilder
 				TCIExecutorServiceHolder.instance());
 		}
 		
-		return builtImageName;
+		return imageName;
 	}
 }

@@ -19,12 +19,12 @@ public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, We
 	public static final String PROPERTY_APP_DOCKERIMAGE = "appDockerImage";
 	public static final String PROPERTY_TAG_INTERMEDIATE = "tagIntermediate";
 	
-	protected static final Supplier<String> APP_IMAGE_NAME_SUPPLIER = Suppliers.memoize(() ->
+	protected static final Supplier<String> IMAGE_NAME_SUPPLIER = Suppliers.memoize(() ->
 		Objects.requireNonNullElseGet(
 			System.getProperty(PROPERTY_APP_DOCKERIMAGE),
 			() -> {
 				String property = System.getProperty(PROPERTY_TAG_INTERMEDIATE);
-				return WebAppContainerBuilder.getBuiltImageName(
+				return WebAppContainerBuilder.getImageName(
 					"1".equals(property) || Boolean.parseBoolean(property));
 			})
 	);
@@ -35,7 +35,7 @@ public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, We
 		super(
 			WebAppTCI::new,
 			() -> {
-				final WebAppContainer container = new WebAppContainer(APP_IMAGE_NAME_SUPPLIER.get(), true)
+				final WebAppContainer container = new WebAppContainer(IMAGE_NAME_SUPPLIER.get(), true)
 					.withDefaultWaitStrategy(
 						Duration.ofSeconds(40L + 20L * EnvironmentPerformance.cpuSlownessFactor()),
 						WebAppTCI.ACTUATOR_USERNAME,
@@ -59,7 +59,7 @@ public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, We
 	@Override
 	protected void warmUpInternal()
 	{
-		APP_IMAGE_NAME_SUPPLIER.get();
+		IMAGE_NAME_SUPPLIER.get();
 		super.warmUpInternal();
 	}
 }
