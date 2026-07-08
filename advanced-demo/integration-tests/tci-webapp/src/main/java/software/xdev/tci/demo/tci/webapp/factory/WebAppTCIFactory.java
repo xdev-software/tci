@@ -16,18 +16,10 @@ import software.xdev.tci.misc.ContainerMemory;
 
 public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, WebAppTCI>
 {
-	public static final String PROPERTY_APP_DOCKERIMAGE = "appDockerImage";
-	public static final String PROPERTY_TAG_INTERMEDIATE = "tagIntermediate";
-	
 	protected static final Supplier<String> IMAGE_NAME_SUPPLIER = Suppliers.memoize(() ->
 		Objects.requireNonNullElseGet(
-			System.getProperty(PROPERTY_APP_DOCKERIMAGE),
-			() -> {
-				String property = System.getProperty(PROPERTY_TAG_INTERMEDIATE);
-				return WebAppContainerBuilder.getImageName(
-					"1".equals(property) || Boolean.parseBoolean(property));
-			})
-	);
+			System.getProperty(WebAppContainerBuilder.PROPERTY),
+			WebAppContainerBuilder::getImageName));
 	
 	@SuppressWarnings("checkstyle:MagicNumber")
 	public WebAppTCIFactory(final Consumer<WebAppContainer> additionalContainerBuilder)

@@ -1,20 +1,17 @@
 package software.xdev.tci.demo.tci.webapp.containers;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.jacoco.testbase.config.JaCoCoConfig;
-import software.xdev.testcontainers.imagebuilder.AdvancedImageFromDockerFile;
+import software.xdev.testcontainers.imagebuilder.buildxnative.NativeAdvancedImageFromDockerfile;
 import software.xdev.testcontainers.imagebuilder.compat.DockerfileCOPYParentsEmulator;
 import software.xdev.testcontainers.imagebuilder.transfer.fcm.FileLinesContentModifier;
 
@@ -26,20 +23,21 @@ public final class WebAppContainerBuilder
 	private static final Logger LOG_CONTAINER_BUILD =
 		LoggerFactory.getLogger("container.build.webapp");
 	
+	public static final String PROPERTY = "app-docker-image";
+	
 	private WebAppContainerBuilder()
 	{
 	}
 	
-	public static String getImageName(final boolean tagIntermediate)
+	public static String getImageName()
 	{
 		LOG.info("Building WebApp-DockerImage...");
 		
-		final AdvancedImageFromDockerFile builder =
-			new AdvancedImageFromDockerFile("webapp-it-local", false)
+		final NativeAdvancedImageFromDockerfile builder =
+			new NativeAdvancedImageFromDockerfile("webapp-it-local", Boolean.getBoolean(PROPERTY + ".delete-on-exit"))
 				.withLoggerForBuild(LOG_CONTAINER_BUILD)
 				.withDockerFilePath(Paths.get("../../integration-tests/tci-webapp/Dockerfile"))
 				.withBaseDir(Paths.get("../../"))
-				.withCreateTransferFilesCache(tagIntermediate)
 				.configureFilesToTransferHandler(h -> h
 					.withPostGitIgnoreLines(
 						// Ignore git-folder, as it will be provided in the Dockerfile
@@ -83,7 +81,7 @@ public final class WebAppContainerBuilder
 								final List<String> lines,
 								final Path sourcePath,
 								final String targetPath,
-								final TarArchiveEntry tarArchiveEntry) throws IOException
+								final TarArchiveEntry tarArchiveEntry)
 							{
 								return lines.stream()
 									// Remove integration tests module
@@ -99,6 +97,11 @@ public final class WebAppContainerBuilder
 						}))
 				);
 		
+		Optional.ofNullable(System.getProperty(PROPERTY + ".cache-from"))
+			.ifPresent(builder::withCacheFrom);
+		Optional.ofNullable(System.getProperty(PROPERTY + ".cache-to"))
+			.ifPresent(builder::withCacheTo);
+		
 		if(JaCoCoConfig.instance().enabled())
 		{
 			builder.withBuildArg("JACOCO_AGENT_ENABLED", "1");
@@ -107,28 +110,6 @@ public final class WebAppContainerBuilder
 		final String imageName = builder.build(Duration.ofMinutes(5));
 		
 		LOG.info("Built Image; Name ='{}'", imageName);
-		
-		if(tagIntermediate)
-		{
-			CompletableFuture.runAsync(
-				() -> {
-					try
-					{
-						Stream.of("jre-base", "jre-minimized", "builder")
-							.forEach(target -> builder.copyForIntermediateTag(target)
-								.build(Duration.ofMinutes(1)));
-						
-						builder.cleanCreatedTransferFilesCache();
-						
-						LOG.info("Tagged intermediate image");
-					}
-					catch(final Exception ex)
-					{
-						LOG.warn("Tagging intermediate target failed", ex);
-					}
-				},
-				TCIExecutorServiceHolder.instance());
-		}
 		
 		return imageName;
 	}
