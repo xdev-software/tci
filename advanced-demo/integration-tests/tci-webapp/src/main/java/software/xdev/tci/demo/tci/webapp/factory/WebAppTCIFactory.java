@@ -1,10 +1,12 @@
 package software.xdev.tci.demo.tci.webapp.factory;
 
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import software.xdev.tci.concurrent.Suppliers;
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.demo.tci.webapp.WebAppTCI;
 import software.xdev.tci.demo.tci.webapp.containers.WebAppContainer;
 import software.xdev.tci.demo.tci.webapp.containers.WebAppContainerBuilder;
@@ -48,7 +50,7 @@ public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, We
 	@Override
 	protected void warmUpInternal()
 	{
-		IMAGE_NAME_SUPPLIER.get();
+		CompletableFuture.runAsync(IMAGE_NAME_SUPPLIER::get, TCIExecutorServiceHolder.instance());
 		super.warmUpInternal();
 	}
 }

@@ -1,8 +1,10 @@
 package software.xdev.tci.demo.tci.db.factory;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import software.xdev.tci.concurrent.Suppliers;
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.db.factory.BaseDBTCIFactory;
 import software.xdev.tci.demo.tci.db.DBTCI;
 import software.xdev.tci.demo.tci.db.containers.DBContainer;
@@ -34,7 +36,7 @@ public class DBTCIFactory extends BaseDBTCIFactory<DBContainer, DBTCI>
 	@Override
 	protected void warmUpInternal()
 	{
-		IMAGE_NAME_SUPPLIER.get();
+		CompletableFuture.runAsync(IMAGE_NAME_SUPPLIER::get, TCIExecutorServiceHolder.instance());
 		super.warmUpInternal();
 	}
 }
