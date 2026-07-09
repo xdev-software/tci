@@ -29,7 +29,7 @@ runs:
 
         mkdir -p ~/.cache/docker
         image_ids_to_save=$(comm -23 <(docker images -q | sort) <(docker image ls -q ${CI_CACHE_DOCKER_SAVE_IGNORE_FILTERS:--f="label=org.testcontainers.sessionId"} | sort))
-        image_ids_to_save=$(comm -23 <(echo $image_ids_to_save) <(cat ~/.cache/docker-preinstalled/ids.txt || echo ""))
+        image_ids_to_save=$(comm -23 <(echo "${image_ids_to_save[@]}") <(cat ~/.cache/docker-preinstalled/ids.txt || echo ""))
         echo "Saving image ids" && echo $image_ids_to_save
         docker save $image_ids_to_save -o ~/.cache/docker/images.tar
 
