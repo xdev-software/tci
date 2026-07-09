@@ -10,14 +10,15 @@ on:
       - '.github/**'
       - '.idea/**'
       - 'assets/**'
-  pull_request:
-    branches: [ develop ]
-    paths-ignore: 
-      - '**.md'
-      - '.config/**'
-      - '.github/**'
-      - '.idea/**'
-      - 'assets/**'
+  # TODO
+  # pull_request:
+  #   branches: [ develop ]
+  #   paths-ignore: 
+  #     - '**.md'
+  #     - '.config/**'
+  #     - '.github/**'
+  #     - '.idea/**'
+  #     - 'assets/**'
 
 env:
   DEMO_MAVEN_MODULE: ${{ github.event.repository.name }}-demo
