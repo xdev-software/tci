@@ -137,34 +137,14 @@ jobs:
         path: ~/.m2/repository
         key: ${{ runner.os }}-mvn-it-build-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
 
-    - name: Restore docker image cache
-      uses: actions/cache/restore@v6
-      id: restore-docker-image-cache
+    - name: Docker Image Cache Setup
+      id: docker-image-cache-setup
+      uses: ./.github/actions/docker-image-cache/setup
       with:
-        path: ~/.cache/docker/
-        key: ${{ runner.os }}-it-docker-images-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
+        key: it-docker-images-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-it-docker-images-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
           ${{ runner.os }}-it-docker-images-selenium-${{ matrix.project }}-
-
-    - name: Load docker image cache
-      run: |
-        echo "Deleting preinstalled images" && docker image ls
-        docker image prune -af > /dev/null
-
-        docker load -i ~/.cache/docker/images.tar && echo "Restored docker image cache" && docker image ls || true
-
-    # These are required for caching 
-    # https://docs.docker.com/build/cache/backends/gha/#authentication
-    - name: Get Actions Runtime credentials
-      id: actions-vars
-      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-      with:
-        script: |
-          core.setOutput('ACTIONS_RUNTIME_TOKEN', process.env['ACTIONS_RUNTIME_TOKEN'])
-          core.setOutput('ACTIONS_RESULTS_URL', process.env['ACTIONS_RESULTS_URL'])
-
-    - uses: docker/setup-buildx-action@v4
 
     - name: Test
       run: |
@@ -177,33 +157,14 @@ jobs:
         ${{ matrix.pre-start && '-Dinfra-pre-start.enabled=1 ' || '' }} \
         ${{ matrix.parallel > 0 && format('-Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent -Djunit.jupiter.execution.parallel.config.strategy=fixed -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2 -Djunit.jupiter.execution.parallel.config.fixed.max-pool-size={0} ', matrix.parallel) || '' }}
       env:
-        ACTIONS_RUNTIME_TOKEN: ${{ steps.actions-vars.outputs.ACTIONS_RUNTIME_TOKEN }}
-        ACTIONS_RESULTS_URL: ${{ steps.actions-vars.outputs.ACTIONS_RESULTS_URL }}
+        ACTIONS_RUNTIME_TOKEN: ${{ steps.docker-image-cache-setup.outputs.ACTIONS_RUNTIME_TOKEN }}
+        ACTIONS_RESULTS_URL: ${{ steps.docker-image-cache-setup.outputs.ACTIONS_RESULTS_URL }}
 
-    - name: Create docker image cache
-      # Cache can't be saved when it's already present
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: |
-        echo "Images before pruning" && docker image ls
-        docker image prune -af --filter "until=2160h"
-        docker image prune -f
-        echo "Currently available images" && docker image ls
-
-        echo "Will NOT cache images" && docker image ls -f="label=org.testcontainers.sessionId"
-
-        mkdir -p ~/.cache/docker
-        image_ids_to_save=$(comm -23 <(docker images -q | sort) <(docker image ls -q -f="label=org.testcontainers.sessionId" | sort))
-        echo "Saving image ids" && echo $image_ids_to_save
-        docker save $image_ids_to_save -o ~/.cache/docker/images.tar
-
-        ls -lha ~/.cache/docker
-
-    - name: Save docker image cache
-      if: steps.cache.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v6
+    - name: Docker Image Cache Save
+      uses: ./.github/actions/docker-image-cache/save
       with:
-        path: ~/.cache/docker/
-        key: ${{ runner.os }}-it-docker-images-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
+        key: ${{ steps.docker-image-cache-setup.outputs.key }}
+        cache-hit: ${{ steps.docker-image-cache-setup.outputs.cache-hit }}
 
     - name: Upload videos of test failures
       if: ${{ failure() }}

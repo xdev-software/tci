@@ -1,0 +1,56 @@
+name: 'Restore docker image cache'
+description: 'Restore and load docker image cache'
+# Based on https://github.com/actions/cache/blob/v6/restore/action.yml
+inputs:
+  key:
+    description: 'An explicit key for restoring the cache'
+    required: true
+  restore-keys:
+    description: 'An ordered multiline string listing the prefix-matched keys, that are used for restoring stale cache if no cache hit occurred for key. Note `cache-hit` returns false in this case.'
+    required: false
+outputs:
+  key:
+    description: 'Identical to the input - can be used to prevent copy pasting'
+    value: ${{ inputs.key }}
+  cache-hit:
+    description: 'A boolean value to indicate an exact match was found for the primary key'
+    value: ${{ steps.restore-docker-image-cache.outputs.cache-hit }}
+  ACTIONS_RUNTIME_TOKEN:
+    value: ${{ steps.actions-vars.outputs.ACTIONS_RUNTIME_TOKEN }}
+  ACTIONS_RESULTS_URL:
+    value: ${{ steps.actions-vars.outputs.ACTIONS_RESULTS_URL }}
+runs:
+  using: "composite"
+  steps:
+    # RESTORE "NORMAL" DOCKER IMAGE CACHE
+    - name: Restore docker image cache
+      uses: actions/cache/restore@v6
+      id: restore-docker-image-cache
+      with:
+        path: ~/.cache/docker/
+        key: ${{ inputs.key }}
+        restore-keys: ${{ inputs.restore-keys }}
+
+    - name: Load docker image cache
+      shell: bash
+      run: |
+        echo "Deleting preinstalled images" && docker image ls
+        docker image prune -af > /dev/null
+
+        docker load -i ~/.cache/docker/images.tar && echo "Restored docker image cache" && docker image ls || true
+
+    # CONFIGURE BUILDX FOR CACHING
+
+    # These are required for caching 
+    # https://docs.docker.com/build/cache/backends/gha/#authentication
+    - name: Get Actions Runtime credentials
+      if: runner.os != 'Windows'
+      id: actions-vars
+      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+      with:
+        script: |
+          core.setOutput('ACTIONS_RUNTIME_TOKEN', process.env['ACTIONS_RUNTIME_TOKEN'])
+          core.setOutput('ACTIONS_RESULTS_URL', process.env['ACTIONS_RESULTS_URL'])
+
+    - uses: docker/setup-buildx-action@v4
+      if: runner.os != 'Windows'
