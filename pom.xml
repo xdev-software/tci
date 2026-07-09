@@ -21,6 +21,7 @@
 		<module>db-jdbc-spring-orm</module>
 		<module>db-jdbc-spring-orm-eclipselink</module>
 		<module>db-jdbc-spring-orm-hibernate</module>
+		<module>image-build</module>
 		<module>jacoco</module>
 		<module>jul-to-slf4j</module>
 		<module>junit-jupiter-api-support</module>

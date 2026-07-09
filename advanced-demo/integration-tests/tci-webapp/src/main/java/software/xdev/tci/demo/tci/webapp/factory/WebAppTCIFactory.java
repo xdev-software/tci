@@ -1,7 +1,6 @@
 package software.xdev.tci.demo.tci.webapp.factory;
 
 import java.time.Duration;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -16,10 +15,8 @@ import software.xdev.tci.misc.ContainerMemory;
 
 public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, WebAppTCI>
 {
-	protected static final Supplier<String> IMAGE_NAME_SUPPLIER = Suppliers.memoize(() ->
-		Objects.requireNonNullElseGet(
-			System.getProperty(WebAppContainerBuilder.PROPERTY),
-			WebAppContainerBuilder::getImageName));
+	protected static final Supplier<String> IMAGE_NAME_SUPPLIER =
+		Suppliers.memoize(WebAppContainerBuilder::getImageName);
 	
 	@SuppressWarnings("checkstyle:MagicNumber")
 	public WebAppTCIFactory(final Consumer<WebAppContainer> additionalContainerBuilder)

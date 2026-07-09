@@ -69,6 +69,11 @@
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
+				<artifactId>image-build</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>software.xdev.tci</groupId>
 				<artifactId>jacoco</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -112,13 +117,6 @@
 				<version>6.1.1</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-
-			<!-- Test Containers -->
-			<dependency>
-				<groupId>software.xdev</groupId>
-				<artifactId>testcontainers-advanced-imagebuilder</artifactId>
-				<version>4.0.0</version>
 			</dependency>
 
 			<!-- Utility for proxies in tests -->

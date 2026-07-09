@@ -4,26 +4,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import software.xdev.tci.imagebuild.ImageCreator;
 import software.xdev.tci.jacoco.testbase.config.JaCoCoConfig;
 import software.xdev.testcontainers.imagebuilder.buildxnative.NativeAdvancedImageFromDockerfile;
 import software.xdev.testcontainers.imagebuilder.compat.DockerfileCOPYParentsEmulator;
 import software.xdev.testcontainers.imagebuilder.transfer.fcm.FileLinesContentModifier;
 
 
-@SuppressWarnings("PMD.MoreThanOneLogger")
 public final class WebAppContainerBuilder
 {
 	private static final Logger LOG = LoggerFactory.getLogger(WebAppContainerBuilder.class);
-	private static final Logger LOG_CONTAINER_BUILD =
-		LoggerFactory.getLogger("container.build.webapp");
-	
-	public static final String PROPERTY = "app-docker-image";
 	
 	private WebAppContainerBuilder()
 	{
@@ -33,9 +28,7 @@ public final class WebAppContainerBuilder
 	{
 		LOG.info("Building WebApp-DockerImage...");
 		
-		final NativeAdvancedImageFromDockerfile builder =
-			new NativeAdvancedImageFromDockerfile("webapp-it-local", Boolean.getBoolean(PROPERTY + ".delete-on-exit"))
-				.withLoggerForBuild(LOG_CONTAINER_BUILD)
+		final NativeAdvancedImageFromDockerfile builder = ImageCreator.nativeImage("tci-demo-webapp")
 				.withDockerFilePath(Paths.get("../../integration-tests/tci-webapp/Dockerfile"))
 				.withBaseDir(Paths.get("../../"))
 				.configureFilesToTransferHandler(h -> h
@@ -96,11 +89,6 @@ public final class WebAppContainerBuilder
 							}
 						}))
 				);
-		
-		Optional.ofNullable(System.getProperty(PROPERTY + ".cache-from"))
-			.ifPresent(builder::withCacheFrom);
-		Optional.ofNullable(System.getProperty(PROPERTY + ".cache-to"))
-			.ifPresent(builder::withCacheTo);
 		
 		if(JaCoCoConfig.instance().enabled())
 		{

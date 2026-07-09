@@ -18,11 +18,11 @@
 		</dependency>
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
-			<artifactId>jacoco</artifactId>
+			<artifactId>image-build</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>software.xdev</groupId>
-			<artifactId>testcontainers-advanced-imagebuilder</artifactId>
+			<groupId>software.xdev.tci</groupId>
+			<artifactId>jacoco</artifactId>
 		</dependency>
 	</dependencies>
 </project>
