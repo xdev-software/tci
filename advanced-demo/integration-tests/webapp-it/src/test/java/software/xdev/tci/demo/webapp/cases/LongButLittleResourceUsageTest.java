@@ -3,7 +3,6 @@ package software.xdev.tci.demo.webapp.cases;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,7 +13,6 @@ import software.xdev.tci.selenium.TestBrowser;
 
 
 // These tests were written to show the advantages of PreStarting
-@Disabled // TODO
 class LongButLittleResourceUsageTest extends InfraPerCaseTest
 {
 	static Stream<Arguments> simulatedLongTest()
