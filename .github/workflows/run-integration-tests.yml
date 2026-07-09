@@ -138,14 +138,18 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-mvn-it-build-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
       
-      - name: Docker Image Cache Setup
-        id: docker-image-cache-setup
-        uses: ./.github/actions/docker-image-cache/setup
+      - name: Docker Image Cache Restore
+        id: docker-image-cache-restore
+        uses: ./.github/actions/docker-image-cache/restore
         with:
           key: it-docker-images-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-it-docker-images-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
             ${{ runner.os }}-it-docker-images-selenium-${{ matrix.project }}-
+
+      - name: Setup Buildx
+        id: docker-image-cache-setup-buildx
+        uses: ./.github/actions/docker-image-cache/setup-buildx
 
     - name: Test
       run: |
@@ -158,8 +162,8 @@ jobs:
         ${{ matrix.pre-start && '-Dinfra-pre-start.enabled=1 ' || '' }} \
         ${{ matrix.parallel > 0 && format('-Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent -Djunit.jupiter.execution.parallel.config.strategy=fixed -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2 -Djunit.jupiter.execution.parallel.config.fixed.max-pool-size={0} ', matrix.parallel) || '' }}
       env:
-        ACTIONS_RUNTIME_TOKEN: ${{ steps.docker-image-cache-setup.outputs.ACTIONS_RUNTIME_TOKEN }}
-        ACTIONS_RESULTS_URL: ${{ steps.docker-image-cache-setup.outputs.ACTIONS_RESULTS_URL }}
+        ACTIONS_RUNTIME_TOKEN: ${{ steps.docker-image-cache-setup-buildx.outputs.ACTIONS_RUNTIME_TOKEN }}
+        ACTIONS_RESULTS_URL: ${{ steps.docker-image-cache-setup-buildx.outputs.ACTIONS_RESULTS_URL }}
     
     - name: Display images
       run: |
@@ -168,8 +172,8 @@ jobs:
     - name: Docker Image Cache Save
       uses: ./.github/actions/docker-image-cache/save
       with:
-        key: ${{ steps.docker-image-cache-setup.outputs.key }}
-        cache-hit: ${{ steps.docker-image-cache-setup.outputs.cache-hit }}
+        key: ${{ steps.docker-image-cache-restore.outputs.key }}
+        cache-hit: ${{ steps.docker-image-cache-restore.outputs.cache-hit }}
       background: true
 
     - name: Upload videos of test failures
