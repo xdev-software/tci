@@ -38,7 +38,7 @@ runs:
       shell: bash
       run: |
         echo "Getting preinstalled images" && docker image ls
-        preinstalled_image_ids=$(docker images -q)
+        preinstalled_image_ids=$(docker images -q | sort)
 
         echo "Storing preinstalled image ids" && echo $preinstalled_image_ids
         mkdir -p ~/.cache/docker-preinstalled
