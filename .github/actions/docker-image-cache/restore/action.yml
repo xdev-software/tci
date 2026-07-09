@@ -41,4 +41,4 @@ runs:
         printf "%s\n" "${preinstalled_image_ids[@]}" > ~/.cache/docker-preinstalled/ids.txt
 
         echo "Importing cache"
-        time docker load -i ~/.cache/docker/images.tar && echo "Restored docker image cache" && docker image ls || true
+        docker load -i ~/.cache/docker/images.tar && echo "Restored docker image cache" && docker image ls || true
