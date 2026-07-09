@@ -83,6 +83,9 @@ jobs:
         ACTIONS_RUNTIME_TOKEN: ${{ steps.docker-image-cache-setup-buildx.outputs.ACTIONS_RUNTIME_TOKEN }}
         ACTIONS_RESULTS_URL: ${{ steps.docker-image-cache-setup-buildx.outputs.ACTIONS_RESULTS_URL }}
 
+    - name: Show images
+      run: docker image ls
+
     - name: Docker Image Cache Save
       uses: ./.github/actions/docker-image-cache/save
       with:
@@ -146,9 +149,8 @@ jobs:
         ACTIONS_RUNTIME_TOKEN: ${{ steps.docker-image-cache-setup-buildx.outputs.ACTIONS_RUNTIME_TOKEN }}
         ACTIONS_RESULTS_URL: ${{ steps.docker-image-cache-setup-buildx.outputs.ACTIONS_RESULTS_URL }}
 
-    - name: Display images
-      run: |
-        docker image ls
+    - name: Show images
+      run: docker image ls
 
     - name: Docker Image Cache Save
       uses: ./.github/actions/docker-image-cache/save
