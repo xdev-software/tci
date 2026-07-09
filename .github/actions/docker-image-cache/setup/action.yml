@@ -37,7 +37,7 @@ runs:
     - name: Load docker image cache
       shell: bash
       run: |
-        echo "Deleting preinstalled images" && docker image ls
+        echo "Deleting preinstalled images to not run out of disk space" && docker image ls
         image_ids_to_delete=$(docker images -a -q)
         echo "Deleting image ids" && echo $image_ids_to_delete
         # Delete images in background while new images are loaded in
