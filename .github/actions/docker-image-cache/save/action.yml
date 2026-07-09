@@ -23,8 +23,7 @@ runs:
 
         preinstalled_image_ids=()
         if [ -f ~/.cache/docker-preinstalled/ids.txt ]; then
-          cat ~/.cache/docker-preinstalled/ids.txt
-          readarray -t preinstalled_image_ids ~/.cache/docker-preinstalled/ids.txt
+          readarray -t preinstalled_image_ids < ~/.cache/docker-preinstalled/ids.txt
           echo "Will NOT cache pre-installed images" && echo $preinstalled_image_ids
         fi
 
