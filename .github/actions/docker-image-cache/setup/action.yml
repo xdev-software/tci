@@ -26,12 +26,6 @@ runs:
 
     # NOTE 2026-07-09 Parallel execution is not yet available for composite actions
     # https://github.blog/changelog/2026-06-25-actions-steps-can-now-be-run-in-parallel/
-    - name: Delete preinstalled images
-      shell: bash
-      run: |
-        echo "Deleting preinstalled images" && docker image ls
-        docker image prune -af > /dev/null
-
     - name: Restore docker image cache
       uses: actions/cache/restore@v6
       id: restore-docker-image-cache
@@ -44,9 +38,15 @@ runs:
       shell: bash
       run: |
         echo "Deleting preinstalled images" && docker image ls
-        docker image prune -af > /dev/null
+        image_ids_to_delete=$(docker images -a -q)
+        echo "Deleting image ids" && echo $image_ids_to_save
+        # Delete images in background while new images are loaded in
+        (time docker image rm -f $image_ids_to_delete || true) &
+        rm_pid=$!
 
-        docker load -i ~/.cache/docker/images.tar && echo "Restored docker image cache" && docker image ls || true
+        time docker load -i ~/.cache/docker/images.tar && echo "Restored docker image cache" && docker image ls || true
+
+        wait $rm_pid
 
     # CONFIGURE BUILDX FOR CACHING
 
