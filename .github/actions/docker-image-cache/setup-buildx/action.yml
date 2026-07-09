@@ -1,6 +1,5 @@
 name: 'Setup buildx'
 description: 'Setup buildx'
-# Based on https://github.com/actions/cache/blob/v6/restore/action.yml
 outputs:
   ACTIONS_RUNTIME_TOKEN:
     value: ${{ steps.actions-vars.outputs.ACTIONS_RUNTIME_TOKEN }}
