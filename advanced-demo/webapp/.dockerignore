@@ -1,5 +1,0 @@
-# by default ignore everything!
-*
-
-# allow only things that should be used in the context
-!target/webapp.jar
