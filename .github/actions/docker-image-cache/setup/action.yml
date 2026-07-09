@@ -37,6 +37,13 @@ runs:
     - name: Load docker image cache
       shell: bash
       run: |
+        echo "Getting preinstalled images" && docker image ls
+        preinstalled_image_ids=$(docker images -q)
+
+        echo "Storing preinstalled image ids" && echo $preinstalled_image_ids
+        mkdir -p ~/.cache/docker-preinstalled
+        printf "%s\n" "${preinstalled_image_ids[@]}" > ~/.cache/docker-preinstalled/ids.txt
+
         echo "Importing cache"
         time docker load -i ~/.cache/docker/images.tar && echo "Restored docker image cache" && docker image ls || true
 
