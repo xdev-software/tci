@@ -24,97 +24,78 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # persistence:
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       project: [persistence-it-hibernate]
-  #       parallel: [0, 2]
-  #       pre-start: [false, true]
-  #       java: [21]
-  #       include:
-  #         - project: persistence-it-eclipselink
-  #           parallel: 2
-  #           pre-start: true
-  #           java: 21
-  #   name: "persistence (${{matrix.project}}, ${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})"
-  #   runs-on: ubuntu-latest
-  #   if: ${{ !(github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/')) }}
-  #   timeout-minutes: 10
-  #   permissions:
-  #     contents: read
-  #   steps:
-  #   - uses: actions/checkout@v7
+  persistence:
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [persistence-it-hibernate]
+        parallel: [0, 2]
+        pre-start: [false, true]
+        java: [21]
+        include:
+          - project: persistence-it-eclipselink
+            parallel: 2
+            pre-start: true
+            java: 21
+    name: "persistence (${{matrix.project}}, ${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})"
+    runs-on: ubuntu-latest
+    if: ${{ !(github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/')) }}
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v7
 
-  #   - name: Set up JDK
-  #     uses: actions/setup-java@v5
-  #     with:
-  #       distribution: temurin
-  #       java-version: ${{ matrix.java }}
+    - parallel:
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
 
-  #   - name: Cache Maven
-  #     uses: actions/cache@v6
-  #     with:
-  #       path: ~/.m2/repository
-  #       key: ${{ runner.os }}-mvn-it-build-persistence-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
+      - name: Cache Maven
+        uses: actions/cache@v6
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-mvn-it-build-persistence-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
 
-  #   - name: Restore docker image cache
-  #     uses: actions/cache/restore@v6
-  #     id: restore-docker-image-cache
-  #     with:
-  #       path: ~/.cache/docker/
-  #       key: ${{ runner.os }}-it-docker-images-persistence-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
-  #       restore-keys: |
-  #         ${{ runner.os }}-it-docker-images-persistence-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
-  #         ${{ runner.os }}-it-docker-images-persistence-${{ matrix.project }}-
+      - name: Docker Image Cache Restore
+        id: docker-image-cache-restore
+        uses: ./.github/actions/docker-image-cache/restore
+        with:
+          key: it-docker-images-persistence-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-it-docker-images-persistence-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
+            ${{ runner.os }}-it-docker-images-persistence-${{ matrix.project }}-
 
-  #   - name: Load docker image cache
-  #     run: |
-  #       echo "Deleting preinstalled images" && docker image ls
-  #       docker image prune -af
+      - name: Setup Buildx
+        id: docker-image-cache-setup-buildx
+        uses: ./.github/actions/docker-image-cache/setup-buildx
 
-  #       cat ~/.cache/docker/images.tar | docker load && echo "Restored docker image cache" && docker image ls || true
+    - name: Test
+      run: |
+        ./mvnw -B test \
+        -pl "advanced-demo/integration-tests/${{ matrix.project }}" -am \
+        -P run-it \
+        ${{ matrix.pre-start && '-Dinfra-pre-start.enabled=1 ' || '' }} \
+        ${{ matrix.parallel > 0 && format('-Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent -Djunit.jupiter.execution.parallel.config.strategy=fixed -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2 -Djunit.jupiter.execution.parallel.config.fixed.max-pool-size={0} ', matrix.parallel) || '' }}
+      env:
+        ACTIONS_RUNTIME_TOKEN: ${{ steps.docker-image-cache-setup-buildx.outputs.ACTIONS_RUNTIME_TOKEN }}
+        ACTIONS_RESULTS_URL: ${{ steps.docker-image-cache-setup-buildx.outputs.ACTIONS_RESULTS_URL }}
 
-  #   - name: Test
-  #     run: |
-  #       ./mvnw -B test \
-  #       -pl "advanced-demo/integration-tests/${{ matrix.project }}" -am \
-  #       -P run-it \
-  #       ${{ matrix.pre-start && '-Dinfra-pre-start.enabled=1 ' || '' }} \
-  #       ${{ matrix.parallel > 0 && format('-Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent -Djunit.jupiter.execution.parallel.config.strategy=fixed -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2 -Djunit.jupiter.execution.parallel.config.fixed.max-pool-size={0} ', matrix.parallel) || '' }}
-
-  #   - name: Create docker image cache
-  #     # Cache can't be saved when it's already present
-  #     if: steps.cache.outputs.cache-hit != 'true'
-  #     run: |
-  #       echo "Images before pruning" && docker image ls
-  #       docker image prune -af --filter "until=2160h"
-  #       docker image prune -f
-  #       echo "Currently available images" && docker image ls
-
-  #       echo "Will NOT cache images" && docker image ls -f="label=org.testcontainers.sessionId"
-
-  #       mkdir -p ~/.cache/docker
-  #       image_ids_to_save=$(comm -23 <(docker images -q | sort) <(docker image ls -q -f="label=org.testcontainers.sessionId" | sort))
-  #       echo "Saving image ids" && echo $image_ids_to_save
-  #       docker save $image_ids_to_save -o ~/.cache/docker/images.tar
-
-  #       ls -lha ~/.cache/docker
-
-  #   - name: Save docker image cache
-  #     if: steps.cache.outputs.cache-hit != 'true'
-  #     uses: actions/cache/save@v6
-  #     with:
-  #       path: ~/.cache/docker/
-  #       key: ${{ runner.os }}-it-docker-images-persistence-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
+    - name: Docker Image Cache Save
+      uses: ./.github/actions/docker-image-cache/save
+      with:
+        key: ${{ steps.docker-image-cache-restore.outputs.key }}
+        cache-hit: ${{ steps.docker-image-cache-restore.outputs.cache-hit }}
 
   selenium:
     strategy:
       fail-fast: false
       matrix:
         project: [webapp-it]
-        parallel: [2] # [0, 2]
-        pre-start: [true] # [false, true]
+        parallel: [0, 2]
+        pre-start: [false, true]
         java: [21]
     name: "selenium (${{matrix.project}}, ${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})"
     runs-on: ubuntu-latest
@@ -137,7 +118,7 @@ jobs:
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-mvn-it-build-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
-      
+
       - name: Docker Image Cache Restore
         id: docker-image-cache-restore
         uses: ./.github/actions/docker-image-cache/restore
@@ -164,7 +145,7 @@ jobs:
       env:
         ACTIONS_RUNTIME_TOKEN: ${{ steps.docker-image-cache-setup-buildx.outputs.ACTIONS_RUNTIME_TOKEN }}
         ACTIONS_RESULTS_URL: ${{ steps.docker-image-cache-setup-buildx.outputs.ACTIONS_RESULTS_URL }}
-    
+
     - name: Display images
       run: |
         docker image ls
@@ -198,6 +179,6 @@ jobs:
         name: webapp-jacoco-report-${{ matrix.java }}-${{ matrix.project }}-${{ matrix.parallel }}-${{ matrix.pre-start }}
         path: advanced-demo/target/site/jacoco-aggregate
         if-no-files-found: ignore
-    
+
     - name: Wait for async jobs to finish
       wait-all:
