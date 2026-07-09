@@ -160,6 +160,10 @@ jobs:
       env:
         ACTIONS_RUNTIME_TOKEN: ${{ steps.docker-image-cache-setup.outputs.ACTIONS_RUNTIME_TOKEN }}
         ACTIONS_RESULTS_URL: ${{ steps.docker-image-cache-setup.outputs.ACTIONS_RESULTS_URL }}
+    
+    - name: Display images
+      run: |
+        docker image ls
 
     - name: Docker Image Cache Save
       uses: ./.github/actions/docker-image-cache/save
