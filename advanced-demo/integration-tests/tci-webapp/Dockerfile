@@ -119,6 +119,7 @@ RUN if [[ ! -z "$ENABLE_AOT" ]]; then \
     -XX:+UseCompactObjectHeaders \
     -XX:+UseStringDeduplication \
     -XX:AOTCacheOutput=app.aot \
+    ${JACOCO_AGENT_ENABLED:+"-javaagent:/jacoco/agent.jar=destfile=/jacoco/report/jacoco.exec"} \
     -Djava.awt.headless=true \
     -Dspring.context.exit=onRefresh \
     # Disable Flyway
