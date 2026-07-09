@@ -23,13 +23,20 @@ runs:
   using: "composite"
   steps:
     # RESTORE "NORMAL" DOCKER IMAGE CACHE
-    - name: Restore docker image cache
-      uses: actions/cache/restore@v6
-      id: restore-docker-image-cache
-      with:
-        path: ~/.cache/docker/
-        key: ${{ inputs.key }}
-        restore-keys: ${{ inputs.restore-keys }}
+    - parallel:
+      - name: Delete preinstalled images
+        shell: bash
+        run: |
+          echo "Deleting preinstalled images" && docker image ls
+          docker image prune -af > /dev/null
+
+      - name: Restore docker image cache
+        uses: actions/cache/restore@v6
+        id: restore-docker-image-cache
+        with:
+          path: ~/.cache/docker/
+          key: ${{ inputs.key }}
+          restore-keys: ${{ inputs.restore-keys }}
 
     - name: Load docker image cache
       shell: bash
