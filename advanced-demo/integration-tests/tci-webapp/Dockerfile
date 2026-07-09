@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1-labs
 # Note: This Dockerfile is used by the integration tests for compiling the app when there was no Image was supplied
-ARG JAVA_VERSION=21
+ARG JAVA_VERSION=25
 FROM eclipse-temurin:${JAVA_VERSION}-jre-alpine AS jre-base
 
 
@@ -111,7 +111,7 @@ RUN true
 COPY --from=builder --chown=${user}:${group} /builder/extracted/application/ ./
 
 ENV JAVA_JACOCO_OPTS=${JACOCO_AGENT_ENABLED:+"-javaagent:/jacoco/agent.jar=destfile=/jacoco/report/jacoco.exec"}
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 -Djava.awt.headless=true"
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 -XX:+UseCompactObjectHeaders -Djava.awt.headless=true"
 
 EXPOSE 8080
 

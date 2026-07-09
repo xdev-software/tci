@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jre-alpine AS jre-base
+FROM eclipse-temurin:25-jre-alpine AS jre-base
 
 
 # Build the JRE ourself and exclude stuff from Eclipse-Temurin that we don't need
