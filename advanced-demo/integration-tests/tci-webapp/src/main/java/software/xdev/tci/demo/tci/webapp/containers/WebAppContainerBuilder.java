@@ -29,6 +29,7 @@ public final class WebAppContainerBuilder
 		LOG.info("Building WebApp-DockerImage...");
 		
 		final NativeAdvancedImageFromDockerfile builder = ImageCreator.nativeImage("tci-demo-webapp")
+			// NOTE: AOT can't be used properly when JaCoCo is active
 			.withBuildArg("ENABLE_AOT", "1")
 			.withDockerFilePath(Paths.get("../../integration-tests/tci-webapp/Dockerfile"))
 			.withBaseDir(Paths.get("../../"))
