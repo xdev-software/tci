@@ -17,7 +17,6 @@ runs:
       shell: bash
       run: |
         echo "Images before pruning" && docker image ls
-        docker image prune -af --filter "until=2160h"
         docker image prune -f
         echo "Currently available images" && docker image ls
 
