@@ -125,26 +125,27 @@ jobs:
     steps:
     - uses: actions/checkout@v7
 
-    - name: Set up JDK
-      uses: actions/setup-java@v5
-      with:
-        distribution: temurin
-        java-version: ${{ matrix.java }}
+    - parallel:
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
 
-    - name: Cache Maven
-      uses: actions/cache@v6
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-mvn-it-build-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
-
-    - name: Docker Image Cache Setup
-      id: docker-image-cache-setup
-      uses: ./.github/actions/docker-image-cache/setup
-      with:
-        key: it-docker-images-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-it-docker-images-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
-          ${{ runner.os }}-it-docker-images-selenium-${{ matrix.project }}-
+      - name: Cache Maven
+        uses: actions/cache@v6
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-mvn-it-build-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
+      
+      - name: Docker Image Cache Setup
+        id: docker-image-cache-setup
+        uses: ./.github/actions/docker-image-cache/setup
+        with:
+          key: it-docker-images-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-it-docker-images-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
+            ${{ runner.os }}-it-docker-images-selenium-${{ matrix.project }}-
 
     - name: Test
       run: |
@@ -165,6 +166,7 @@ jobs:
       with:
         key: ${{ steps.docker-image-cache-setup.outputs.key }}
         cache-hit: ${{ steps.docker-image-cache-setup.outputs.cache-hit }}
+      background: true
 
     - name: Upload videos of test failures
       if: ${{ failure() }}
@@ -173,6 +175,7 @@ jobs:
         name: test-fail-videos-${{ matrix.java }}-${{ matrix.project }}-${{ matrix.parallel }}-${{ matrix.pre-start }}
         path: advanced-demo/integration-tests/${{ matrix.project }}/target/records
         if-no-files-found: ignore
+      background: true
 
     - name: Aggregate WebApp JaCoCo report
       if: ${{ success() }}
@@ -187,3 +190,6 @@ jobs:
         name: webapp-jacoco-report-${{ matrix.java }}-${{ matrix.project }}-${{ matrix.parallel }}-${{ matrix.pre-start }}
         path: advanced-demo/target/site/jacoco-aggregate
         if-no-files-found: ignore
+    
+    - name: Wait for async jobs to finish
+      wait-all:

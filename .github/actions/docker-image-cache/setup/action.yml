@@ -23,20 +23,22 @@ runs:
   using: "composite"
   steps:
     # RESTORE "NORMAL" DOCKER IMAGE CACHE
-    - parallel:
-      - name: Delete preinstalled images
-        shell: bash
-        run: |
-          echo "Deleting preinstalled images" && docker image ls
-          docker image prune -af > /dev/null
 
-      - name: Restore docker image cache
-        uses: actions/cache/restore@v6
-        id: restore-docker-image-cache
-        with:
-          path: ~/.cache/docker/
-          key: ${{ inputs.key }}
-          restore-keys: ${{ inputs.restore-keys }}
+    # NOTE 2026-07-09 Parallel execution is not yet available for composite actions
+    # https://github.blog/changelog/2026-06-25-actions-steps-can-now-be-run-in-parallel/
+    - name: Delete preinstalled images
+      shell: bash
+      run: |
+        echo "Deleting preinstalled images" && docker image ls
+        docker image prune -af > /dev/null
+
+    - name: Restore docker image cache
+      uses: actions/cache/restore@v6
+      id: restore-docker-image-cache
+      with:
+        path: ~/.cache/docker/
+        key: ${{ inputs.key }}
+        restore-keys: ${{ inputs.restore-keys }}
 
     - name: Load docker image cache
       shell: bash
