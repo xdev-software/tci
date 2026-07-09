@@ -8,14 +8,12 @@
     * `restore` - Restores the previously downloaded images
     * `setup-buildx` - Set's up the buildx worker and returns required environment variables
     * `save` - Saves the downloaded images
-* Updated demo
-* Fixed a deadlock during service resolution
-
-# 3.5.0
 * `db-jdbc-spring-orm` & implementations
   * No longer use `setPersistenceProviderClassName` because it has no effect
   * Performance: Reuse `PersistenceProvider`
+* Fixed a deadlock during service resolution
 * Updated dependencies
+* Updated demo
 
 # 3.4.1
 * Remove dedicated code for Java 17 (no longer needed because Java 21 is the minimum)
