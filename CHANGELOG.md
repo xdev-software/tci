@@ -1,3 +1,16 @@
+# 4.0.0
+* Added `image-build` module
+  * This module utilizes v4 of [testcontainers-advanced-imagebuilder](https://github.com/xdev-software/testcontainers-advanced-imagebuilder)
+  * It contains some shortcuts that help with common configuration e.g. related to caching (see below)
+* Added dedicated composite actions for caching
+  * These can be found in `.github/actions/docker-image-cache`
+  * Currently 3 actions exist:
+    * `restore` - Restores the previously downloaded images
+    * `setup-buildx` - Set's up the buildx worker and returns required environment variables
+    * `save` - Saves the downloaded images
+* Updated demo
+* Fixed a deadlock during service resolution
+
 # 3.5.0
 * `db-jdbc-spring-orm` & implementations
   * No longer use `setPersistenceProviderClassName` because it has no effect
