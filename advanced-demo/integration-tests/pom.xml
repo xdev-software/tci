@@ -118,7 +118,7 @@
 			<dependency>
 				<groupId>software.xdev</groupId>
 				<artifactId>testcontainers-advanced-imagebuilder</artifactId>
-				<version>2.5.0</version>
+				<version>4.0.0</version>
 			</dependency>
 
 			<!-- Utility for proxies in tests -->
