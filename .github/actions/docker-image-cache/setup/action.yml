@@ -39,7 +39,7 @@ runs:
       run: |
         echo "Deleting preinstalled images" && docker image ls
         image_ids_to_delete=$(docker images -a -q)
-        echo "Deleting image ids" && echo $image_ids_to_save
+        echo "Deleting image ids" && echo $image_ids_to_delete
         # Delete images in background while new images are loaded in
         (time docker image rm -f $image_ids_to_delete || true) &
         rm_pid=$!
