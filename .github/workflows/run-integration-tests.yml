@@ -103,11 +103,14 @@ jobs:
         parallel: [0, 2]
         pre-start: [false, true]
         java: [21]
-        # Only enable jacoco on the fastest builds because AOT is not fully working with it
+        jacoco: [false]
+        # Dedicated build with JaCoCo
         include:
           - project: webapp-it
             parallel: 2
-            jacoco: [true]
+            pre-start: true
+            java: 21
+            jacoco: true
     name: "selenium (${{matrix.project}}, ${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})"
     runs-on: ubuntu-latest
     if: ${{ !(github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/')) }}
