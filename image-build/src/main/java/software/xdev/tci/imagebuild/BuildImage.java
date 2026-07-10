@@ -15,29 +15,38 @@
  */
 package software.xdev.tci.imagebuild;
 
+import java.time.Duration;
+import java.util.function.UnaryOperator;
+
 import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
 import software.xdev.testcontainers.imagebuilder.AdvancedImageFromDockerFile;
 import software.xdev.testcontainers.imagebuilder.buildxnative.NativeAdvancedImageFromDockerfile;
 
 
-public final class ImageCreator
+public final class BuildImage
 {
-	public static NativeAdvancedImageFromDockerfile nativeImage(final String dockerImage)
+	public static String nativeImage(
+		final String dockerImage,
+		final Duration timeout,
+		final UnaryOperator<NativeAdvancedImageFromDockerfile> configure)
 	{
-		return impl().nativeImage(dockerImage);
+		return impl().nativeImage(dockerImage, timeout, configure);
 	}
 	
-	public static AdvancedImageFromDockerFile image(final String dockerImage)
+	public static String image(
+		final String dockerImage,
+		final Duration timeout,
+		final UnaryOperator<AdvancedImageFromDockerFile> configure)
 	{
-		return impl().image(dockerImage);
+		return impl().image(dockerImage, timeout, configure);
 	}
 	
-	public static CreateImageHandler impl()
+	public static BuildImageHandler impl()
 	{
-		return TCIServiceLoaderHolder.instance().service(CreateImageHandler.class);
+		return TCIServiceLoaderHolder.instance().service(BuildImageHandler.class);
 	}
 	
-	private ImageCreator()
+	private BuildImage()
 	{
 	}
 }

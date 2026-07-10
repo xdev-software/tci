@@ -15,13 +15,22 @@
  */
 package software.xdev.tci.imagebuild;
 
+import java.time.Duration;
+import java.util.function.UnaryOperator;
+
 import software.xdev.testcontainers.imagebuilder.AdvancedImageFromDockerFile;
 import software.xdev.testcontainers.imagebuilder.buildxnative.NativeAdvancedImageFromDockerfile;
 
 
-public interface CreateImageHandler
+public interface BuildImageHandler
 {
-	NativeAdvancedImageFromDockerfile nativeImage(String dockerImage);
+	String nativeImage(
+		String dockerImage,
+		Duration timeout,
+		UnaryOperator<NativeAdvancedImageFromDockerfile> configure);
 	
-	AdvancedImageFromDockerFile image(String dockerImage);
+	String image(
+		String dockerImage,
+		Duration timeout,
+		UnaryOperator<AdvancedImageFromDockerFile> configure);
 }

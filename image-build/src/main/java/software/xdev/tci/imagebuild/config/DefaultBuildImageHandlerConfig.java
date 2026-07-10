@@ -21,12 +21,16 @@ import software.xdev.tci.config.DefaultConfig;
 
 
 @SuppressWarnings({"java:S2789", "OptionalAssignedToNull", "OptionalUsedAsFieldOrParameterType"})
-public class DefaultCreateImageHandlerConfig extends DefaultConfig implements CreateImageHandlerConfig
+public class DefaultBuildImageHandlerConfig extends DefaultConfig implements BuildImageHandlerConfig
 {
+	protected static final String SAVE_CACHE_IN_BACKGROUND = "save-cache-in-background";
+	
 	protected Boolean deleteOnExit;
 	protected String loggerForBuildPrefix;
 	protected Optional<String> cacheFrom;
 	protected Optional<String> cacheTo;
+	protected Boolean saveCacheInBackground;
+	protected Boolean waitForSaveCacheInBackground;
 	
 	@Override
 	protected String propertyNamePrefix()
@@ -73,5 +77,27 @@ public class DefaultCreateImageHandlerConfig extends DefaultConfig implements Cr
 			this.cacheTo = this.resolve("cache-to");
 		}
 		return this.cacheTo;
+	}
+	
+	@Override
+	public boolean saveCacheInBackground()
+	{
+		if(this.saveCacheInBackground == null)
+		{
+			this.saveCacheInBackground =
+				this.resolveBool(SAVE_CACHE_IN_BACKGROUND, this.cacheTo().isPresent());
+		}
+		return this.saveCacheInBackground;
+	}
+	
+	@Override
+	public boolean waitForSaveCacheInBackground()
+	{
+		if(this.waitForSaveCacheInBackground == null)
+		{
+			this.waitForSaveCacheInBackground =
+				this.resolveBool("wait-for-" + SAVE_CACHE_IN_BACKGROUND, true);
+		}
+		return this.waitForSaveCacheInBackground;
 	}
 }
