@@ -20,7 +20,7 @@ import java.util.Optional;
 import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
 
 
-public interface CreateImageHandlerConfig
+public interface BuildImageHandlerConfig
 {
 	boolean deleteOnExit();
 	
@@ -30,8 +30,12 @@ public interface CreateImageHandlerConfig
 	
 	Optional<String> cacheTo();
 	
-	static CreateImageHandlerConfig instance()
+	boolean saveCacheInBackground();
+	
+	boolean waitForSaveCacheInBackground();
+	
+	static BuildImageHandlerConfig instance()
 	{
-		return TCIServiceLoaderHolder.instance().service(CreateImageHandlerConfig.class);
+		return TCIServiceLoaderHolder.instance().service(BuildImageHandlerConfig.class);
 	}
 }

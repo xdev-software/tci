@@ -25,6 +25,8 @@ _You should know exactly what you're doing when doing modifications._
 | `logger-for-build-prefix` | `string` | `container.build.` | Prefix used for the build logger |
 | `cache-from` | `string` | - | Only applies to BuildKit (native) build.<br/> See [Docker docs](https://docs.docker.com/build/cache/backends/) for details. |
 | `cache-to` | `string` | - | Only applies to BuildKit (native) build.<br/> See [Docker docs](https://docs.docker.com/build/cache/backends/) for details. |
+| `save-cache-in-background` | `bool` | if `cache-to` set `true`<br/> otherwise `false` | Builds the image the first time WITHOUT `cache-to` and the async in the background again WITH `cache-to`. This way saving the cache does not delay test execution. |
+| `wait-for-save-cache-in-background` | `bool` | `true` | Wait until all caches are saved before terminating |
 
 </details>
 
