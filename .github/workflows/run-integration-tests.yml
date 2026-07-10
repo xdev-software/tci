@@ -63,6 +63,9 @@ jobs:
         id: docker-image-cache-restore
         uses: ./.github/actions/docker-image-cache/restore
         with:
+          # This cache could always change however because docker images can be changed remotely if the version is not fixated
+          # As a compromise it utilizes the hash of the pom files because when the dependencies stay the same 
+          # the images should also be roughly the same
           key: it-docker-images-persistence-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-it-docker-images-persistence-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
@@ -131,6 +134,9 @@ jobs:
         id: docker-image-cache-restore
         uses: ./.github/actions/docker-image-cache/restore
         with:
+          # This cache could always change however because docker images can be changed remotely if the version is not fixated
+          # As a compromise it utilizes the hash of the pom files because when the dependencies stay the same 
+          # the images should also be roughly the same
           key: it-docker-images-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-it-docker-images-selenium-${{ matrix.project }}-${{ hashFiles('**/pom.xml') }}
