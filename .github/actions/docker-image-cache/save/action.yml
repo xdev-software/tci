@@ -20,19 +20,26 @@ runs:
         docker image prune -f
         echo "Currently available images" && docker image ls
 
-        if [ -f ~/.cache/docker-preinstalled/ids.txt ]; then
-          echo && echo "Will NOT cache pre-installed images" && cat ~/.cache/docker-preinstalled/ids.txt
+        has_preinstalled_ids=false
+        if [ -f ~/.cache/docker-preinstalled/ids-${{ github.run_id }}.txt ]; then
+          echo && echo "Will NOT cache pre-installed images" && cat ~/.cache/docker-preinstalled/ids-${{ github.run_id }}.txt
+          has_preinstalled_ids=true
         fi
 
         echo && echo "Will NOT cache images" && docker image ls ${CI_CACHE_DOCKER_SAVE_IGNORE_FILTERS:--f="label=org.testcontainers.sessionId"}
 
         mkdir -p ~/.cache/docker
         image_ids_to_save=$(comm -23 <(docker images -q | sort) <(docker image ls -q ${CI_CACHE_DOCKER_SAVE_IGNORE_FILTERS:--f="label=org.testcontainers.sessionId"} | sort))
-        image_ids_to_save=$(comm -23 <(echo "${image_ids_to_save[@]}") <(cat ~/.cache/docker-preinstalled/ids.txt || echo ""))
+        if [ "$has_preinstalled_ids" = true ]; then
+          image_ids_to_save=$(comm -23 <(echo "${image_ids_to_save[@]}") <(cat ~/.cache/docker-preinstalled/ids-${{ github.run_id }}.txt || echo ""))
+        fi
         echo && echo "Saving image ids" && echo $image_ids_to_save
         docker save $image_ids_to_save -o ~/.cache/docker/images.tar
 
         ls -lha ~/.cache/docker
+        if [ "$has_preinstalled_ids" = true ]; then
+          rm -f ~/.cache/docker-preinstalled/ids-${{ github.run_id }}.txt || true
+        fi
 
     - name: Save docker image cache
       if: inputs.cache-hit != 'true'
