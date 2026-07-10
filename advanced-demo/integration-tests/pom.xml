@@ -7,12 +7,12 @@
 	<parent>
 		<groupId>software.xdev.tci.demo</groupId>
 		<artifactId>advanced-demo</artifactId>
-		<version>3.5.0-SNAPSHOT</version>
+		<version>4.0.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>software.xdev.tci.demo.it</groupId>
 	<artifactId>integration-tests</artifactId>
-	<version>3.5.0-SNAPSHOT</version>
+	<version>4.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -30,7 +30,7 @@
 			<dependency>
 				<groupId>software.xdev.tci.demo.it</groupId>
 				<artifactId>persistence-it</artifactId>
-				<version>3.5.0-SNAPSHOT</version>
+				<version>4.0.0-SNAPSHOT</version>
 				<type>test-jar</type>
 				<classifier>tests</classifier>
 			</dependency>
@@ -38,13 +38,13 @@
 			<dependency>
 				<groupId>software.xdev.tci.demo.it</groupId>
 				<artifactId>tci-db</artifactId>
-				<version>3.5.0-SNAPSHOT</version>
+				<version>4.0.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>software.xdev.tci.demo.it</groupId>
 				<artifactId>tci-webapp</artifactId>
-				<version>3.5.0-SNAPSHOT</version>
+				<version>4.0.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
@@ -65,6 +65,11 @@
 			<dependency>
 				<groupId>software.xdev.tci</groupId>
 				<artifactId>db-jdbc-spring-orm-hibernate</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>software.xdev.tci</groupId>
+				<artifactId>image-build</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -112,13 +117,6 @@
 				<version>6.1.1</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-
-			<!-- Test Containers -->
-			<dependency>
-				<groupId>software.xdev</groupId>
-				<artifactId>testcontainers-advanced-imagebuilder</artifactId>
-				<version>2.5.0</version>
 			</dependency>
 
 			<!-- Utility for proxies in tests -->

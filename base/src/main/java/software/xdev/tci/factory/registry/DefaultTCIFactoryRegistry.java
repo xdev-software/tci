@@ -21,6 +21,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -58,7 +61,28 @@ public class DefaultTCIFactoryRegistry implements TCIFactoryRegistry
 				.filter(f -> !this.warmedUpFactories.contains(f))
 				.map(this::warmUpFactory)
 				.toList()
-				.forEach(CompletableFuture::join);
+				.forEach(this::waitForWarmUpCF);
+		}
+	}
+	
+	protected void waitForWarmUpCF(final CompletableFuture<?> cf)
+	{
+		try
+		{
+			cf.get(10, TimeUnit.MINUTES);
+		}
+		catch(final TimeoutException ex)
+		{
+			throw new IllegalStateException("Timed out", ex);
+		}
+		catch(final InterruptedException ex)
+		{
+			Thread.currentThread().interrupt();
+			throw new IllegalStateException("Got interrupted", ex);
+		}
+		catch(final ExecutionException ex)
+		{
+			throw new IllegalStateException("Execution failed", ex);
 		}
 	}
 	

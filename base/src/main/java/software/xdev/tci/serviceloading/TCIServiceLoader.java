@@ -24,6 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Central point for service loading
@@ -31,6 +34,8 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"java:S6548", "java:S2789"}) // Don't force us to write our own Optional!?!
 public class TCIServiceLoader
 {
+	private static final Logger LOG = LoggerFactory.getLogger(TCIServiceLoader.class);
+	
 	protected final Object globalInitServiceLockHandlerLock = new Object();
 	protected final InheritableThreadLocal<LinkedHashSet<Class<?>>> tlDetectRecursiveInitServices =
 		new InheritableThreadLocal<>();
@@ -84,8 +89,11 @@ public class TCIServiceLoader
 			lock = this.servicesLoadingSyncLocks.computeIfAbsent(
 				clazz,
 				ignored -> new ReentrantLock());
-			lock.lock();
+			this.reportLockAction("got", clazz);
 		}
+		
+		lock.lock();
+		this.reportLockAction("acquired", clazz);
 		
 		try
 		{
@@ -97,6 +105,11 @@ public class TCIServiceLoader
 			
 			this.loadedServices.put(clazz, this.loadService(clazz));
 		}
+		catch(final RuntimeException rex)
+		{
+			LOG.debug("Service loading failed", rex);
+			throw rex;
+		}
 		finally
 		{
 			synchronized(this.globalInitServiceLockHandlerLock)
@@ -106,7 +119,21 @@ public class TCIServiceLoader
 				
 				this.servicesLoadingSyncLocks.remove(clazz);
 				lock.unlock();
+				this.reportLockAction("release", clazz);
 			}
+		}
+	}
+	
+	protected <T> void reportLockAction(final String action, final Class<T> clazz)
+	{
+		if(LOG.isTraceEnabled())
+		{
+			LOG.trace(
+				"Lock {} {} - T:{}",
+				action,
+				clazz,
+				Thread.currentThread().getName(),
+				new RuntimeException());
 		}
 	}
 	

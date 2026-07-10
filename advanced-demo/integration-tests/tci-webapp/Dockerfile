@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1-labs
 # Note: This Dockerfile is used by the integration tests for compiling the app when there was no Image was supplied
-ARG JAVA_VERSION=21
+ARG JAVA_VERSION=25
 FROM eclipse-temurin:${JAVA_VERSION}-jre-alpine AS jre-base
 
 
@@ -74,8 +74,10 @@ RUN mv webapp/target/webapp.jar app.jar \
 
 FROM jre-minimized
 
+ARG ENABLE_AOT
+
 ARG JACOCO_AGENT_ENABLED
-ARG JACOCO_AGENT_VERSION="0.8.14"
+ARG JACOCO_AGENT_VERSION="0.8.15"
 
 ARG user=app
 ARG group=app
@@ -110,9 +112,48 @@ COPY --from=builder --chown=${user}:${group} /builder/extracted/snapshot-depende
 RUN true
 COPY --from=builder --chown=${user}:${group} /builder/extracted/application/ ./
 
+# RUN AOT and boot with dummy configuration
+RUN if [[ ! -z "$ENABLE_AOT" ]]; then \
+  java \
+    -XX:+UseG1GC \
+    -XX:+UseCompactObjectHeaders \
+    -XX:+UseStringDeduplication \
+    -XX:AOTCacheOutput=app.aot \
+    -Djava.awt.headless=true \
+    -Dspring.context.exit=onRefresh \
+    # Disable Flyway
+    -Dspring.flyway.enabled=false \
+    # Disabled DB actuator endpoint
+    -Dmanagement.health.db.enabled=false \
+    # Disbale DB instant connection
+    -Dspring.jpa.properties.jakarta.persistence.database-product-name=MariaDB \
+    -Dspring.jpa.properties.jakarta.persistence.database-major-version=11 \
+    -Dspring.jpa.properties.jakarta.persistence.database-minor-version=8 \
+    -Dspring.jpa.properties.hibernate.boot.allow.jdbc.metadata.access=false \
+    # Fake DB
+    -Dspring.datasource.url=jdbc:mariadb://localhost:3306/dummy \
+    -Dspring.datasource.username=dummy \
+    -Dspring.datasource.password=dummy \
+    # Fake Auth
+    -Dspring.security.oauth2.client.registration.local.authorization-grant-type=authorization_code \
+    -Dspring.security.oauth2.client.registration.local.redirect-uri="{baseUrl}/{action}/oauth2/code/{registrationId}" \
+    -Dspring.security.oauth2.client.provider.local.authorization-uri=http://localhost/connect/authorize \
+    -Dspring.security.oauth2.client.provider.local.token-uri=http://localhost/connect/token \
+    -Dspring.security.oauth2.client.provider.local.jwk-set-uri=http://localhost/.well-known/openid-configuration/jwks \
+    -Dspring.security.oauth2.client.provider.local.user-info-uri=http://localhost/connect/userinfo \
+    -Dspring.security.oauth2.client.provider.local.user-info-authentication-method=header \
+    -Dspring.security.oauth2.client.provider.local.user-name-attribute=sub \
+    -Dspring.security.oauth2.client.registration.local.client-name=Local \
+    -Dspring.security.oauth2.client.registration.local.client-id=dummy \
+    -Dspring.security.oauth2.client.registration.local.client-secret=dummy \
+    -Dspring.security.oauth2.client.registration.local.scope="openid,profile,email,offline_access" \
+    -jar app.jar; \
+  fi
+
 ENV JAVA_JACOCO_OPTS=${JACOCO_AGENT_ENABLED:+"-javaagent:/jacoco/agent.jar=destfile=/jacoco/report/jacoco.exec"}
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 -Djava.awt.headless=true"
+ENV JAVA_OPTS="-XX:+UseG1GC -XX:MaxRAMPercentage=75 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication -Djava.awt.headless=true"
+ENV JAVA_AOT_OPTS=${ENABLE_AOT:+"-XX:AOTCache=app.aot"}
 
 EXPOSE 8080
 
-CMD [ "/bin/sh", "-c", "java $JAVA_OPTS $JAVA_JACOCO_OPTS -jar /opt/app/app.jar" ]
+CMD [ "/bin/sh", "-c", "java $JAVA_OPTS $JAVA_JACOCO_OPTS $JAVA_AOT_OPTS -jar /opt/app/app.jar" ]

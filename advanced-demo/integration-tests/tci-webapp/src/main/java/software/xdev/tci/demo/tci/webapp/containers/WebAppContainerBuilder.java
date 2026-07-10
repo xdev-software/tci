@@ -1,47 +1,39 @@
 package software.xdev.tci.demo.tci.webapp.containers;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import software.xdev.tci.imagebuild.ImageCreator;
 import software.xdev.tci.jacoco.testbase.config.JaCoCoConfig;
-import software.xdev.testcontainers.imagebuilder.AdvancedImageFromDockerFile;
+import software.xdev.testcontainers.imagebuilder.buildxnative.NativeAdvancedImageFromDockerfile;
 import software.xdev.testcontainers.imagebuilder.compat.DockerfileCOPYParentsEmulator;
 import software.xdev.testcontainers.imagebuilder.transfer.fcm.FileLinesContentModifier;
 
 
-@SuppressWarnings("PMD.MoreThanOneLogger")
 public final class WebAppContainerBuilder
 {
 	private static final Logger LOG = LoggerFactory.getLogger(WebAppContainerBuilder.class);
-	private static final Logger LOG_CONTAINER_BUILD =
-		LoggerFactory.getLogger("container.build.webapp");
-	
-	private static String builtImageName;
 	
 	private WebAppContainerBuilder()
 	{
 	}
 	
-	public static synchronized String getBuiltImageName()
+	public static String getImageName()
 	{
-		if(builtImageName != null)
-		{
-			return builtImageName;
-		}
-		
 		LOG.info("Building WebApp-DockerImage...");
 		
-		final AdvancedImageFromDockerFile builder =
-			new AdvancedImageFromDockerFile("webapp-it-local", false)
-				.withLoggerForBuild(LOG_CONTAINER_BUILD)
+		final NativeAdvancedImageFromDockerfile builder = ImageCreator.nativeImage("tci-demo-webapp")
+			// NOTE: AOT can't be used properly when JaCoCo is active
+			.withBuildArg("ENABLE_AOT", "1")
+			.withDockerFilePath(Paths.get("../../integration-tests/tci-webapp/Dockerfile"))
+			.withBaseDir(Paths.get("../../"))
+			.configureFilesToTransferHandler(h -> h
 				.withPostGitIgnoreLines(
 					// Ignore git-folder, as it will be provided in the Dockerfile
 					".git/**",
@@ -62,8 +54,6 @@ public final class WebAppContainerBuilder
 					// Most files from these folders need to be ignored -> Down there for highest prio
 					"node_modules",
 					"target")
-				.withDockerFilePath(Paths.get("../../integration-tests/tci-webapp/Dockerfile"))
-				.withBaseDir(Paths.get("../../"))
 				// File is in root directory - we can't access it
 				.withBaseDirRelativeIgnoreFile(null)
 				.withDockerFileLinesModifier(new DockerfileCOPYParentsEmulator())
@@ -86,7 +76,7 @@ public final class WebAppContainerBuilder
 							final List<String> lines,
 							final Path sourcePath,
 							final String targetPath,
-							final TarArchiveEntry tarArchiveEntry) throws IOException
+							final TarArchiveEntry tarArchiveEntry)
 						{
 							return lines.stream()
 								// Remove integration tests module
@@ -99,24 +89,18 @@ public final class WebAppContainerBuilder
 						{
 							return original.size() == created.size();
 						}
-					}));
+					}))
+			);
 		
 		if(JaCoCoConfig.instance().enabled())
 		{
 			builder.withBuildArg("JACOCO_AGENT_ENABLED", "1");
 		}
 		
-		try
-		{
-			builtImageName = builder.get(5, TimeUnit.MINUTES);
-		}
-		catch(final TimeoutException tex)
-		{
-			throw new IllegalStateException("Timed out", tex);
-		}
+		final String imageName = builder.build(Duration.ofMinutes(5));
 		
-		LOG.info("Built Image; Name ='{}'", builtImageName);
+		LOG.info("Built Image; Name ='{}'", imageName);
 		
-		return builtImageName;
+		return imageName;
 	}
 }

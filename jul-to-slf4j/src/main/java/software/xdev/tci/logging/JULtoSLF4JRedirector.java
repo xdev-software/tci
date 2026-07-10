@@ -35,6 +35,17 @@ public class JULtoSLF4JRedirector
 		{
 			return;
 		}
+		
+		this.redirectInternalSync();
+	}
+	
+	protected synchronized void redirectInternalSync()
+	{
+		if(this.installed)
+		{
+			return;
+		}
+		
 		if(SLF4JBridgeHandler.isInstalled())
 		{
 			this.installed = true;

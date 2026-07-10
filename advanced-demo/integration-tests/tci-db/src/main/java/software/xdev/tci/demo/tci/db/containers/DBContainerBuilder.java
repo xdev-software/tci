@@ -1,58 +1,41 @@
 package software.xdev.tci.demo.tci.db.containers;
 
 import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.time.Duration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import software.xdev.testcontainers.imagebuilder.AdvancedImageFromDockerFile;
+import software.xdev.tci.imagebuild.ImageCreator;
+import software.xdev.testcontainers.imagebuilder.buildxnative.NativeAdvancedImageFromDockerfile;
 
 
-@SuppressWarnings("PMD.MoreThanOneLogger")
 public final class DBContainerBuilder
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DBContainerBuilder.class);
-	private static final Logger LOG_CONTAINER_BUILD =
-		LoggerFactory.getLogger("container.build.db");
-	
-	private static String builtImageName;
 	
 	private DBContainerBuilder()
 	{
 	}
 	
-	public static synchronized String getBuiltImageName()
+	public static String getImageName()
 	{
-		if(builtImageName != null)
-		{
-			return builtImageName;
-		}
-		
 		LOG.info("Building Webapp-db-DockerImage...");
 		
-		final AdvancedImageFromDockerFile builder =
-			new AdvancedImageFromDockerFile("webapp-db", false)
-				.withLoggerForBuild(LOG_CONTAINER_BUILD)
+		final NativeAdvancedImageFromDockerfile builder = ImageCreator.nativeImage("tci-demo-db")
+			.withDockerFilePath(Paths.get("../tci-db/Dockerfile"))
+			.withBaseDir(Paths.get("../"))
+			.configureFilesToTransferHandler(h -> h
 				.withPostGitIgnoreLines(
 					// Ignore everything
 					"**")
-				.withDockerFilePath(Paths.get("../tci-db/Dockerfile"))
-				.withBaseDir(Paths.get("../"))
-				.withBaseDirRelativeIgnoreFile(null);
+				.withBaseDirRelativeIgnoreFile(null)
+			);
 		
-		try
-		{
-			builtImageName = builder.get(5, TimeUnit.MINUTES);
-		}
-		catch(final TimeoutException tex)
-		{
-			throw new IllegalStateException("Timed out", tex);
-		}
+		final String name = builder.build(Duration.ofMinutes(5));
 		
-		LOG.info("Built Image; Name ='{}'", builtImageName);
+		LOG.info("Built Image; Name ='{}'", name);
 		
-		return builtImageName;
+		return name;
 	}
 }

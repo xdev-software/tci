@@ -1,5 +1,10 @@
 package software.xdev.tci.demo.tci.db.factory;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+
+import software.xdev.tci.concurrent.Suppliers;
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.db.factory.BaseDBTCIFactory;
 import software.xdev.tci.demo.tci.db.DBTCI;
 import software.xdev.tci.demo.tci.db.containers.DBContainer;
@@ -10,6 +15,8 @@ import software.xdev.tci.misc.ContainerMemory;
 
 public class DBTCIFactory extends BaseDBTCIFactory<DBContainer, DBTCI>
 {
+	protected static final Supplier<String> IMAGE_NAME_SUPPLIER = Suppliers.memoize(DBContainerBuilder::getImageName);
+	
 	public DBTCIFactory()
 	{
 		this(true);
@@ -20,7 +27,7 @@ public class DBTCIFactory extends BaseDBTCIFactory<DBContainer, DBTCI>
 	{
 		super(
 			(c, n) -> new DBTCI(c, n, migrateAndInitializeEMC),
-			() -> new DBContainer(DBContainerBuilder.getBuiltImageName())
+			() -> new DBContainer(IMAGE_NAME_SUPPLIER.get())
 				.withDatabaseName(DBTCI.DB_DATABASE)
 				.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M)));
 		this.withSnapshotManager(new CommitedImageSnapshotManager("/var/lib/mysql"));
@@ -29,7 +36,7 @@ public class DBTCIFactory extends BaseDBTCIFactory<DBContainer, DBTCI>
 	@Override
 	protected void warmUpInternal()
 	{
-		DBContainerBuilder.getBuiltImageName();
+		CompletableFuture.runAsync(IMAGE_NAME_SUPPLIER::get, TCIExecutorServiceHolder.instance());
 		super.warmUpInternal();
 	}
 }
