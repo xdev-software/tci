@@ -111,7 +111,7 @@ jobs:
             pre-start: true
             java: 21
             jacoco: true
-    name: "selenium (${{matrix.project}}, ${{matrix.parallel}}, ${{matrix.pre-start}}, ${{matrix.java}})"
+    name: "selenium (${{matrix.project}}, ${{matrix.parallel }}, ${{matrix.pre-start}}, ${{matrix.java}}${{ matrix.jacoco && ', JaCoCo' }})"
     runs-on: ubuntu-latest
     if: ${{ !(github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/')) }}
     timeout-minutes: 30
