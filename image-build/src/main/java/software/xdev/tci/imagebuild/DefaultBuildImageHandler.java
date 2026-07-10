@@ -68,7 +68,11 @@ public class DefaultBuildImageHandler implements BuildImageHandler
 		this.templateCacheConfigValue(this.config.cacheFrom(), sanitizeDockerImageName)
 			.ifPresent(builder::withCacheFrom);
 		
-		if(!this.config.saveCacheInBackground())
+		if(this.config.saveCacheInBackground())
+		{
+			builder.withCreateTransferFilesCache(true);
+		}
+		else
 		{
 			this.configureCacheTo(sanitizeDockerImageName, builder);
 		}
@@ -96,6 +100,17 @@ public class DefaultBuildImageHandler implements BuildImageHandler
 						catch(final Exception ex)
 						{
 							LOG.warn("Rebuilding {} to save cache failed", builtImageName, ex);
+						}
+						finally
+						{
+							try
+							{
+								builder.cleanCreatedTransferFilesCache();
+							}
+							catch(final Exception ex)
+							{
+								LOG.warn("Failed to clean created transfer file cache for {}", builtImageName, ex);
+							}
 						}
 					},
 					TCIExecutorServiceHolder.instance()));
