@@ -128,6 +128,7 @@ public class WebAppContainer extends GenericContainer<WebAppContainer> implement
 					.forStatusCode(HttpStatus.SC_OK)
 					.withReadTimeout(Duration.ofSeconds(10))
 			));
+	}
 	
 	@Override
 	protected void containerIsStarted(final InspectContainerResponse containerInfo, final boolean reused)
