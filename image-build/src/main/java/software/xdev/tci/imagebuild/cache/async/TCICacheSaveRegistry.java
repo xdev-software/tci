@@ -23,23 +23,18 @@ import java.util.concurrent.CompletableFuture;
 
 public class TCICacheSaveRegistry
 {
-	private static TCICacheSaveRegistry instance;
-	
-	public static void setInstance(final TCICacheSaveRegistry instance)
-	{
-		TCICacheSaveRegistry.instance = instance;
-	}
+	protected static TCICacheSaveRegistry instance;
 	
 	public static TCICacheSaveRegistry instance()
 	{
 		if(instance == null)
 		{
-			createInstance();
+			createDefaultInstance();
 		}
 		return instance;
 	}
 	
-	private static synchronized void createInstance()
+	protected static synchronized void createDefaultInstance()
 	{
 		if(instance == null)
 		{

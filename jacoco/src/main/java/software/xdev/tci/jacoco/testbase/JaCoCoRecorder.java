@@ -46,9 +46,17 @@ public class JaCoCoRecorder
 	{
 		if(instance == null)
 		{
-			instance = new JaCoCoRecorder();
+			createDefaultInstance();
 		}
 		return instance;
+	}
+	
+	protected static synchronized void createDefaultInstance()
+	{
+		if(instance == null)
+		{
+			instance = new JaCoCoRecorder();
+		}
 	}
 	
 	protected JaCoCoConfig config;
