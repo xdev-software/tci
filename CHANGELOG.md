@@ -12,6 +12,7 @@
   * No longer use `setPersistenceProviderClassName` because it has no effect
   * Performance: Reuse `PersistenceProvider`
 * Fixed a deadlock during service resolution
+* Improve container cleanup
 * Updated dependencies
 * Updated demo
 
