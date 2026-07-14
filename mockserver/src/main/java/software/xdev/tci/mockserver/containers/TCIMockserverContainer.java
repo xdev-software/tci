@@ -75,7 +75,7 @@ public class TCIMockserverContainer extends MockServerContainer
 		container
 			.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M))
 			.waitingFor(new FastAbortOnContainerDeathWaitStrategy(new LogMessageWaitAbortableStrategy()
-				.withRegEx(".*started on port: " + PORT + ".*")
+				.withRegEx(MockServerContainer.LOG_MSG_WAIT_STRATEGY_REGEX)
 			));
 		return container;
 	}
