@@ -49,44 +49,27 @@ public class HostPortWaitAbortableStrategy extends AbstractWaitAbortableStrategy
 	@Override
 	protected void waitUntilReady(final AbortMonitor abortMonitor)
 	{
-		final Set<Integer> externalLivenessCheckPorts;
-		if(this.ports == null || this.ports.length == 0)
+		final Set<Integer> externalLivenessCheckPorts = this.determineExternalLivenessCheckPorts();
+		if(externalLivenessCheckPorts == null || externalLivenessCheckPorts.isEmpty())
 		{
-			externalLivenessCheckPorts = this.getLivenessCheckPorts();
-			if(externalLivenessCheckPorts.isEmpty())
+			if(LOG.isDebugEnabled())
 			{
-				if(LOG.isDebugEnabled())
-				{
-					LOG.debug(
-						"Liveness check ports of {} is empty. Not waiting.",
-						this.waitStrategyTarget.getContainerInfo().getName()
-					);
-				}
-				return;
+				LOG.debug(
+					"Liveness check ports of {} is empty. Not waiting.",
+					this.waitStrategyTarget.getContainerInfo().getName()
+				);
 			}
-		}
-		else
-		{
-			externalLivenessCheckPorts =
-				Arrays
-					.stream(this.ports)
-					.mapToObj(port -> this.waitStrategyTarget.getMappedPort(port))
-					.collect(Collectors.toSet());
+			return;
 		}
 		
 		abortMonitor.throwIfRequired();
 		
-		final List<Integer> exposedPorts = this.waitStrategyTarget.getExposedPorts();
+		final Set<Integer> internalPorts = this.getInternalPorts(
+			externalLivenessCheckPorts,
+			this.waitStrategyTarget.getExposedPorts());
 		
-		final Set<Integer> internalPorts = this.getInternalPorts(externalLivenessCheckPorts, exposedPorts);
-		
-		final Callable<Boolean> internalCheck =
-			new InternalCommandPortListeningCheck(this.waitStrategyTarget, internalPorts);
-		
-		final Callable<Boolean> externalCheck = new ExternalPortListeningCheck(
-			this.waitStrategyTarget,
-			externalLivenessCheckPorts
-		);
+		final Callable<Boolean> internalCheck = this.createInternalCheck(internalPorts);
+		final Callable<Boolean> externalCheck = this.createExternalCheck(externalLivenessCheckPorts);
 		
 		try
 		{
@@ -154,13 +137,42 @@ public class HostPortWaitAbortableStrategy extends AbstractWaitAbortableStrategy
 		}
 	}
 	
+	private ExternalPortListeningCheck createExternalCheck(final Set<Integer> externalLivenessCheckPorts)
+	{
+		return new ExternalPortListeningCheck(
+			this.waitStrategyTarget,
+			externalLivenessCheckPorts
+		);
+	}
+	
+	private InternalCommandPortListeningCheck createInternalCheck(final Set<Integer> internalPorts)
+	{
+		return new InternalCommandPortListeningCheck(this.waitStrategyTarget, internalPorts);
+	}
+	
+	/**
+	 * @apiNote Can return null
+	 */
+	protected Set<Integer> determineExternalLivenessCheckPorts()
+	{
+		if(this.ports == null || this.ports.length == 0)
+		{
+			return this.getLivenessCheckPorts();
+		}
+		
+		return Arrays
+			.stream(this.ports)
+			.mapToObj(this.waitStrategyTarget::getMappedPort)
+			.collect(Collectors.toSet());
+	}
+	
 	protected Set<Integer> getInternalPorts(
 		final Set<Integer> externalLivenessCheckPorts,
 		final List<Integer> exposedPorts)
 	{
 		return exposedPorts
 			.stream()
-			.filter(it -> externalLivenessCheckPorts.contains(this.waitStrategyTarget.getMappedPort(it)))
+			.filter(port -> externalLivenessCheckPorts.contains(this.waitStrategyTarget.getMappedPort(port)))
 			.collect(Collectors.toSet());
 	}
 	
