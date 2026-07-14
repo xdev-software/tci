@@ -149,7 +149,7 @@ public class SafeNamedContainerStarter<C extends GenericContainer<?>> implements
 				// Check if container was already cleaned up (e.g. with tryStart->stop)
 				if(ex.getCause() instanceof final NotFoundException nfe
 					&& nfe.getMessage() != null
-					&& nfe.getMessage().startsWith("{\"message\":\"No such container:"))
+					&& nfe.getMessage().startsWith("Status 404: {\"message\":\"No such container:"))
 				{
 					LOG.info("Container[name='{}'] was already removed", containerName);
 					return;
