@@ -121,7 +121,8 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 			// Some (AWS) CPUs are completely overloaded with the default 15s timeout -> increase it
 			.waitingFor(FastAbortOnContainerDeathWaitStrategy.waitAll(s -> s
 				.withStartupTimeout(Duration.ofSeconds(30 + 20L * cpuSlownessFactor()))
-				.withStrategy(new LogMessageWaitAbortableStrategy().withRegEx(".*(Started Selenium Standalone).*\n"))
+				.withStrategy(new LogMessageWaitAbortableStrategy()
+					.withRegEx(BrowserWebDriverContainer.LOG_MSG_WAIT_STRATEGY_REGEX))
 				.withStrategy(new HostPortWaitAbortableStrategy())
 			));
 	}
@@ -132,7 +133,11 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 	{
 		return new SeleniumRecordingContainer(browserContainer)
 			.withLogConsumer(getLogConsumer("container.browserrecorder." + capabilities.getBrowserName()))
-			.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M));
+			.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M))
+			.waitingFor(new FastAbortOnContainerDeathWaitStrategy(
+				new LogMessageWaitAbortableStrategy()
+					.withRegEx(SeleniumRecordingContainer.LOG_MSG_WAIT_STRATEGY_REGEX)
+			));
 	}
 	
 	public BrowserTCIFactory(
