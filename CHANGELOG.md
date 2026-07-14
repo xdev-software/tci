@@ -8,10 +8,15 @@
     * `restore` - Restores the previously downloaded images
     * `setup-buildx` - Set's up the buildx worker and returns required environment variables
     * `save` - Saves the downloaded images
+* Added abortable wait strategies
+  * primarily designed to be used with `FastAbortOnContainerDeathWaitStrategy`
+  * the strategies can be aborted e.g. when a container died during startup
+    * a dead container therefore no longer has to wait until the corresponding strategy times out
 * `db-jdbc-spring-orm` & implementations
   * No longer use `setPersistenceProviderClassName` because it has no effect
   * Performance: Reuse `PersistenceProvider`
 * Fixed a deadlock during service resolution
+* Fixed rate limiting in some places
 * Improve container cleanup
 * Updated dependencies
 * Updated demo

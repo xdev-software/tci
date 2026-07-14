@@ -3,14 +3,15 @@ package software.xdev.tci.demo.tci.webapp.containers;
 import java.time.Duration;
 
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
-import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 
 import software.xdev.tci.jacoco.containers.JaCoCoAwareContainer;
 import software.xdev.tci.startup.error.java.fatal.HsErrPidStartUpCrashReporter;
+import software.xdev.tci.startup.wait.FastAbortOnContainerDeathWaitStrategy;
+import software.xdev.tci.startup.wait.strategy.HostPortWaitAbortableStrategy;
+import software.xdev.tci.startup.wait.strategy.HttpWaitAbortableStrategy;
 
 
 @SuppressWarnings("java:S2160")
@@ -111,23 +112,22 @@ public class WebAppContainer extends GenericContainer<WebAppContainer> implement
 		final String actuatorUsername,
 		final String actuatorPassword)
 	{
-		return this.waitingFor(new WaitAllStrategy()
+		return this.waitingFor(FastAbortOnContainerDeathWaitStrategy.waitAll(s -> s
 			.withStartupTimeout(startUpTimeout)
-			.withStrategy(
-				new HttpWaitStrategy()
+			.withStrategy(new HostPortWaitAbortableStrategy())
+			.withStrategy(new HttpWaitAbortableStrategy()
 					.forPort(WebAppContainer.DEFAULT_HTTP_PORT)
 					.forPath("/robots.txt")
 					.forStatusCode(HttpStatus.SC_OK)
-					.withReadTimeout(Duration.ofSeconds(10))
-			)
-			.withStrategy(
-				new HttpWaitStrategy()
+				.withReadTimeout(Duration.ofSeconds(10)))
+			.withStrategy(new HttpWaitAbortableStrategy()
 					.forPort(WebAppContainer.DEFAULT_HTTP_PORT)
 					.forPath("/actuator/health")
 					.withBasicCredentials(actuatorUsername, actuatorPassword)
 					.forStatusCode(HttpStatus.SC_OK)
 					.withReadTimeout(Duration.ofSeconds(10))
-			));
+			))
+		);
 	}
 	
 	@Override

@@ -31,9 +31,6 @@ import org.openqa.selenium.remote.http.ClientConfig;
 import org.rnorth.ducttape.unreliables.Unreliables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
-import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
-import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.images.RemoteDockerImage;
 
 import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
@@ -45,6 +42,9 @@ import software.xdev.tci.selenium.BrowserTCI;
 import software.xdev.tci.selenium.containers.SeleniumBrowserWebDriverContainer;
 import software.xdev.tci.selenium.factory.config.BrowserTCIFactoryConfig;
 import software.xdev.tci.serviceloading.TCIServiceLoaderHolder;
+import software.xdev.tci.startup.wait.FastAbortOnContainerDeathWaitStrategy;
+import software.xdev.tci.startup.wait.strategy.HostPortWaitAbortableStrategy;
+import software.xdev.tci.startup.wait.strategy.LogMessageWaitAbortableStrategy;
 import software.xdev.testcontainers.selenium.containers.browser.BrowserWebDriverContainer;
 import software.xdev.testcontainers.selenium.containers.recorder.SeleniumRecordingContainer;
 
@@ -119,12 +119,11 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 			// https://github.com/SeleniumHQ/docker-selenium/issues/2355
 			.withEnv("SE_ENABLE_TRACING", "false")
 			// Some (AWS) CPUs are completely overloaded with the default 15s timeout -> increase it
-			.waitingFor(new WaitAllStrategy()
-				.withStrategy(new LogMessageWaitStrategy()
-					.withRegEx(".*(Started Selenium Standalone).*\n")
-					.withStartupTimeout(Duration.ofSeconds(30 + 20L * cpuSlownessFactor())))
-				.withStrategy(new HostPortWaitStrategy())
-				.withStartupTimeout(Duration.ofSeconds(30 + 20L * cpuSlownessFactor())));
+			.waitingFor(FastAbortOnContainerDeathWaitStrategy.waitAll(s -> s
+				.withStartupTimeout(Duration.ofSeconds(30 + 20L * cpuSlownessFactor()))
+				.withStrategy(new LogMessageWaitAbortableStrategy().withRegEx(".*(Started Selenium Standalone).*\n"))
+				.withStrategy(new HostPortWaitAbortableStrategy())
+			));
 	}
 	
 	public static SeleniumRecordingContainer createDefaultRecordingContainer(
