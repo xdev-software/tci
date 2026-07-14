@@ -34,7 +34,7 @@ import software.xdev.tci.concurrent.Suppliers;
 /**
  * Utility to log contents of java hs_err_pid files of a container that failed to start.
  * <p>
- * Additionally also copies the file into target/
+ * Additionally also copies the file into <code>target/has_err_pid/&lt;containerId&gt;/&lt;hs_err_pid-file&gt;</code>
  * </p>
  */
 public class HsErrPidStartUpCrashReporter
