@@ -17,21 +17,10 @@ package software.xdev.tci.imagebuild.config;
 
 import java.util.Optional;
 
-import software.xdev.tci.config.DefaultConfig;
 
-
-@SuppressWarnings({"java:S2789", "OptionalAssignedToNull", "OptionalUsedAsFieldOrParameterType"})
-public class DefaultBuildImageHandlerConfig extends DefaultConfig implements BuildImageHandlerConfig
+@SuppressWarnings({"java:S2789", "OptionalAssignedToNull"})
+public class DefaultBuildImageHandlerConfig extends AbstractBuildImageHandlerConfig
 {
-	protected static final String SAVE_CACHE_IN_BACKGROUND = "save-cache-in-background";
-	
-	protected Boolean deleteOnExit;
-	protected String loggerForBuildPrefix;
-	protected Optional<String> cacheFrom;
-	protected Optional<String> cacheTo;
-	protected Boolean saveCacheInBackground;
-	protected Boolean waitForSaveCacheInBackground;
-	
 	@Override
 	protected String propertyNamePrefix()
 	{
@@ -43,7 +32,7 @@ public class DefaultBuildImageHandlerConfig extends DefaultConfig implements Bui
 	{
 		if(this.deleteOnExit == null)
 		{
-			this.deleteOnExit = this.resolveBool("delete-on-exit", false);
+			this.deleteOnExit = this.resolveBool(DELETE_ON_EXIT, false);
 		}
 		return this.deleteOnExit;
 	}
@@ -53,7 +42,7 @@ public class DefaultBuildImageHandlerConfig extends DefaultConfig implements Bui
 	{
 		if(this.loggerForBuildPrefix == null)
 		{
-			this.loggerForBuildPrefix = this.resolve("logger-for-build-prefix")
+			this.loggerForBuildPrefix = this.resolve(LOGGER_FOR_BUILD_PREFIX)
 				.orElse("container.build.");
 		}
 		return this.loggerForBuildPrefix;
@@ -64,7 +53,7 @@ public class DefaultBuildImageHandlerConfig extends DefaultConfig implements Bui
 	{
 		if(this.cacheFrom == null)
 		{
-			this.cacheFrom = this.resolve("cache-from");
+			this.cacheFrom = this.resolve(CACHE_FROM);
 		}
 		return this.cacheFrom;
 	}
@@ -74,7 +63,7 @@ public class DefaultBuildImageHandlerConfig extends DefaultConfig implements Bui
 	{
 		if(this.cacheTo == null)
 		{
-			this.cacheTo = this.resolve("cache-to");
+			this.cacheTo = this.resolve(CACHE_TO);
 		}
 		return this.cacheTo;
 	}
@@ -96,7 +85,7 @@ public class DefaultBuildImageHandlerConfig extends DefaultConfig implements Bui
 		if(this.waitForSaveCacheInBackground == null)
 		{
 			this.waitForSaveCacheInBackground =
-				this.resolveBool("wait-for-" + SAVE_CACHE_IN_BACKGROUND, true);
+				this.resolveBool(WAIT_FOR_SAVE_CACHE_IN_BACKGROUND, true);
 		}
 		return this.waitForSaveCacheInBackground;
 	}

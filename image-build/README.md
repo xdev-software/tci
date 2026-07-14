@@ -6,11 +6,17 @@ Provides common utility and configuration to build images.
 
 <details><summary>The configuration is dynamically loaded from (sorted by highest priority)</summary>
 
-* Environment variables 
-    * prefixed with ``TCI_IMAGE-BUILD_`` 
+* Environment variables
+    * prefixed with `TCI_IMAGE-BUILD_<imageName>_`
+        * where `imageName` is the (sanitized) name of the image to build
+    * prefixed with `TCI_IMAGE-BUILD_`
     * all properties are in UPPERCASE and use `_` instead of `.` or `-`
 * System properties
-    * prefixed with ``tci.image-build.``
+    * prefixed with `tci.image-build.<imageName>.`
+        * where `imageName` is the (sanitized) name of the image to build
+    * prefixed with `tci.image-build.`
+
+_NOTE: Sanitized image names only include alphanumeric characters, `_` or `-`. All other characters are replaced by `_`_
 
 </details>
 

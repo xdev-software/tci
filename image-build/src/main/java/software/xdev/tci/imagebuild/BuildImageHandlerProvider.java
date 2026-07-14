@@ -22,7 +22,7 @@ import software.xdev.testcontainers.imagebuilder.AdvancedImageFromDockerFile;
 import software.xdev.testcontainers.imagebuilder.buildxnative.NativeAdvancedImageFromDockerfile;
 
 
-public interface BuildImageHandler
+public interface BuildImageHandlerProvider
 {
 	String nativeImage(
 		String dockerImage,

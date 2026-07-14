@@ -41,9 +41,9 @@ public final class BuildImage
 		return impl().image(dockerImage, timeout, configure);
 	}
 	
-	public static BuildImageHandler impl()
+	public static BuildImageHandlerProvider impl()
 	{
-		return TCIServiceLoaderHolder.instance().service(BuildImageHandler.class);
+		return TCIServiceLoaderHolder.instance().service(BuildImageHandlerProvider.class);
 	}
 	
 	private BuildImage()
