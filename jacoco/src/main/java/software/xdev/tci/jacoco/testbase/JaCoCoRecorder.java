@@ -87,7 +87,6 @@ public class JaCoCoRecorder
 		return this.afterTestAsync(optTCI, null, fileSystemFriendlyNameSupplier, variantName);
 	}
 	
-	@SuppressWarnings("resource")
 	public CompletableFuture<Void> afterTestAsync(
 		final Optional<TCI<?>> optTCI,
 		final String jaCoCoExecutionDataFilePathInContainer,
@@ -132,18 +131,7 @@ public class JaCoCoRecorder
 		final GenericContainer<?> container,
 		final String containerPath)
 	{
-		if(container.isRunning())
-		{
-			// Shutdown container so that jacoco agent dumps the execution data file
-			try
-			{
-				DockerClientFactory.lazyClient().stopContainerCmd(container.getContainerId()).exec();
-			}
-			catch(final Exception ex)
-			{
-				LOG.warn("Failed to stop container", ex);
-			}
-		}
+		this.stopContainer(container);
 		
 		try
 		{
@@ -165,6 +153,23 @@ public class JaCoCoRecorder
 		catch(final Exception ex)
 		{
 			LOG.warn("Unable to copy JaCoCo execution data file", ex);
+		}
+	}
+	
+	@SuppressWarnings("resource")
+	protected void stopContainer(final GenericContainer<?> container)
+	{
+		if(container.isRunning())
+		{
+			// Shutdown container so that jacoco agent dumps the execution data file
+			try
+			{
+				DockerClientFactory.lazyClient().stopContainerCmd(container.getContainerId()).exec();
+			}
+			catch(final Exception ex)
+			{
+				LOG.warn("Failed to stop container", ex);
+			}
 		}
 	}
 	
