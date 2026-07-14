@@ -1,0 +1,26 @@
+# complete code
+import os
+import subprocess
+
+def clear_cache():
+    """
+    Clears the corrupted cache by running the gh cache delete --all command.
+    """
+    try:
+        subprocess.run(['gh', 'cache', 'delete', '--all'], check=True)
+        print("Cache cleared successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error: An error occurred while clearing the cache. {str(e)}")
+
+def main():
+    # Check if the corrupted cache is found
+    corrupted_cache_found = os.path.exists('corrupted_cache.txt')
+
+    # Clear the cache if the corrupted cache is found
+    if corrupted_cache_found:
+        clear_cache()
+    else:
+        print("No corrupted cache found.")
+
+if __name__ == "__main__":
+    main()
