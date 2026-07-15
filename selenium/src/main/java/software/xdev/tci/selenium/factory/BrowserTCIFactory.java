@@ -88,8 +88,8 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 			.withWebDriverRetryCount(Math.max(Math.min(cpuSlownessFactor(), 5), 1))
 			.withWebDriverRetrySec(25 + cpuSlownessFactor() * 5)
 			.withBrowserConsoleLog(
-				logBrowserConsoleConsumer(config.browserConsoleLogLevel()),
-				config.browserConsoleLogLevel().logLevels());
+				logBrowserConsoleConsumer(config.minBrowserConsoleLogLevel()),
+				config.minBrowserConsoleLogLevel().logLevels());
 	}
 	
 	@SuppressWarnings({"resource", "checkstyle:MagicNumber"})

@@ -36,9 +36,14 @@ public abstract class DefaultConfig
 	
 	protected boolean resolveBool(final String propertyName, final boolean defaultVal)
 	{
-		return this.resolve(propertyName)
-			.map(s -> "1".equals(s) || Boolean.parseBoolean(s))
+		return this.resolveBool(propertyName)
 			.orElse(defaultVal);
+	}
+	
+	protected Optional<Boolean> resolveBool(final String propertyName)
+	{
+		return this.resolve(propertyName)
+			.map(s -> "1".equals(s) || Boolean.parseBoolean(s));
 	}
 	
 	protected int resolveInt(final String propertyName, final int defaultVal)

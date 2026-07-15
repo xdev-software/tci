@@ -22,6 +22,7 @@
 * Improve container cleanup
 * Updated dependencies
 * Updated demo
+* Updated docs
 
 # 3.4.1
 * Remove dedicated code for Java 17 (no longer needed because Java 21 is the minimum)

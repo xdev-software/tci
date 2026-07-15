@@ -62,7 +62,7 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 	// https://www.selenium.dev/documentation/webdriver/bidi
 	protected boolean bidiEnabled = true;
 	
-	// Disables the (not standardized) Chrome Dev Tools (CDP) protocol (when bidi is enabled).
+	// Disables the (not standardized) Chrome DevTools protocol (CDP) when bidi is enabled.
 	// CDP requires additional maven dependencies (e.g. selenium-devtools-v137) that are
 	// NOT present and result in a warning.
 	protected boolean deactivateCDPIfPossible = true;

@@ -30,12 +30,43 @@ public class DefaultBrowserTCIFactoryConfig extends DefaultConfig implements Bro
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultBrowserTCIFactoryConfig.class);
 	
-	public static final String RECORD_MODE = "recordMode";
-	public static final String RECORD_DIR = "recordDir";
-	public static final String VNC_ENABLED = "vncEnabled";
-	public static final String BIDI_ENABLED = "bidiEnabled";
-	public static final String DEACTIVATE_CDP_IF_POSSIBLE = "deactivateCdpIfPossible";
-	public static final String BROWSER_CONSOLE_LOG_LEVEL = "browserConsoleLogLevel";
+	/**
+	 * @deprecated Use non legacy option instead
+	 */
+	@Deprecated(since = "4.0.0")
+	public static final String LEGACY_RECORD_MODE = "recordMode";
+	/**
+	 * @deprecated Use non legacy option instead
+	 */
+	@Deprecated(since = "4.0.0")
+	public static final String LEGACY_RECORD_DIR = "recordDir";
+	/**
+	 * @deprecated Use non legacy option instead
+	 */
+	@Deprecated(since = "4.0.0")
+	public static final String LEGACY_VNC_ENABLED = "vncEnabled";
+	/**
+	 * @deprecated Use non legacy option instead
+	 */
+	@Deprecated(since = "4.0.0")
+	public static final String LEGACY_BIDI_ENABLED = "bidiEnabled";
+	/**
+	 * @deprecated Use non legacy option instead
+	 */
+	@Deprecated(since = "4.0.0")
+	public static final String LEGACY_DEACTIVATE_CDP_IF_POSSIBLE = "deactivateCdpIfPossible";
+	/**
+	 * @deprecated Use non legacy option instead
+	 */
+	@Deprecated(since = "4.0.0")
+	public static final String LEGACY_BROWSER_CONSOLE_LOG_LEVEL = "browserConsoleLogLevel";
+	
+	public static final String RECORD_MODE = "record-mode";
+	public static final String RECORD_DIR = "record-dir";
+	public static final String VNC_ENABLED = "vnc-enabled";
+	public static final String BIDI_ENABLED = "bidi-enabled";
+	public static final String DEACTIVATE_CDP_IF_POSSIBLE = "deactivate-cdp-if-possible";
+	public static final String MIN_BROWSER_CONSOLE_LOG_LEVEL = "min-browser-console-log-level";
 	
 	public static final String DEFAULT_RECORD_DIR = "target/records";
 	
@@ -57,7 +88,10 @@ public class DefaultBrowserTCIFactoryConfig extends DefaultConfig implements Bro
 	{
 		if(this.systemRecordingMode == null)
 		{
-			final String resolvedRecordMode = this.resolve(RECORD_MODE).orElse(null);
+			final String resolvedRecordMode = this.resolve(RECORD_MODE)
+				.or(() -> this.resolve(LEGACY_RECORD_MODE)
+					.map(v -> this.reportLegacyConfigOption(LEGACY_RECORD_MODE, RECORD_MODE, v)))
+				.orElse(null);
 			this.systemRecordingMode = Stream.of(BrowserWebDriverContainer.RecordingMode.values())
 				.filter(rm -> rm.toString().equals(resolvedRecordMode))
 				.findFirst()
@@ -72,7 +106,10 @@ public class DefaultBrowserTCIFactoryConfig extends DefaultConfig implements Bro
 	{
 		if(this.dirForRecords == null)
 		{
-			this.dirForRecords = Path.of(this.resolve(RECORD_DIR).orElse(DEFAULT_RECORD_DIR));
+			this.dirForRecords = Path.of(this.resolve(RECORD_DIR)
+				.or(() -> this.resolve(LEGACY_RECORD_DIR)
+					.map(v -> this.reportLegacyConfigOption(LEGACY_RECORD_DIR, RECORD_DIR, v)))
+				.orElse(DEFAULT_RECORD_DIR));
 			final boolean wasCreated = this.dirForRecords.toFile().mkdirs();
 			LOG.info(
 				"Default directory for records='{}', created={}", this.dirForRecords.toAbsolutePath(),
@@ -87,7 +124,10 @@ public class DefaultBrowserTCIFactoryConfig extends DefaultConfig implements Bro
 	{
 		if(this.vncEnabled == null)
 		{
-			this.vncEnabled = this.resolveBool(VNC_ENABLED, false);
+			this.vncEnabled = this.resolveBool(VNC_ENABLED)
+				.or(() -> this.resolveBool(LEGACY_VNC_ENABLED)
+					.map(v -> this.reportLegacyConfigOption(LEGACY_VNC_ENABLED, VNC_ENABLED, v)))
+				.orElse(false);
 			LOG.info("VNC enabled={}", this.vncEnabled);
 		}
 		return this.vncEnabled;
@@ -98,7 +138,10 @@ public class DefaultBrowserTCIFactoryConfig extends DefaultConfig implements Bro
 	{
 		if(this.bidiEnabled == null)
 		{
-			this.bidiEnabled = this.resolveBool(BIDI_ENABLED, true);
+			this.bidiEnabled = this.resolveBool(BIDI_ENABLED)
+				.or(() -> this.resolveBool(LEGACY_BIDI_ENABLED)
+					.map(v -> this.reportLegacyConfigOption(LEGACY_BIDI_ENABLED, BIDI_ENABLED, v)))
+				.orElse(true);
 			LOG.info("BiDi enabled={}", this.bidiEnabled);
 		}
 		return this.bidiEnabled;
@@ -116,15 +159,35 @@ public class DefaultBrowserTCIFactoryConfig extends DefaultConfig implements Bro
 	}
 	
 	@Override
-	public BrowserTCIFactory.BrowserConsoleLogLevel browserConsoleLogLevel()
+	public BrowserTCIFactory.BrowserConsoleLogLevel minBrowserConsoleLogLevel()
 	{
 		if(this.browserConsoleLogLevel == null)
 		{
-			this.browserConsoleLogLevel = this.resolve(BROWSER_CONSOLE_LOG_LEVEL)
+			this.browserConsoleLogLevel = this.resolve(MIN_BROWSER_CONSOLE_LOG_LEVEL)
+				.or(() -> this.resolve(LEGACY_BROWSER_CONSOLE_LOG_LEVEL)
+					.map(v -> this.reportLegacyConfigOption(
+						LEGACY_BROWSER_CONSOLE_LOG_LEVEL,
+						MIN_BROWSER_CONSOLE_LOG_LEVEL,
+						v))
+				)
 				.map(BrowserTCIFactory.BrowserConsoleLogLevel::valueOf)
 				.orElse(BrowserTCIFactory.BrowserConsoleLogLevel.ERROR);
 			LOG.info("BrowserConsoleLogLevel={}", this.browserConsoleLogLevel);
 		}
 		return this.browserConsoleLogLevel;
+	}
+	
+	protected <T> T reportLegacyConfigOption(final String legacy, final String upToDate, final T value)
+	{
+		this.reportLegacyConfigOption(legacy, upToDate);
+		return value;
+	}
+	
+	protected void reportLegacyConfigOption(final String legacy, final String upToDate)
+	{
+		LOG.warn(
+			"Detected deprecated config option that will be removed: {} - use {} instead",
+			legacy,
+			upToDate);
 	}
 }
