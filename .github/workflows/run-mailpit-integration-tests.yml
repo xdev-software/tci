@@ -55,7 +55,8 @@ jobs:
         ./mvnw -B test \
         -pl "mailpit" -am \
         -T2C \
-        -P run-it
+        -P run-it \
+        -Dlicense.skip
 
     - name: Show images
       run: docker image ls
