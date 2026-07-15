@@ -3,7 +3,7 @@
   * This module utilizes v4 of [testcontainers-advanced-imagebuilder](https://github.com/xdev-software/testcontainers-advanced-imagebuilder)
   * It contains some shortcuts that help with common configuration e.g. related to caching (see below)
   * Can be configured using environment variables or system properties (see corresponding configuration section for details)
-* Added `mailpit` module
+* Added `mailpit` module #455
 * Added dedicated composite actions for caching
   * These can be found in `.github/actions/docker-image-cache`
   * Currently 3 actions exist:
