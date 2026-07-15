@@ -80,7 +80,7 @@ jobs:
         ./mvnw -B test \
         -pl "advanced-demo/integration-tests/${{ matrix.project }}" -am \
         -P run-it \
-        ${{ matrix.pre-start && '-Dinfra-pre-start.enabled=1 ' || '' }} \
+        ${{ matrix.pre-start && '-Dtci.infra-pre-start.enabled=1 ' || '' }} \
         ${{ matrix.parallel > 0 && format('-Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent -Djunit.jupiter.execution.parallel.config.strategy=fixed -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2 -Djunit.jupiter.execution.parallel.config.fixed.max-pool-size={0} ', matrix.parallel) || '' }}
       env:
         ACTIONS_RUNTIME_TOKEN: ${{ steps.docker-image-cache-setup-buildx.outputs.ACTIONS_RUNTIME_TOKEN }}
@@ -165,7 +165,7 @@ jobs:
         -Dtci.image-build.cache-to="type=gha,mode=max,scope=§image" \
         -Dtci.image-build.tci-demo-webapp.cache-from="type=gha,scope=§image-j_avx${java_useavx}${{ matrix.jacoco && '-jacoco' || '' }}" \
         -Dtci.image-build.tci-demo-webapp.cache-to="type=gha,mode=max,scope=§image-j_avx${java_useavx}${{ matrix.jacoco && '-jacoco' || '' }}" \
-        ${{ matrix.pre-start && '-Dinfra-pre-start.enabled=1 ' || '' }} \
+        ${{ matrix.pre-start && '-Dtci.infra-pre-start.enabled=1 ' || '' }} \
         ${{ matrix.parallel > 0 && format('-Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent -Djunit.jupiter.execution.parallel.config.strategy=fixed -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2 -Djunit.jupiter.execution.parallel.config.fixed.max-pool-size={0} ', matrix.parallel) || '' }}
       env:
         ACTIONS_RUNTIME_TOKEN: ${{ steps.docker-image-cache-setup-buildx.outputs.ACTIONS_RUNTIME_TOKEN }}

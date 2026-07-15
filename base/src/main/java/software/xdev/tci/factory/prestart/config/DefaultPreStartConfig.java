@@ -25,8 +25,8 @@ import software.xdev.tci.config.DefaultConfig;
  * <p>
  * Properties can be defined in the following way:
  * <pre>
- * -Dinfra-pre-start.keep-ready=2
- * -Dinfra-pre-start.coordinator.idle-cpu-percent=50
+ * -Dtci.infra-pre-start.keep-ready=2
+ * -Dtci.infra-pre-start.coordinator.idle-cpu-percent=50
  * </pre>
  * </p>
  */
