@@ -151,12 +151,13 @@ jobs:
         id: docker-image-cache-setup-buildx
         uses: ./.github/actions/docker-image-cache/setup-buildx
 
-    - name: Test
+    - name: Report CPU details
       run: |
-        # Report CPU details
         cat /proc/cpuinfo | grep 'name' | uniq
         cat /proc/cpuinfo | grep 'flags' | uniq
 
+    - name: Test
+      run: |
         # Differentiate cache between AVX microcode used by Java (until https://github.com/xdev-software/tci/issues/688 is fixed)
         java_useavx=$(java -XX:+PrintFlagsFinal -version 2> /dev/null | awk '/UseAVX/ {print $4}')
         echo "Java UseAVX: ${java_useavx}"
