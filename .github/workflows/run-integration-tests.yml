@@ -153,8 +153,8 @@ jobs:
 
     - name: Report CPU details
       run: |
-        cat /proc/cpuinfo | grep 'name' | uniq
-        cat /proc/cpuinfo | grep 'flags' | uniq
+        cat /proc/cpuinfo | grep -P '^name' | uniq
+        cat /proc/cpuinfo | grep -P '^flags' | uniq
 
     - name: Test
       run: |
