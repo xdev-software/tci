@@ -484,7 +484,7 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 	@Override
 	public void close()
 	{
-		this.log().warn("[{}] Shutting down", this.name);
+		this.log().info("[{}] Shutting down", this.name);
 		if(!this.isPreStartingDisabled())
 		{
 			GlobalPreStartCoordinator.instance().unregister(this);

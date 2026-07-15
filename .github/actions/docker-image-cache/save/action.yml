@@ -34,7 +34,7 @@ runs:
           image_ids_to_save=$(comm -23 <(echo "${image_ids_to_save[@]}") <(cat ~/.cache/docker-preinstalled/ids-${{ github.run_id }}.txt || echo ""))
         fi
         echo && echo "Saving image ids" && echo $image_ids_to_save
-        docker save $image_ids_to_save -o ~/.cache/docker/images.tar
+        docker save $image_ids_to_save -o ~/.cache/docker/images.tar || true
 
         ls -lha ~/.cache/docker
         if [ "$has_preinstalled_ids" = true ]; then
