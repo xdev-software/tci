@@ -188,6 +188,12 @@
 	</build>
 	<profiles>
 		<profile>
+			<id>run-it</id>
+			<properties>
+				<skipTests>false</skipTests>
+			</properties>
+		</profile>
+		<profile>
 			<id>ignore-service-loading</id>
 			<build>
 				<resources>
