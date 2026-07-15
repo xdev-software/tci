@@ -44,8 +44,8 @@ _NOTE: `*` indicates that only some properties support this_
 | Property | Type | Default | Notes |
 | --- | --- | --- | --- |
 | `enabled` | `bool` | `false` | Should PreStarting be enabled? |
-| `keep-ready`* | `int` | [`junit.jupiter.execution.parallel.config.fixed.max-pool-size`](https://docs.junit.org/6.1.2/writing-tests/parallel-execution.html) or `1` | How many container should be kept ready for use in the background?<br/>Setting this to a value `< 0` will effectively disable PreStarting |
-| `max-start-simultan`* | `int` | [`junit.jupiter.execution.parallel.config.fixed.max-pool-size`](https://docs.junit.org/6.1.2/writing-tests/parallel-execution.html) or `1` | How many contains should be started simultaneously?<br/>Setting a negative value will remove this limitation |
+| `keep-ready`* | `int` | [`junit.jupiter.execution.parallel.`<br/>`config.fixed.max-pool-size`](https://docs.junit.org/6.1.2/writing-tests/parallel-execution.html) or `1` | How many container should be kept ready for use in the background?<br/>Setting this to a value `< 0` will effectively disable PreStarting |
+| `max-start-simultan`* | `int` | [`junit.jupiter.execution.parallel.`<br/>`config.fixed.max-pool-size`](https://docs.junit.org/6.1.2/writing-tests/parallel-execution.html) or `1` | How many contains should be started simultaneously?<br/>Setting a negative value will remove this limitation |
 | `direct-network-attach-if-possible`* | `bool` | `true` | <ul><li><code>true</code> - Directly attaches the container to the network during startup if possible</li><li><code>false</code> - Always performs a network-connect as if PreStarting is active. This is slower, however it emulates PreStarting better and may help with finding bugs.</li></ul> |
 | `fixate-exposed-ports-if-required`* | `bool` | `true` | Fixates exposed ports when no direct network attach is possible. This is a workaround for <a href="https://github.com/moby/moby/issues/44137">moby/moby#44137</a>. |
 | `coordinator.idle-cpu-percent` | `int` | `40`% | Amount of CPU that needs to be idle to allow PreStarting of containers |
