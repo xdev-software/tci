@@ -90,7 +90,20 @@ public class DefaultPreStartConfig extends DefaultConfig implements PreStartConf
 	@Override
 	public String propertyNamePrefix()
 	{
-		return "infra-pre-start";
+		return "tci.infra-pre-start";
+	}
+	
+	@Override
+	protected Optional<String> resolve(final String propertyName)
+	{
+		return super.resolve(propertyName)
+			.or(() -> this.resolveFullyBuildPropertyName("infra-prestart." + propertyName)
+				.map(v -> this.reportLegacyConfigOption(
+					"infra-prestart." + propertyName,
+					this.propertyNamePrefix() + "." + propertyName,
+					v)
+				)
+			);
 	}
 	
 	@Override

@@ -15,17 +15,14 @@ TCI for [Selenium](https://github.com/SeleniumHQ/selenium).
 <details><summary>The configuration is dynamically loaded from (sorted by highest priority)</summary>
 
 * Environment variables 
-    * prefixed with ``TCI_SELENIUM_`` 
+    * prefixed with `TCI_SELENIUM_`
     * all properties are in UPPERCASE and use `_` instead of `.` or `-`
 * System properties
-    * prefixed with ``tci.selenium.``
+    * prefixed with `tci.selenium.`
 
 </details>
 
 <details><summary>Full list of configuration options</summary>
-
-_Please note that the preconfigured values usually work out of the box.<br/>_
-_You should know exactly what you're doing when doing modifications._
 
 | Property | Type | Default | Notes |
 | --- | --- | --- | --- |
@@ -35,3 +32,5 @@ _You should know exactly what you're doing when doing modifications._
 | `bidi-enabled` | `bool` | `true` | Use [Selenium BiDirectional functionality](https://www.selenium.dev/documentation/webdriver/bidi/) instead of legacy Chrome DevTools Protocol (CDP).<br/>Disabling this will make certain operations unavailable e.g. listening for browser logs. |
 | `deactivate-cdp-if-possible` | `bool` | `true` | Disable Chrome DevTools Protocol (CDP) if possible.<br/>CDP requires additional maven dependencies (e.g. `selenium-devtools-v137)` that are not present by default and will result in a warning. |
 | `min-browser-console-log-level` | `Enum` | `ERROR` | Prints out browser console logs. Configures the MINIMUM log level.<br/>Available options:<ul><li>OFF</li><li>ERROR</li><li>WARN</li><li>INFO</li><li>DEBUG</li><li>ALL</li></ul>
+
+</details>

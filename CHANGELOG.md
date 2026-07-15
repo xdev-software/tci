@@ -17,6 +17,16 @@
 * `db-jdbc-spring-orm` & implementations
   * No longer use `setPersistenceProviderClassName` because it has no effect
   * Performance: Reuse `PersistenceProvider`
+* Standardized some configuration properties
+  * `tci.selenium`
+    * `recordMode` → `record-mode`
+    * `recordDir` → `record-dir`
+    * `vncEnabled` → `vnc-enabled`
+    * `bidiEnabled` → `bidi-enabled`
+    * `deactivateCdpIfPossible` → `deactivate-cdp-if-possible`
+    * `browserConsoleLogLevel` → `min-browser-console-log-level`
+  * `infra-pre-start` → `tci.infra-pre-start`
+  * `leak-detection` → `tci.leak-detection`
 * Fixed a deadlock during service resolution
 * Fixed rate limiting in some places
 * Improve container cleanup

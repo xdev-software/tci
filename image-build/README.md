@@ -16,14 +16,11 @@ Provides common utility and configuration to build images.
         * where `imageName` is the (sanitized) name of the image to build
     * prefixed with `tci.image-build.`
 
-_NOTE: Sanitized image names only include alphanumeric characters, `_` or `-`. All other characters are replaced by `_`_
+_NOTE: Sanitized image-names only include alphanumeric characters, `_` or `-`. All other characters are replaced by `_`_
 
 </details>
 
 <details><summary>Full list of configuration options</summary>
-
-_Please note that the preconfigured values usually work out of the box.<br/>_
-_You should know exactly what you're doing when doing modifications._
 
 | Property | Type | Default | Notes |
 | --- | --- | --- | --- |

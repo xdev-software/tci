@@ -12,17 +12,14 @@ Please have a look at the [advanced-demo](../advanced-demo/) and the correspondi
 <details><summary>The configuration is dynamically loaded from (sorted by highest priority)</summary>
 
 * Environment variables 
-    * prefixed with ``TCI_JACOCO_`` 
+    * prefixed with `TCI_JACOCO_`
     * all properties are in UPPERCASE and use `_` instead of `.` or `-`
 * System properties
-    * prefixed with ``tci.jacoco.``
+    * prefixed with `tci.jacoco.`
 
 </details>
 
 <details><summary>Full list of configuration options</summary>
-
-_Please note that the preconfigured values usually work out of the box.<br/>_
-_You should know exactly what you're doing when doing modifications._
 
 | Property | Type | Default | Notes |
 | --- | --- | --- | --- |

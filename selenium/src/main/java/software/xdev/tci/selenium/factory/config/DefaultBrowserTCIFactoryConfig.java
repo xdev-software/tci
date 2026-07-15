@@ -176,18 +176,4 @@ public class DefaultBrowserTCIFactoryConfig extends DefaultConfig implements Bro
 		}
 		return this.browserConsoleLogLevel;
 	}
-	
-	protected <T> T reportLegacyConfigOption(final String legacy, final String upToDate, final T value)
-	{
-		this.reportLegacyConfigOption(legacy, upToDate);
-		return value;
-	}
-	
-	protected void reportLegacyConfigOption(final String legacy, final String upToDate)
-	{
-		LOG.warn(
-			"Detected deprecated config option that will be removed: {} - use {} instead",
-			legacy,
-			upToDate);
-	}
 }

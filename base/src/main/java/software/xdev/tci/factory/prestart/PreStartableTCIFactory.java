@@ -150,7 +150,7 @@ public class PreStartableTCIFactory<C extends GenericContainer<C>, I extends TCI
 	/**
 	 * Has the following effects:
 	 * <ul>
-	 *     <li><code>true</code> (default) - Directly attaches the Container to the network during startup if
+	 *     <li><code>true</code> (default) - Directly attaches the container to the network during startup if
 	 *     possible</li>
 	 *     <li><code>false</code> - Performs a Network#connect as if PreStarting is active.
 	 *     This is slower however it emulates PreStarting better and may help finding bugs.</li>
