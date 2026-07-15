@@ -20,6 +20,9 @@ Modules for XDEV's Testcontainer Infrastructure Framework
   * Data-generation template
   * Improved JDBC Container wait strategy
   * Predefined implementations for [Spring-ORM](./db-jdbc-spring-orm/), [Hibernate](./db-jdbc-spring-orm-hibernate/) and [EclipseLink](./db-jdbc-spring-orm-eclipselink/)
+* [image-build](./image-build/)
+  * Contains some shortcuts that help with common build configuration e.g. related to caching
+  * Designed to work together with the [`docker-image-cache` actions](./.github/actions/docker-image-cache/)
 * [jacoco](./jacoco/)
   * Allows for recording of JaCoCo code coverage files with Java containers
 * [jul-to-slf4j](./jul-to-slf4j/)

@@ -35,7 +35,7 @@ public class DefaultLeakDetectionConfig extends DefaultConfig implements LeakDet
 	@Override
 	protected String propertyNamePrefix()
 	{
-		return "leak-detection";
+		return "tci.leak-detection";
 	}
 	
 	@Override

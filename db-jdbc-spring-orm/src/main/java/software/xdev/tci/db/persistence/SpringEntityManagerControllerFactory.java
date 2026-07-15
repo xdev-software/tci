@@ -20,21 +20,27 @@ import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnitTransactionType;
 import jakarta.persistence.spi.ClassTransformer;
+import jakarta.persistence.spi.PersistenceProvider;
 import jakarta.persistence.spi.PersistenceUnitInfo;
 
 import org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo;
 
 
 @SuppressWarnings("java:S119")
-public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEntityManagerControllerFactory<SELF>>
+public abstract class SpringEntityManagerControllerFactory<
+	P extends PersistenceProvider,
+	SELF extends SpringEntityManagerControllerFactory<P, SELF>>
 	extends EntityManagerControllerFactory<SELF, PersistenceUnitInfo>
 {
 	protected boolean addJarFileUrls;
+	protected P persistenceProvider;
 	
 	protected SpringEntityManagerControllerFactory()
 	{
@@ -58,6 +64,15 @@ public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEn
 	public SELF withAddJarFileUrls(final boolean addJarFileUrls)
 	{
 		this.addJarFileUrls = addJarFileUrls;
+		return this.self();
+	}
+	
+	/**
+	 * Allows to manually configure a (default) persistence provider
+	 */
+	public SELF withPersistenceProvider(final P persistenceProvider)
+	{
+		this.persistenceProvider = persistenceProvider;
 		return this.self();
 	}
 	
@@ -100,12 +115,6 @@ public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEn
 		return pui;
 	}
 	
-	@Override
-	protected PersistenceUnitInfo createPersistenceUnitInfo()
-	{
-		return this.createSpringPersistenceUnitInfo().asStandardPersistenceUnitInfo();
-	}
-	
 	protected Collection<URL> jarFileUrlsToAdd()
 	{
 		try
@@ -118,5 +127,25 @@ public abstract class SpringEntityManagerControllerFactory<SELF extends SpringEn
 		{
 			throw new UncheckedIOException(ioe);
 		}
+	}
+	
+	@Override
+	protected PersistenceUnitInfo createPersistenceUnitInfo()
+	{
+		return this.createSpringPersistenceUnitInfo().asStandardPersistenceUnitInfo();
+	}
+	
+	protected abstract P createDefaultPersistenceProvider();
+	
+	@Override
+	protected EntityManagerFactory createEntityManagerFactory(
+		final PersistenceUnitInfo pui,
+		final Map<String, Object> properties)
+	{
+		if(this.persistenceProvider == null)
+		{
+			this.persistenceProvider = this.createDefaultPersistenceProvider();
+		}
+		return this.persistenceProvider.createContainerEntityManagerFactory(pui, properties);
 	}
 }

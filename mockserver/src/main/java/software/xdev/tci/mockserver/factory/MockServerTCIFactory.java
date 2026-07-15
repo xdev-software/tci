@@ -22,8 +22,8 @@ import java.util.function.Supplier;
 import org.testcontainers.containers.Network;
 
 import software.xdev.tci.factory.ondemand.OnDemandTCIFactory;
-import software.xdev.tci.misc.ContainerMemory;
 import software.xdev.tci.mockserver.MockServerTCI;
+import software.xdev.tci.mockserver.containers.TCIMockserverContainer;
 import software.xdev.testcontainers.mockserver.containers.MockServerContainer;
 
 
@@ -39,7 +39,6 @@ public abstract class MockServerTCIFactory<I extends MockServerTCI>
 		super(infraBuilder, containerBuilder, containerBaseName, containerLoggerName);
 	}
 	
-	@SuppressWarnings("resource")
 	protected MockServerTCIFactory(
 		final BiFunction<MockServerContainer, String, I> infraBuilder,
 		final String additionalContainerBaseName,
@@ -47,8 +46,7 @@ public abstract class MockServerTCIFactory<I extends MockServerTCI>
 	{
 		super(
 			infraBuilder,
-			() -> new MockServerContainer()
-				.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M)),
+			TCIMockserverContainer::createDefaultForFactory,
 			"mockserver-" + additionalContainerBaseName,
 			"container.mockserver." + additionalLoggerName);
 	}

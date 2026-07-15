@@ -25,3 +25,4 @@ The most interesting project is probably [webapp-it](./integration-tests/webapp-
 * Safe starting of named containers:<br/> Is integrated inside ``TCI``. Parts of it only kick in on unexpected container start errors. Can also be observed during tests (with e.g. ``docker stats``) as it names the containers.
 * Container leak detection:<br/> Only kicks in when you forget to stop infrastructure after a test. Can be manually reproduced by commenting out the corresponding ``TCI#stop`` methods.
 * Tracing:<br/> Seen at the end of each test inside the logs.
+* Caching (using GitHub actions):<br/> Cache configuration and usage can be found in [`run-integration-tests.yml`](../.github/workflows/run-integration-tests.yml).

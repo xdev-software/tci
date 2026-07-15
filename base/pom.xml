@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci</groupId>
 	<artifactId>base</artifactId>
-	<version>3.4.2-SNAPSHOT</version>
+	<version>4.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>base</name>
@@ -69,14 +69,14 @@
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-launcher</artifactId>
 			<scope>compile</scope>
-			<version>6.1.0</version>
+			<version>6.1.2</version>
 		</dependency>
 
 		<!-- Tests -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>6.1.0</version>
+			<version>6.1.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -136,6 +136,28 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.15.0</version>
+				<executions>
+					<execution>
+						<id>compile-java-21</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>compile-java-25</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<release>25</release>
+							<compileSourceRoots>
+								<compileSourceRoot>${project.basedir}/src/main/java25</compileSourceRoot>
+							</compileSourceRoots>
+							<multiReleaseOutput>true</multiReleaseOutput>
+						</configuration>
+					</execution>
+				</executions>
 				<configuration>
 					<release>${maven.compiler.release}</release>
 					<compilerArgs>
@@ -284,7 +306,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>13.6.0</version>
+								<version>13.8.0</version>
 							</dependency>
 						</dependencies>
 						<configuration>
@@ -322,12 +344,12 @@
 							<dependency>
 								<groupId>net.sourceforge.pmd</groupId>
 								<artifactId>pmd-core</artifactId>
-								<version>7.25.0</version>
+								<version>7.26.0</version>
 							</dependency>
 							<dependency>
 								<groupId>net.sourceforge.pmd</groupId>
 								<artifactId>pmd-java</artifactId>
-								<version>7.25.0</version>
+								<version>7.26.0</version>
 							</dependency>
 						</dependencies>
 					</plugin>

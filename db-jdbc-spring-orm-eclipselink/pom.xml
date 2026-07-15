@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci</groupId>
 	<artifactId>db-jdbc-spring-orm-eclipselink</artifactId>
-	<version>3.4.2-SNAPSHOT</version>
+	<version>4.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>db-jdbc-spring-orm-eclipselink</name>
@@ -53,13 +53,13 @@
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>db-jdbc-spring-orm</artifactId>
-			<version>3.4.2-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.eclipse.persistence</groupId>
 			<artifactId>eclipselink</artifactId>
-			<version>5.0.0</version>
+			<version>5.0.1</version>
 		</dependency>
 	</dependencies>
 
@@ -226,7 +226,7 @@
 					<plugin>
 						<groupId>org.sonatype.central</groupId>
 						<artifactId>central-publishing-maven-plugin</artifactId>
-						<version>0.10.0</version>
+						<version>0.11.0</version>
 						<extensions>true</extensions>
 						<configuration>
 							<publishingServerId>sonatype-central-portal</publishingServerId>
@@ -248,7 +248,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>13.5.0</version>
+								<version>13.8.0</version>
 							</dependency>
 						</dependencies>
 						<configuration>
@@ -286,12 +286,12 @@
 							<dependency>
 								<groupId>net.sourceforge.pmd</groupId>
 								<artifactId>pmd-core</artifactId>
-								<version>7.25.0</version>
+								<version>7.26.0</version>
 							</dependency>
 							<dependency>
 								<groupId>net.sourceforge.pmd</groupId>
 								<artifactId>pmd-java</artifactId>
-								<version>7.25.0</version>
+								<version>7.26.0</version>
 							</dependency>
 						</dependencies>
 					</plugin>

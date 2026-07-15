@@ -21,9 +21,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.apache.hc.core5.http.HttpStatus;
-import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
-import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
-import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 
 import software.xdev.tci.envperf.EnvironmentPerformance;
 import software.xdev.tci.factory.prestart.PreStartableTCIFactory;
@@ -32,6 +29,9 @@ import software.xdev.tci.misc.ContainerMemory;
 import software.xdev.tci.oidc.BaseOIDCTCI;
 import software.xdev.tci.oidc.containers.BaseOIDCServerContainer;
 import software.xdev.tci.oidc.containers.OIDCServerContainer;
+import software.xdev.tci.startup.wait.FastAbortOnContainerDeathWaitStrategy;
+import software.xdev.tci.startup.wait.strategy.HostPortWaitAbortableStrategy;
+import software.xdev.tci.startup.wait.strategy.HttpWaitAbortableStrategy;
 
 
 @SuppressWarnings("java:S119")
@@ -92,22 +92,21 @@ public abstract class BaseOIDCTCIFactory<
 		return createDefaultContainer(null);
 	}
 	
-	@SuppressWarnings({"resource", "checkstyle:MagicNumber"})
+	@SuppressWarnings({"checkstyle:MagicNumber"})
 	public static OIDCServerContainer createDefaultContainer(final Consumer<OIDCServerContainer> customizer)
 	{
 		final OIDCServerContainer oidcServerContainer = new OIDCServerContainer()
 			.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M))
-			.waitingFor(
-				new WaitAllStrategy()
-					.withStartupTimeout(Duration.ofSeconds(40L + 20L * EnvironmentPerformance.cpuSlownessFactor()))
-					.withStrategy(new HostPortWaitStrategy())
-					.withStrategy(
-						new HttpWaitStrategy()
-							.forPort(BaseOIDCServerContainer.PORT)
-							.forPath("/")
-							.forStatusCode(HttpStatus.SC_OK)
-							.withReadTimeout(Duration.ofSeconds(10))
-					)
+			.waitingFor(FastAbortOnContainerDeathWaitStrategy.waitAll(s -> s
+				.withStartupTimeout(Duration.ofSeconds(40L + 20L * EnvironmentPerformance.cpuSlownessFactor()))
+				.withStrategy(new HostPortWaitAbortableStrategy())
+				.withStrategy(
+					new HttpWaitAbortableStrategy()
+						.forPort(BaseOIDCServerContainer.PORT)
+						.forPath("/")
+						.forStatusCode(HttpStatus.SC_OK)
+						.withReadTimeout(Duration.ofSeconds(10))
+				))
 			);
 		
 		if(customizer != null)

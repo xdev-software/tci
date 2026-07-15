@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
 
+import com.github.dockerjava.api.exception.NotFoundException;
+
 import software.xdev.tci.envperf.EnvironmentPerformance;
 
 
@@ -144,6 +146,15 @@ public class SafeNamedContainerStarter<C extends GenericContainer<?>> implements
 			}
 			catch(final Exception ex)
 			{
+				// Check if container was already cleaned up (e.g. with tryStart->stop)
+				if(ex.getCause() instanceof final NotFoundException nfe
+					&& nfe.getMessage() != null
+					&& nfe.getMessage().startsWith("Status 404: {\"message\":\"No such container:"))
+				{
+					LOG.info("Container[name='{}'] was already removed", containerName);
+					return;
+				}
+				
 				LOG.warn("Unable to cleanup container[name='{}']", containerName, ex);
 			}
 		}

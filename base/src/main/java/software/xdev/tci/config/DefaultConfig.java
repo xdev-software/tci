@@ -20,6 +20,8 @@ import java.util.Optional;
 import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 
+import org.slf4j.LoggerFactory;
+
 
 public abstract class DefaultConfig
 {
@@ -27,7 +29,11 @@ public abstract class DefaultConfig
 	
 	protected Optional<String> resolve(final String propertyName)
 	{
-		final String fullPropertyName = this.propertyNamePrefix() + "." + propertyName;
+		return this.resolveFullyBuildPropertyName(this.propertyNamePrefix() + "." + propertyName);
+	}
+	
+	protected Optional<String> resolveFullyBuildPropertyName(final String fullPropertyName)
+	{
 		return Optional.ofNullable(System.getenv(fullPropertyName
 				.replace(".", "_")
 				.toUpperCase(Locale.ROOT)))
@@ -36,9 +42,14 @@ public abstract class DefaultConfig
 	
 	protected boolean resolveBool(final String propertyName, final boolean defaultVal)
 	{
-		return this.resolve(propertyName)
-			.map(s -> "1".equals(s) || Boolean.parseBoolean(s))
+		return this.resolveBool(propertyName)
 			.orElse(defaultVal);
+	}
+	
+	protected Optional<Boolean> resolveBool(final String propertyName)
+	{
+		return this.resolve(propertyName)
+			.map(s -> "1".equals(s) || Boolean.parseBoolean(s));
 	}
 	
 	protected int resolveInt(final String propertyName, final int defaultVal)
@@ -76,5 +87,19 @@ public abstract class DefaultConfig
 				}
 			})
 			.orElseGet(defaultValueSupplier::getAsLong);
+	}
+	
+	protected <T> T reportLegacyConfigOption(final String legacy, final String upToDate, final T value)
+	{
+		this.reportLegacyConfigOption(legacy, upToDate);
+		return value;
+	}
+	
+	protected void reportLegacyConfigOption(final String legacy, final String upToDate)
+	{
+		LoggerFactory.getLogger(this.getClass()).warn(
+			"Detected deprecated config option that will be removed: {} - use {} instead",
+			legacy,
+			upToDate);
 	}
 }

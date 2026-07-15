@@ -33,5 +33,5 @@ public interface BrowserTCIFactoryConfig
 	
 	boolean deactivateCdpIfPossible();
 	
-	BrowserTCIFactory.BrowserConsoleLogLevel browserConsoleLogLevel();
+	BrowserTCIFactory.BrowserConsoleLogLevel minBrowserConsoleLogLevel();
 }

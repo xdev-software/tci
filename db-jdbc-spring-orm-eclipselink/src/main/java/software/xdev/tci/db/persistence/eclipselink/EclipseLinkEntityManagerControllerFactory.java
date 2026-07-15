@@ -19,9 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.spi.PersistenceUnitInfo;
-
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo;
@@ -30,7 +27,7 @@ import software.xdev.tci.db.persistence.SpringEntityManagerControllerFactory;
 
 
 public class EclipseLinkEntityManagerControllerFactory
-	extends SpringEntityManagerControllerFactory<EclipseLinkEntityManagerControllerFactory>
+	extends SpringEntityManagerControllerFactory<PersistenceProvider, EclipseLinkEntityManagerControllerFactory>
 {
 	// Disabled (false) by default as it's not used by the default created SpringPersistenceUnitInfo anyway
 	protected boolean weavingEnabled;
@@ -69,7 +66,6 @@ public class EclipseLinkEntityManagerControllerFactory
 		final SpringPersistenceUnitInfo spui = super.createSpringPersistenceUnitInfo();
 		// Required otherwise createContainerEntityManagerFactoryImpl crashes
 		spui.setPersistenceUnitRootUrl(this.getClass().getResource(""));
-		spui.setPersistenceProviderClassName(PersistenceProvider.class.getName());
 		return spui;
 	}
 	
@@ -85,10 +81,8 @@ public class EclipseLinkEntityManagerControllerFactory
 	}
 	
 	@Override
-	protected EntityManagerFactory createEntityManagerFactory(
-		final PersistenceUnitInfo pui,
-		final Map<String, Object> properties)
+	protected PersistenceProvider createDefaultPersistenceProvider()
 	{
-		return new PersistenceProvider().createContainerEntityManagerFactory(pui, properties);
+		return new PersistenceProvider();
 	}
 }

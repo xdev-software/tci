@@ -1,3 +1,40 @@
+# 4.0.0
+* Added `image-build` module
+  * This module utilizes v4 of [testcontainers-advanced-imagebuilder](https://github.com/xdev-software/testcontainers-advanced-imagebuilder)
+  * It contains some shortcuts that help with common configuration e.g. related to caching (see below)
+  * Can be configured using environment variables or system properties (see corresponding configuration section for details)
+* Added `mailpit` module #455
+* Added dedicated composite actions for caching
+  * These can be found in `.github/actions/docker-image-cache`
+  * Currently 3 actions exist:
+    * `restore` - Restores the previously downloaded images
+    * `setup-buildx` - Set's up the buildx worker and returns required environment variables
+    * `save` - Saves the downloaded images
+* Added abortable wait strategies
+  * primarily designed to be used with `FastAbortOnContainerDeathWaitStrategy`
+  * the strategies can be aborted e.g. when a container died during startup
+    * a dead container therefore no longer has to wait until the corresponding strategy times out
+  * Implemented in all applicable modules
+* `db-jdbc-spring-orm` & implementations
+  * No longer use `setPersistenceProviderClassName` because it has no effect
+  * Performance: Reuse `PersistenceProvider`
+* Standardized some configuration properties
+  * `tci.selenium`
+    * `recordMode` → `record-mode`
+    * `recordDir` → `record-dir`
+    * `vncEnabled` → `vnc-enabled`
+    * `bidiEnabled` → `bidi-enabled`
+    * `deactivateCdpIfPossible` → `deactivate-cdp-if-possible`
+    * `browserConsoleLogLevel` → `min-browser-console-log-level`
+  * `infra-pre-start` → `tci.infra-pre-start`
+  * `leak-detection` → `tci.leak-detection`
+* Fixed a deadlock during service resolution
+* Fixed rate limiting in some places
+* Improve container cleanup
+* Updated dependencies
+* Updated demo
+* Updated docs
+
 # 3.4.1
 * Remove dedicated code for Java 17 (no longer needed because Java 21 is the minimum)
 

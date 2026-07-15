@@ -1,8 +1,12 @@
 package software.xdev.tci.demo.tci.webapp.factory;
 
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
+import software.xdev.tci.concurrent.Suppliers;
+import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.demo.tci.webapp.WebAppTCI;
 import software.xdev.tci.demo.tci.webapp.containers.WebAppContainer;
 import software.xdev.tci.demo.tci.webapp.containers.WebAppContainerBuilder;
@@ -13,9 +17,8 @@ import software.xdev.tci.misc.ContainerMemory;
 
 public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, WebAppTCI>
 {
-	public static final String PROPERTY_APP_DOCKERIMAGE = "appDockerImage";
-	
-	protected static String appImageName;
+	protected static final Supplier<String> IMAGE_NAME_SUPPLIER =
+		Suppliers.memoize(WebAppContainerBuilder::getImageName);
 	
 	@SuppressWarnings("checkstyle:MagicNumber")
 	public WebAppTCIFactory(final Consumer<WebAppContainer> additionalContainerBuilder)
@@ -23,7 +26,7 @@ public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, We
 		super(
 			WebAppTCI::new,
 			() -> {
-				final WebAppContainer container = new WebAppContainer(getAppImageName(), true)
+				final WebAppContainer container = new WebAppContainer(IMAGE_NAME_SUPPLIER.get(), true)
 					.withDefaultWaitStrategy(
 						Duration.ofSeconds(40L + 20L * EnvironmentPerformance.cpuSlownessFactor()),
 						WebAppTCI.ACTUATOR_USERNAME,
@@ -47,23 +50,7 @@ public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, We
 	@Override
 	protected void warmUpInternal()
 	{
-		getAppImageName();
+		CompletableFuture.runAsync(IMAGE_NAME_SUPPLIER::get, TCIExecutorServiceHolder.instance());
 		super.warmUpInternal();
-	}
-	
-	protected static synchronized String getAppImageName()
-	{
-		if(appImageName != null)
-		{
-			return appImageName;
-		}
-		
-		appImageName = System.getProperty(PROPERTY_APP_DOCKERIMAGE);
-		if(appImageName == null)
-		{
-			appImageName = WebAppContainerBuilder.getBuiltImageName();
-		}
-		
-		return appImageName;
 	}
 }
