@@ -153,11 +153,13 @@ jobs:
 
     - name: Test
       run: |
-        # Report CPU
+        # Report CPU details
         cat /proc/cpuinfo | grep 'name' | uniq
+        cat /proc/cpuinfo | grep 'flags' | uniq
 
         # Differentiate cache between AVX microcode used by Java (until https://github.com/xdev-software/tci/issues/688 is fixed)
         java_useavx=$(java -XX:+PrintFlagsFinal -version 2> /dev/null | awk '/UseAVX/ {print $4}')
+        echo "Java UseAVX: ${java_useavx}"
 
         ./mvnw -B test \
         -pl "advanced-demo/integration-tests/${{ matrix.project }}" -am \
