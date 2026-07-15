@@ -25,6 +25,7 @@
 		<module>jacoco</module>
 		<module>jul-to-slf4j</module>
 		<module>junit-jupiter-api-support</module>
+		<module>mailpit</module>
 		<module>mockserver</module>
 		<module>oidc-server-mock</module>
 		<module>selenium</module>
