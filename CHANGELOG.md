@@ -1,3 +1,6 @@
+# 4.0.1
+* Fix selenium 4.46 crash when bidi is enabled
+
 # 4.0.0
 * Added `image-build` module
   * This module utilizes v4 of [testcontainers-advanced-imagebuilder](https://github.com/xdev-software/testcontainers-advanced-imagebuilder)

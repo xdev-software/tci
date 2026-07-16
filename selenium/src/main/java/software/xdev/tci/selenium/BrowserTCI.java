@@ -15,6 +15,7 @@
  */
 package software.xdev.tci.selenium;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
@@ -29,12 +30,16 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.bidi.HasBiDi;
 import org.openqa.selenium.bidi.log.LogLevel;
 import org.openqa.selenium.bidi.log.StackTrace;
 import org.openqa.selenium.bidi.module.LogInspector;
 import org.openqa.selenium.remote.Augmenter;
+import org.openqa.selenium.remote.Command;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.remote.http.ClientConfig;
 import org.openqa.selenium.remote.http.HttpClient;
 import org.rnorth.ducttape.timeouts.Timeouts;
@@ -105,13 +110,13 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 	
 	public BrowserTCI withWebDriverRetryCount(final int webDriverRetryCount)
 	{
-		this.webDriverRetryCount = Math.min(Math.max(webDriverRetryCount, 2), 10);
+		this.webDriverRetryCount = Math.clamp(webDriverRetryCount, 2, 10);
 		return this;
 	}
 	
 	public BrowserTCI withWebDriverRetrySec(final int webDriverRetrySec)
 	{
-		this.webDriverRetrySec = Math.min(Math.max(webDriverRetrySec, 10), 10 * 60);
+		this.webDriverRetrySec = Math.clamp(webDriverRetrySec, 10, 10 * 60);
 		return this;
 	}
 	
@@ -175,7 +180,21 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 			Map.of(),
 			config,
 			// Constructor without factory does not exist...
-			ignored -> client);
+			ignored -> client)
+		{
+			// See https://github.com/SeleniumHQ/selenium/issues/17782
+			@Override
+			public Response execute(final Command command) throws IOException
+			{
+				final Response response = super.execute(command);
+				if(DriverCommand.NEW_SESSION.equals(command.getName())
+					&& response.getValue() instanceof final Map<?, ?> responseValues)
+				{
+					BrowserTCI.this.modifyNewSessionResponseValues(responseValues);
+				}
+				return response;
+			}
+		};
 		
 		try
 		{
@@ -191,23 +210,12 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 					
 					final RemoteWebDriver driver =
 						new RemoteWebDriver(commandExecutor, this.capabilities);
-					if(!this.bidiEnabled)
+					if(driver instanceof HasBiDi || !this.bidiEnabled)
 					{
 						return driver;
 					}
 					
-					if(this.deactivateCDPIfPossible)
-					{
-						this.disableCDP(driver);
-					}
-					
-					// Create BiDi able driver
-					this.fixCapAddress(driver);
-					
-					final Augmenter augmenter = new Augmenter();
-					final WebDriver augmentedWebDriver = augmenter.augment(driver);
-					
-					return (RemoteWebDriver)augmentedWebDriver;
+					return this.augment(driver);
 				});
 		}
 		catch(final RuntimeException rex)
@@ -233,13 +241,23 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 		this.capabilities.setCapability("se:cdpEnabled", Boolean.FALSE.toString());
 	}
 	
-	protected void disableCDP(final RemoteWebDriver originalDriver)
+	@SuppressWarnings({"rawtypes"})
+	protected void modifyNewSessionResponseValues(final Map responseValues)
 	{
-		if(!(originalDriver.getCapabilities() instanceof final MutableCapabilities mutableCapabilities))
+		if(this.bidiEnabled)
 		{
-			return;
+			if(this.deactivateCDPIfPossible)
+			{
+				this.disableCDP(responseValues);
+			}
+			this.fixCapAddress(responseValues);
 		}
-		mutableCapabilities.setCapability("se:cdp", (Object)null);
+	}
+	
+	@SuppressWarnings({"rawtypes"})
+	protected void disableCDP(final Map responseValues)
+	{
+		responseValues.remove("se:cdp");
 	}
 	
 	protected Set<String> getCapsToPatchAddress()
@@ -247,20 +265,13 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 		return CAPS_TO_PATCH_ADDRESS;
 	}
 	
-	/**
-	 * Tries to fix the capabilities, e.g. wrong URLs that must be translated so that communication with the container
-	 * works
-	 */
-	protected void fixCapAddress(final RemoteWebDriver originalDriver)
+	// See https://github.com/SeleniumHQ/selenium/issues/17782
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	protected void fixCapAddress(final Map responseValues)
 	{
-		if(!(originalDriver.getCapabilities() instanceof final MutableCapabilities mutableCapabilities))
-		{
-			return;
-		}
-		
 		for(final String capabilityName : this.getCapsToPatchAddress())
 		{
-			if(mutableCapabilities.getCapability(capabilityName) instanceof final String cdpCap)
+			if(responseValues.get(capabilityName) instanceof final String cdpCap)
 			{
 				final Matcher matcher = IP_PORT_EXTRACTOR.matcher(cdpCap);
 				if(matcher.find())
@@ -270,7 +281,7 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 						+ ":"
 						+ this.getContainer().getMappedPort(Integer.parseInt(matcher.group(3)))
 						+ matcher.group(4);
-					mutableCapabilities.setCapability(
+					responseValues.put(
 						capabilityName,
 						newValue);
 					LOG.debug("Patched cap '{}': '{}' -> '{}'", capabilityName, cdpCap, newValue);
@@ -279,14 +290,29 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 		}
 	}
 	
+	/**
+	 * This was required before Selenium 4.46 to get BiDi running
+	 *
+	 * @deprecated Update Selenium to 4.46+
+	 */
+	@Deprecated(since = "4.0.0")
+	protected RemoteWebDriver augment(final RemoteWebDriver driver)
+	{
+		final Augmenter augmenter = new Augmenter();
+		final WebDriver augmentedWebDriver = augmenter.augment(driver);
+		
+		return (RemoteWebDriver)augmentedWebDriver;
+	}
+	
 	protected void installBrowserLogInspector()
 	{
-		if(this.browserConsoleLogConsumer == null || !this.bidiEnabled)
+		if(this.browserConsoleLogConsumer == null)
 		{
-			if(this.browserConsoleLogConsumer != null)
-			{
-				LOG.warn("Browser Console Log Consumer is present but BiDi is disabled");
-			}
+			return;
+		}
+		if(!this.bidiEnabled)
+		{
+			LOG.warn("Browser Console Log Consumer is present but BiDi is disabled");
 			return;
 		}
 		
@@ -354,7 +380,7 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 			}
 			finally
 			{
-				LOG.debug("Stopping logInspector driver took {}ms", System.currentTimeMillis() - startMs);
+				LOG.debug("Stopping logInspector took {}ms", System.currentTimeMillis() - startMs);
 			}
 			this.logInspector = null;
 		}
