@@ -194,9 +194,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-mvn-build-
 
+    - name: Remove not needed modules
+      run: |
+        sed -i '/<module>.*-demo<\/module>/d' pom.xml
+
     - name: Build site
-      # Exclude demo projects to resolve dependency resolution problems
-      run: ./mvnw -B compile site -pl '!advanced-demo,!base-demo' -DskipTests -T2C
+      run: ./mvnw -B compile site -DskipTests -T2C
 
     - name: Aggregate site
       run: |
