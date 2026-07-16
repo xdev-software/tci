@@ -21,43 +21,51 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.openqa.selenium.MutableCapabilities;
 import org.testcontainers.containers.Network;
 
 import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.factory.TCIFactory;
 import software.xdev.tci.selenium.BrowserTCI;
+import software.xdev.tci.selenium.CapabilityFactory;
 import software.xdev.tci.selenium.TestBrowser;
 import software.xdev.tci.selenium.containers.SeleniumBrowserWebDriverContainer;
 import software.xdev.tci.tracing.TCITracer;
 
 
-public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverContainer, BrowserTCI>
+/**
+ * Contains multiple {@link BrowserTCIFactory}s - usually one per browser/capabilities - and manages them.
+ */
+public class BrowsersTCIFactory<F extends CapabilityFactory>
+	implements TCIFactory<SeleniumBrowserWebDriverContainer, BrowserTCI>
 {
-	protected final Map<String, BrowserTCIFactory> browserFactories = new ConcurrentHashMap<>();
+	protected final Map<CapabilityFactory, BrowserTCIFactory> browserFactories = new ConcurrentHashMap<>();
 	
-	public BrowsersTCIFactory()
+	public static BrowsersTCIFactory<TestBrowser> createDefault()
 	{
-		this(Arrays.stream(TestBrowser.values())
-			.map(TestBrowser::getCapabilityFactory)
-			.map(Supplier::get));
+		return new BrowsersTCIFactory<>(TestBrowser.values());
 	}
 	
-	public BrowsersTCIFactory(final Stream<MutableCapabilities> caps)
+	@SafeVarargs
+	public BrowsersTCIFactory(final F... caps)
 	{
-		caps.forEach(cap -> this.browserFactories.put(cap.getBrowserName(), new BrowserTCIFactory(cap)));
+		this(Arrays.stream(caps));
 	}
 	
-	public BrowsersTCIFactory(final Map<String, BrowserTCIFactory> browserFactories)
+	public BrowsersTCIFactory(final Stream<F> caps)
+	{
+		caps.forEach(factory ->
+			this.browserFactories.put(factory, new BrowserTCIFactory(factory.createCapabilities())));
+	}
+	
+	public BrowsersTCIFactory(final Map<F, BrowserTCIFactory> browserFactories)
 	{
 		this.browserFactories.putAll(browserFactories);
 	}
 	
-	public BrowsersTCIFactory withPullVideoRecordingContainerOnWarmUp(final boolean pull)
+	public BrowsersTCIFactory<F> withPullVideoRecordingContainerOnWarmUp(final boolean pull)
 	{
 		this.browserFactories.values().forEach(f -> f.withPullVideoRecordingContainerOnWarmUp(pull));
 		return this;
@@ -69,16 +77,19 @@ public class BrowsersTCIFactory implements TCIFactory<SeleniumBrowserWebDriverCo
 		// No effect - Done in downstream factories
 	}
 	
-	@SuppressWarnings("resource")
 	public BrowserTCI getNew(
-		final MutableCapabilities capabilities,
+		final F factory,
 		final Network network,
 		final String... networkAliases)
 	{
-		return this.browserFactories.computeIfAbsent(
-				capabilities.getBrowserName(),
-				x -> new BrowserTCIFactory(capabilities))
-			.getNew(network, networkAliases);
+		final BrowserTCIFactory infraFactory = this.browserFactories.get(factory);
+		if(infraFactory == null)
+		{
+			throw new IllegalStateException(
+				"Requested factory " + factory + " was not found/registered during initialization! "
+					+ "Make sure to register it and ensure that equals/hashCode are correctly implemented");
+		}
+		return infraFactory.getNew(network, networkAliases);
 	}
 	
 	@Override

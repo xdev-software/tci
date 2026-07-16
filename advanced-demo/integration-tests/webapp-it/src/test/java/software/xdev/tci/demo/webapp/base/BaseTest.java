@@ -67,7 +67,7 @@ public abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 				OIDCTCI.CLIENT_SECRET,
 				OIDCTCI.getInternalHttpBaseEndPoint(DNS_NAME_OIDC)
 			));
-	protected static final BrowsersTCIFactory BROWSER_INFRA_FACTORY = new BrowsersTCIFactory();
+	protected static final BrowsersTCIFactory<TestBrowser> BROWSER_INFRA_FACTORY = BrowsersTCIFactory.createDefault();
 	protected static final LazyNetworkPool LAZY_NETWORK_POOL = new LazyNetworkPool();
 	
 	private DBTCI dbInfra;
@@ -167,7 +167,7 @@ public abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 		final long start = System.currentTimeMillis();
 		try
 		{
-			this.browserInfra = BROWSER_INFRA_FACTORY.getNew(testBrowser.getCapabilityFactory().get(), this.network);
+			this.browserInfra = BROWSER_INFRA_FACTORY.getNew(testBrowser, this.network);
 			this.browserInfra.getVncAddress().ifPresent(a -> LOG.info(">>> VNC: {}", a));
 			this.browserInfra.getNoVncAddress().ifPresent(a -> LOG.info(">>> NoVNC: {}", a));
 			
