@@ -195,7 +195,8 @@ jobs:
           ${{ runner.os }}-mvn-build-
 
     - name: Build site
-      run: ./mvnw -B compile site -DskipTests -T2C
+      # Exclude demo projects to resolve dependency resolution problems
+      run: ./mvnw -B compile site -pl '!advanced-demo,!base-demo' -DskipTests -T2C
 
     - name: Aggregate site
       run: |

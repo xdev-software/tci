@@ -1,3 +1,12 @@
+# 4.1.0
+* `selenium`
+  * Prevent devs/users from supplying different capabilities for the same browser causing inconsistent behavior
+    * `BrowsersTCIFactory` is now typed to `CapabilityFactory`
+      * `TestBrowser` now implements `CapabilityFactory`
+    * `BrowsersTCIFactory#getNew` now throws an error if the requested `CapabilityFactory` was not registered during initialization
+    * Replaced `new BrowsersTCIFactory()` with `BrowsersTCIFactory.createDefault()`
+  * Added docs that Chromium based browser do not support (insecure) downloads (Chrome removed the flag to enable this in 2024)
+
 # 4.0.1
 * Fix selenium 4.46 crash when bidi is enabled
 

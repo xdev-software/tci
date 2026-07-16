@@ -207,15 +207,6 @@ public abstract class BaseTCIFactory<
 		this.getNewAttempts = attempts;
 	}
 	
-	/**
-	 * @deprecated Use {@link #setGetNewAttempts(int)} instead
-	 */
-	@Deprecated
-	public void setGetNewTryCount(final int attempts)
-	{
-		this.setGetNewAttempts(attempts);
-	}
-	
 	protected Logger log()
 	{
 		return this.logger;

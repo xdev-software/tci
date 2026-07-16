@@ -23,7 +23,10 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 
 
-public enum TestBrowser
+/**
+ * This is a convenient default implementation for {@link CapabilityFactory}.
+ */
+public enum TestBrowser implements CapabilityFactory
 {
 	FIREFOX(() -> {
 		final FirefoxOptions options = new FirefoxOptions();
@@ -37,6 +40,26 @@ public enum TestBrowser
 		
 		return options;
 	}),
+	// @formatter:off - Link will get cut off
+	/**
+	 * NOTE: Chrome does not support downloads from insecure (non-HTTPS) locations.
+	 * <p>
+	 * Support for this was removed in <a
+	 * href="https://github.com/chromium/chromium/commit/9606bbe9acda26fdae5b4c407b47a9d98e593464">9606bbe</a> and no
+	 * replacement added ever again.
+	 * <p>
+	 * To make the confusion perfect: Some files can always be downloaded - disregarding if secure or not - because <a
+	 * href="https://github.com/chromium/chromium/blob/962086dbf5a0e90475108a7293443deaef6cc7a3/chrome/browser/download/insecure_download_blocking.cc#L85-L87">
+	 * there is a hardcoded list of allowed file extensions</a>.
+	 * <p>
+	 * As a workaround it's possible to specify <code>--unsafely-treat-insecure-origin-as-secure=http://webapp</code>
+	 * HOWEVER this will declare the entire site as "secure" which can have unintended side effects
+	 * <p>
+	 * It's recommended to NOT use Chrome to execute downloads.
+	 * <p>
+	 * See also: <a href="https://stackoverflow.com/q/78057740">StackOverflow#78057740</a>
+	 */
+	// @formatter:on
 	CHROME(ChromeOptions::new);
 	
 	private final Supplier<MutableCapabilities> capabilityFactory;
@@ -46,8 +69,9 @@ public enum TestBrowser
 		this.capabilityFactory = driverFactory;
 	}
 	
-	public Supplier<MutableCapabilities> getCapabilityFactory()
+	@Override
+	public MutableCapabilities createCapabilities()
 	{
-		return this.capabilityFactory;
+		return this.capabilityFactory.get();
 	}
 }

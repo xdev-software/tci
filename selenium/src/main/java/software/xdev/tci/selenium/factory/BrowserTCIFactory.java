@@ -85,7 +85,7 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 			.withDeactivateCDPIfPossible(config.deactivateCdpIfPossible())
 			.withClientConfig(ClientConfig.defaultConfig()
 				.readTimeout(Duration.ofSeconds(60 + cpuSlownessFactor() * 10L)))
-			.withWebDriverRetryCount(Math.max(Math.min(cpuSlownessFactor(), 5), 1))
+			.withWebDriverRetryCount(Math.clamp(cpuSlownessFactor(), 1, 5))
 			.withWebDriverRetrySec(25 + cpuSlownessFactor() * 5)
 			.withBrowserConsoleLog(
 				logBrowserConsoleConsumer(config.minBrowserConsoleLogLevel()),
@@ -184,7 +184,7 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 	
 	protected void pullRecordingContainerOnWarmUpAsync()
 	{
-		if(this.pullVideoRecordingContainerOnWarmUp)
+		if(this.pullVideoRecordingContainerOnWarmUp && !warmupRecordingContainerPullStarted)
 		{
 			pullRecordingContainerOnWarmUpAsyncDefault();
 		}
