@@ -176,25 +176,7 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 		@SuppressWarnings("java:S2095") // Handled by Selenium when quit is called
 		final HttpClient client = factory.createClient(config);
 		
-		final HttpCommandExecutor commandExecutor = new HttpCommandExecutor(
-			Map.of(),
-			config,
-			// Constructor without factory does not exist...
-			ignored -> client)
-		{
-			// See https://github.com/SeleniumHQ/selenium/issues/17782
-			@Override
-			public Response execute(final Command command) throws IOException
-			{
-				final Response response = super.execute(command);
-				if(DriverCommand.NEW_SESSION.equals(command.getName())
-					&& response.getValue() instanceof final Map<?, ?> responseValues)
-				{
-					BrowserTCI.this.modifyNewSessionResponseValues(responseValues);
-				}
-				return response;
-			}
-		};
+		final HttpCommandExecutor commandExecutor = this.createCommandExecutor(config, client);
 		
 		try
 		{
@@ -234,6 +216,29 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 			
 			throw rex;
 		}
+	}
+	
+	protected HttpCommandExecutor createCommandExecutor(final ClientConfig config, final HttpClient client)
+	{
+		return new HttpCommandExecutor(
+			Map.of(),
+			config,
+			// Constructor without factory does not exist...
+			ignored -> client)
+		{
+			// See https://github.com/SeleniumHQ/selenium/issues/17782
+			@Override
+			public Response execute(final Command command) throws IOException
+			{
+				final Response response = super.execute(command);
+				if(DriverCommand.NEW_SESSION.equals(command.getName())
+					&& response.getValue() instanceof final Map<?, ?> responseValues)
+				{
+					BrowserTCI.this.modifyNewSessionResponseValues(responseValues);
+				}
+				return response;
+			}
+		};
 	}
 	
 	protected void modifyCapsDisableCDP()
