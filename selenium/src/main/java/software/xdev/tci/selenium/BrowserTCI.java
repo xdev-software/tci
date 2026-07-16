@@ -259,6 +259,10 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 		}
 	}
 	
+	/**
+	 * @deprecated This is no longer needed because {@link #modifyCapsDisableCDP()} is already sufficient
+	 */
+	@Deprecated(since = "4.0.1")
 	@SuppressWarnings({"rawtypes"})
 	protected void disableCDP(final Map responseValues)
 	{
@@ -300,7 +304,7 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 	 *
 	 * @deprecated Update Selenium to 4.46+
 	 */
-	@Deprecated(since = "4.0.0")
+	@Deprecated(since = "4.0.1")
 	protected RemoteWebDriver augment(final RemoteWebDriver driver)
 	{
 		final Augmenter augmenter = new Augmenter();
