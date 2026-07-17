@@ -9,7 +9,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 import software.xdev.tci.imagebuild.BuildImage;
 import software.xdev.tci.jacoco.testbase.config.JaCoCoConfig;
-import software.xdev.testcontainers.imagebuilder.compat.DockerfileCOPYParentsEmulator;
 import software.xdev.testcontainers.imagebuilder.transfer.fcm.FileLinesContentModifier;
 
 
@@ -53,7 +52,6 @@ public final class WebAppContainerBuilder
 							"target")
 						// File is in root directory - we can't access it
 						.withBaseDirRelativeIgnoreFile(null)
-						.withDockerFileLinesModifier(new DockerfileCOPYParentsEmulator())
 						.withTransferArchiveTARCompressorCustomizer(c -> c
 							// Rewrite parent pom to exclude integration tests
 							// This way changes in test pom's cause no redownload of dependencies
