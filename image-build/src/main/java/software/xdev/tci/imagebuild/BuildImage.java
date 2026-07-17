@@ -25,12 +25,28 @@ import software.xdev.testcontainers.imagebuilder.buildxnative.NativeAdvancedImag
 
 public final class BuildImage
 {
+	public static final Duration DEFAULT_TIMEOUT = Duration.ofMinutes(5);
+	
+	public static String nativeImage(
+		final String dockerImage,
+		final UnaryOperator<NativeAdvancedImageFromDockerfile> configure)
+	{
+		return nativeImage(dockerImage, DEFAULT_TIMEOUT, configure);
+	}
+	
 	public static String nativeImage(
 		final String dockerImage,
 		final Duration timeout,
 		final UnaryOperator<NativeAdvancedImageFromDockerfile> configure)
 	{
 		return impl().nativeImage(dockerImage, timeout, configure);
+	}
+	
+	public static String image(
+		final String dockerImage,
+		final UnaryOperator<AdvancedImageFromDockerFile> configure)
+	{
+		return image(dockerImage, DEFAULT_TIMEOUT, configure);
 	}
 	
 	public static String image(

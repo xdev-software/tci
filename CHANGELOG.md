@@ -1,3 +1,7 @@
+# 4.1.1
+* `image-build`
+  * Add shortcut methods to `BuildImage`
+
 # 4.1.0
 * `selenium`
   * Prevent devs/users from supplying different capabilities for the same browser causing inconsistent behavior
