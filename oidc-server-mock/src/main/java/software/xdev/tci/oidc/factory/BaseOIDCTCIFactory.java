@@ -20,8 +20,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.apache.hc.core5.http.HttpStatus;
-
 import software.xdev.tci.envperf.EnvironmentPerformance;
 import software.xdev.tci.factory.prestart.PreStartableTCIFactory;
 import software.xdev.tci.factory.prestart.config.PreStartConfig;
@@ -38,7 +36,7 @@ import software.xdev.tci.startup.wait.strategy.HttpWaitAbortableStrategy;
 public abstract class BaseOIDCTCIFactory<
 	SELF extends BaseOIDCTCIFactory<SELF, C, I>,
 	C extends BaseOIDCServerContainer<C>,
-	I extends BaseOIDCTCI<?, C>>
+	I extends BaseOIDCTCI<?, C, ?>>
 	extends PreStartableTCIFactory<C, I>
 {
 	protected static final String DEFAULT_CONTAINER_LOGGER_NAME = "container.oidc";
@@ -104,7 +102,7 @@ public abstract class BaseOIDCTCIFactory<
 					new HttpWaitAbortableStrategy()
 						.forPort(BaseOIDCServerContainer.PORT)
 						.forPath("/")
-						.forStatusCode(HttpStatus.SC_OK)
+						.forStatusCode(200)
 						.withReadTimeout(Duration.ofSeconds(10))
 				))
 			);

@@ -1,0 +1,243 @@
+package software.xdev.tci.oidc.api.jackson;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import software.xdev.tci.oidc.api.HttpClientBasedOIDCServerMockApi;
+import tools.jackson.databind.json.JsonMapper;
+
+
+public class JacksonOIDCServerMockApi extends HttpClientBasedOIDCServerMockApi
+{
+	protected static final JsonMapper DEFAULT_MAPPER = new JsonMapper();
+	
+	public JacksonOIDCServerMockApi(final String externalHttpBaseEndPoint)
+	{
+		super(externalHttpBaseEndPoint);
+	}
+	
+	protected JsonMapper jsonMapper()
+	{
+		return DEFAULT_MAPPER;
+	}
+	
+	@Override
+	public String addUser(final String email, final String name, final String pw)
+	{
+		return this.userBuilder()
+			.username(name)
+			.pw(pw)
+			.claims(c -> c
+				.addString("email", email)
+				.addString("name", name))
+			.createNew()
+			.subjectId();
+	}
+	
+	public String addUser(final User user)
+	{
+		this.apiAddUser(this.jsonMapper().writeValueAsString(user));
+		return user.subjectId();
+	}
+	
+	public void replaceUser(final User user)
+	{
+		this.apiReplaceUser(this.jsonMapper().writeValueAsString(user));
+	}
+	
+	public boolean deleteUser(final User user)
+	{
+		return this.apiDeleteUser(user.subjectId());
+	}
+	
+	public UserBuilder userBuilder()
+	{
+		return new UserBuilder(this);
+	}
+	
+	public static class UserBuilder
+	{
+		protected final JacksonOIDCServerMockApi api;
+		
+		protected String subjectId;
+		protected String username;
+		protected String pw;
+		protected List<Claim> claims = new ArrayList<>();
+		
+		public UserBuilder(final JacksonOIDCServerMockApi api)
+		{
+			this.api = api;
+		}
+		
+		public UserBuilder copyFrom(final User user)
+		{
+			return this.subjectId(user.subjectId())
+				.username(user.username())
+				.pw(user.pw())
+				.claims(user.claims());
+		}
+		
+		public UserBuilder subjectId(final String subjectId)
+		{
+			this.subjectId = subjectId;
+			return this;
+		}
+		
+		public UserBuilder username(final String username)
+		{
+			this.username = username;
+			return this;
+		}
+		
+		public UserBuilder pw(final String pw)
+		{
+			this.pw = pw;
+			return this;
+		}
+		
+		public UserBuilder claims(final List<Claim> claims)
+		{
+			this.claims.clear();
+			this.claims.addAll(claims);
+			return this;
+		}
+		
+		public UserBuilder claims(final Consumer<ClaimsBuilder> consumer)
+		{
+			consumer.accept(new ClaimsBuilder(this.api.jsonMapper(), this.claims));
+			return this;
+		}
+		
+		public User createNew()
+		{
+			final User user = new User(
+				this.api.nextSubjectId(),
+				this.username,
+				this.pw,
+				this.claims);
+			
+			this.api.addUser(user);
+			return user;
+		}
+		
+		public User update()
+		{
+			final User user = new User(
+				this.subjectId,
+				this.username,
+				this.pw,
+				this.claims);
+			
+			this.api.replaceUser(user);
+			return user;
+		}
+		
+		public boolean delete()
+		{
+			return this.api.deleteUser(this.subjectId);
+		}
+	}
+	
+	
+	public static class ClaimsBuilder
+	{
+		protected final JsonMapper jsonMapper;
+		protected final List<Claim> claims;
+		
+		public ClaimsBuilder(final JsonMapper jsonMapper, final List<Claim> claims)
+		{
+			this.jsonMapper = jsonMapper;
+			this.claims = claims;
+		}
+		
+		public ClaimsBuilder clear()
+		{
+			this.claims.clear();
+			return this;
+		}
+		
+		public ClaimsBuilder add(final Claim claim)
+		{
+			this.claims.add(claim);
+			return this;
+		}
+		
+		public ClaimsBuilder addString(final String type, final String value)
+		{
+			return this.add(Claim.string(type, value));
+		}
+		
+		public ClaimsBuilder addJsonArrayFromNativeStrings(
+			final String type,
+			final Collection<String> value)
+		{
+			return this.add(Claim.jsonArrayFromNativeStrings(type, value));
+		}
+		
+		public <T> ClaimsBuilder addJsonArray(
+			final String type,
+			final Collection<T> value)
+		{
+			return this.add(Claim.jsonArray(this.jsonMapper, type, value));
+		}
+	}
+	
+	
+	public record User(
+		@JsonProperty("SubjectId")
+		String subjectId,
+		@JsonProperty("Username")
+		String username,
+		@JsonProperty("Password")
+		String pw,
+		@JsonProperty("Claims")
+		List<Claim> claims
+	)
+	{
+	}
+	
+	
+	public record Claim(
+		@JsonProperty("Type")
+		String type,
+		@JsonProperty("Value")
+		String value,
+		@JsonProperty("ValueType")
+		String valueType
+	)
+	{
+		public static Claim string(final String type, final String value)
+		{
+			return new Claim(type, value, "string");
+		}
+		
+		public static Claim jsonArrayFromNativeStrings(
+			final String type,
+			final Collection<String> value)
+		{
+			return new Claim(
+				type, "["
+				+ value.stream()
+				.map(s -> "\"" + s + "\"")
+				.collect(Collectors.joining(", "))
+				+ "]",
+				"json");
+		}
+		
+		public static <T> Claim jsonArray(
+			final JsonMapper jsonMapper,
+			final String type,
+			final Collection<T> value)
+		{
+			return new Claim(
+				type,
+				jsonMapper.writeValueAsString(value),
+				"json");
+		}
+	}
+}

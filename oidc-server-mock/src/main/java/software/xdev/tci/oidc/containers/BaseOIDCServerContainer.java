@@ -28,7 +28,7 @@ public abstract class BaseOIDCServerContainer<C extends BaseOIDCServerContainer<
 	public static final int PORT = 8080;
 	
 	public static final DockerImageName DEFAULT_IMAGE =
-		DockerImageName.parse("xdevsoftware/oidc-server-mock:1.2");
+		DockerImageName.parse("xdevsoftware/oidc-server-mock:1.3");
 	
 	public static final String DEFAULT_CLIENT_ID = "client-id1";
 	public static final String DEFAULT_CLIENT_SECRET = "client-secret1";

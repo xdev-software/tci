@@ -15,13 +15,17 @@
  */
 package software.xdev.tci.oidc;
 
+import software.xdev.tci.oidc.api.simple.SimpleOIDCServerMockApi;
 import software.xdev.tci.oidc.containers.OIDCServerContainer;
 
 
-public class OIDCTCI extends BaseOIDCTCI<OIDCTCI, OIDCServerContainer>
+public class OIDCTCI extends BaseOIDCTCI<OIDCTCI, OIDCServerContainer, SimpleOIDCServerMockApi>
 {
 	public OIDCTCI(final OIDCServerContainer container, final String networkAlias)
 	{
-		super(container, networkAlias);
+		super(
+			container,
+			networkAlias,
+			tci -> new SimpleOIDCServerMockApi(tci.getExternalHttpBaseEndPoint()));
 	}
 }
