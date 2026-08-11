@@ -86,7 +86,7 @@ public abstract class BaseOIDCTCI<
 	
 	protected void addDefaultUser()
 	{
-		this.api().addUser(this.getDefaultUserEmail(), this.getDefaultUserName(), this.getDefaultUserPassword());
+		this.getApi().addUser(this.getDefaultUserEmail(), this.getDefaultUserName(), this.getDefaultUserPassword());
 	}
 	
 	@Override
@@ -165,7 +165,7 @@ public abstract class BaseOIDCTCI<
 		}
 	}
 	
-	public A api()
+	public A getApi()
 	{
 		return this.api;
 	}

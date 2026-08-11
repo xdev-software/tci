@@ -15,13 +15,10 @@
  */
 package software.xdev.tci.oidc.api.jackson;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import software.xdev.tci.oidc.api.HttpClientBasedOIDCServerMockApi;
 import tools.jackson.databind.json.JsonMapper;
@@ -54,18 +51,18 @@ public class JacksonOIDCServerMockApi extends HttpClientBasedOIDCServerMockApi
 			.subjectId();
 	}
 	
-	public String addUser(final User user)
+	public String addUser(final OIDCMockUser user)
 	{
 		this.apiAddUser(this.jsonMapper().writeValueAsString(user));
 		return user.subjectId();
 	}
 	
-	public void replaceUser(final User user)
+	public void replaceUser(final OIDCMockUser user)
 	{
 		this.apiReplaceUser(this.jsonMapper().writeValueAsString(user));
 	}
 	
-	public boolean deleteUser(final User user)
+	public boolean deleteUser(final OIDCMockUser user)
 	{
 		return this.apiDeleteUser(user.subjectId());
 	}
@@ -82,14 +79,14 @@ public class JacksonOIDCServerMockApi extends HttpClientBasedOIDCServerMockApi
 		protected String subjectId;
 		protected String username;
 		protected String pw;
-		protected List<Claim> claims = new ArrayList<>();
+		protected LinkedHashMap<String, OIDCMockClaim> claims = new LinkedHashMap<>();
 		
 		public UserBuilder(final JacksonOIDCServerMockApi api)
 		{
 			this.api = api;
 		}
 		
-		public UserBuilder copyFrom(final User user)
+		public UserBuilder copyFrom(final OIDCMockUser user)
 		{
 			return this.subjectId(user.subjectId())
 				.username(user.username())
@@ -115,10 +112,10 @@ public class JacksonOIDCServerMockApi extends HttpClientBasedOIDCServerMockApi
 			return this;
 		}
 		
-		public UserBuilder claims(final List<Claim> claims)
+		public UserBuilder claims(final Collection<OIDCMockClaim> claims)
 		{
 			this.claims.clear();
-			this.claims.addAll(claims);
+			claims.forEach(c -> this.claims.put(c.type(), c));
 			return this;
 		}
 		
@@ -128,25 +125,30 @@ public class JacksonOIDCServerMockApi extends HttpClientBasedOIDCServerMockApi
 			return this;
 		}
 		
-		public User createNew()
+		protected List<OIDCMockClaim> getClaims()
 		{
-			final User user = new User(
+			return List.copyOf(this.claims.values());
+		}
+		
+		public OIDCMockUser createNew()
+		{
+			final OIDCMockUser user = new OIDCMockUser(
 				this.api.nextSubjectId(),
 				this.username,
 				this.pw,
-				this.claims);
+				this.getClaims());
 			
 			this.api.addUser(user);
 			return user;
 		}
 		
-		public User update()
+		public OIDCMockUser update()
 		{
-			final User user = new User(
+			final OIDCMockUser user = new OIDCMockUser(
 				this.subjectId,
 				this.username,
 				this.pw,
-				this.claims);
+				this.getClaims());
 			
 			this.api.replaceUser(user);
 			return user;
@@ -162,9 +164,9 @@ public class JacksonOIDCServerMockApi extends HttpClientBasedOIDCServerMockApi
 	public static class ClaimsBuilder
 	{
 		protected final JsonMapper jsonMapper;
-		protected final List<Claim> claims;
+		protected final LinkedHashMap<String, OIDCMockClaim> claims;
 		
-		public ClaimsBuilder(final JsonMapper jsonMapper, final List<Claim> claims)
+		public ClaimsBuilder(final JsonMapper jsonMapper, final LinkedHashMap<String, OIDCMockClaim> claims)
 		{
 			this.jsonMapper = jsonMapper;
 			this.claims = claims;
@@ -176,83 +178,40 @@ public class JacksonOIDCServerMockApi extends HttpClientBasedOIDCServerMockApi
 			return this;
 		}
 		
-		public ClaimsBuilder add(final Claim claim)
+		public ClaimsBuilder remove(final OIDCMockClaim claim)
 		{
-			this.claims.add(claim);
+			return this.remove(claim.type());
+		}
+		
+		public ClaimsBuilder remove(final String type)
+		{
+			this.claims.remove(type);
+			return this;
+		}
+		
+		public ClaimsBuilder add(final OIDCMockClaim claim)
+		{
+			this.claims.put(claim.type(), claim);
 			return this;
 		}
 		
 		public ClaimsBuilder addString(final String type, final String value)
 		{
-			return this.add(Claim.string(type, value));
+			return this.add(OIDCMockClaim.string(type, value));
 		}
 		
 		public ClaimsBuilder addJsonArrayFromNativeStrings(
 			final String type,
 			final Collection<String> value)
 		{
-			return this.add(Claim.jsonArrayFromNativeStrings(type, value));
+			return this.add(OIDCMockClaim.jsonArrayFromNativeStrings(type, value));
 		}
 		
 		public <T> ClaimsBuilder addJsonArray(
 			final String type,
 			final Collection<T> value)
 		{
-			return this.add(Claim.jsonArray(this.jsonMapper, type, value));
-		}
-	}
-	
-	
-	public record User(
-		@JsonProperty("SubjectId")
-		String subjectId,
-		@JsonProperty("Username")
-		String username,
-		@JsonProperty("Password")
-		String pw,
-		@JsonProperty("Claims")
-		List<Claim> claims
-	)
-	{
-	}
-	
-	
-	public record Claim(
-		@JsonProperty("Type")
-		String type,
-		@JsonProperty("Value")
-		String value,
-		@JsonProperty("ValueType")
-		String valueType
-	)
-	{
-		public static Claim string(final String type, final String value)
-		{
-			return new Claim(type, value, "string");
-		}
-		
-		public static Claim jsonArrayFromNativeStrings(
-			final String type,
-			final Collection<String> value)
-		{
-			return new Claim(
-				type, "["
-				+ value.stream()
-				.map(s -> "\"" + s + "\"")
-				.collect(Collectors.joining(", "))
-				+ "]",
-				"json");
-		}
-		
-		public static <T> Claim jsonArray(
-			final JsonMapper jsonMapper,
-			final String type,
-			final Collection<T> value)
-		{
-			return new Claim(
-				type,
-				jsonMapper.writeValueAsString(value),
-				"json");
+			return this.add(OIDCMockClaim.jsonArray(this.jsonMapper, type, value));
 		}
 	}
 }
