@@ -22,7 +22,7 @@ public interface IntegrationTestDefaults<SELF extends BaseTest>
 	
 	default void navigateToOIDCLoginPage()
 	{
-		this.navigateTo("login");
+		this.navigateToAndWaitForDocumentReady("login");
 		this.waitUntil(d -> d.findElement(By.xpath("//a[@href='/oauth2/authorization/local']")))
 			.click();
 		this.waitUntil(ExpectedConditions.urlContains(this.self().oidcInfra().getInternalHttpBaseEndPoint()));
@@ -47,7 +47,7 @@ public interface IntegrationTestDefaults<SELF extends BaseTest>
 	
 	default void navigateToLogout()
 	{
-		this.navigateTo("logout");
+		this.navigateToAndWaitForDocumentReady("logout");
 	}
 	
 	default void logout()
@@ -60,14 +60,28 @@ public interface IntegrationTestDefaults<SELF extends BaseTest>
 	
 	default void navigateTo(final String... additionalPathSegments)
 	{
-		this.self().getWebDriver().get(this.self().getWebAppBaseUrl()
-			+ (additionalPathSegments.length > 0 ? ("/" + String.join("/", additionalPathSegments)) : ""));
-		
+		this.navigateToAndWaitForDocumentReady(additionalPathSegments);
+	}
+	
+	default void navigateToAndWaitForDocumentReady(final String... additionalPathSegments)
+	{
+		this.navigateToWithoutWait(additionalPathSegments);
+		this.waitForDocumentReady();
+	}
+	
+	default void waitForDocumentReady()
+	{
 		// Wait for the document to load fully
 		this.waitUntil(
 			d -> Objects.equals(
 				((JavascriptExecutor)d).executeScript("return document.readyState"),
 				"complete"));
+	}
+	
+	default void navigateToWithoutWait(final String... additionalPathSegments)
+	{
+		this.self().getWebDriver().get(this.self().getWebAppBaseUrl()
+			+ (additionalPathSegments.length > 0 ? ("/" + String.join("/", additionalPathSegments)) : ""));
 	}
 	
 	default void checkForMainPage()

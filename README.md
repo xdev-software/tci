@@ -29,6 +29,8 @@ Modules for XDEV's Testcontainer Infrastructure Framework
   * Logging Adapter to redirect JUL to SLF4J
 * [junit-jupiter-api-support](./junit-jupiter-api-support/)
   * Support for JUnit 5+ (Jupiter) API
+* [mailpit](./mailpit/)
+  * Predefined implementation for [Mailpit](https://github.com/axllent/mailpit)
 * [mockserver](./mockserver/)
   * Predefined implementation for [Mockserver](https://github.com/xdev-software/mockserver-neolight)
 * [oidc-server-mock](./oidc-server-mock/)
@@ -56,7 +58,7 @@ You can also have a look at the corresponding modules for usage instructions.
 [Installation guide for the latest release](https://github.com/xdev-software/tci/releases/latest#Installation)
 
 ## Support
-If you need support as soon as possible and you can't wait for any pull request, feel free to use [our support](https://xdev.software/en/services/support).
+If you need support as soon as possible and you can't wait for any pull request, feel free to use [our support](https://xdev.software/en/services-products/support).
 
 ## Contributing
 See the [contributing guide](./CONTRIBUTING.md) for detailed instructions on how to get started with our project.

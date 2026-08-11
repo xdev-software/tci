@@ -15,44 +15,35 @@
  */
 package software.xdev.tci.oidc;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.UUID;
+import java.util.Objects;
+import java.util.function.Function;
 
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.config.ConnectionConfig;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
-import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpHeaders;
-import org.apache.hc.core5.http.HttpStatus;
-import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.apache.hc.core5.util.Timeout;
 import org.rnorth.ducttape.unreliables.Unreliables;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import software.xdev.tci.TCI;
 import software.xdev.tci.envperf.EnvironmentPerformance;
+import software.xdev.tci.oidc.api.OIDCServerMockApi;
 import software.xdev.tci.oidc.containers.BaseOIDCServerContainer;
-import software.xdev.tci.oidc.containers.OIDCServerContainer;
 
 
 @SuppressWarnings("java:S119")
 public abstract class BaseOIDCTCI<
-	SELF extends BaseOIDCTCI<SELF, C>,
-	C extends BaseOIDCServerContainer<C>>
+	SELF extends BaseOIDCTCI<SELF, C, A>,
+	C extends BaseOIDCServerContainer<C>,
+	A extends OIDCServerMockApi>
 	extends TCI<C>
 {
-	protected static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);
+	private static final Logger LOG = LoggerFactory.getLogger(BaseOIDCTCI.class);
 	
-	public static final String CLIENT_ID = OIDCServerContainer.DEFAULT_CLIENT_ID;
-	public static final String CLIENT_SECRET = OIDCServerContainer.DEFAULT_CLIENT_SECRET;
+	public static final String CLIENT_ID = BaseOIDCServerContainer.DEFAULT_CLIENT_ID;
+	public static final String CLIENT_SECRET = BaseOIDCServerContainer.DEFAULT_CLIENT_SECRET;
 	
 	public static final String DEFAULT_DOMAIN = "example.local";
 	
@@ -60,47 +51,88 @@ public abstract class BaseOIDCTCI<
 	public static final String DEFAULT_USER_NAME = "Testuser";
 	public static final String DEFAULT_USER_PASSWORD = "pwd";
 	
-	protected boolean shouldAddDefaultUser = true;
-	protected String defaultUserEmail = DEFAULT_USER_EMAIL;
-	protected String defaultUserName = DEFAULT_USER_NAME;
-	protected String defaultUserPassword = DEFAULT_USER_PASSWORD;
+	protected final Function<SELF, A> apiCreator;
 	
-	protected BaseOIDCTCI(final C container, final String networkAlias)
+	protected A api;
+	
+	protected boolean createDefaultUser = true;
+	protected String defaultUserEmail;
+	protected String defaultUserName;
+	protected String defaultUserPassword;
+	
+	protected BaseOIDCTCI(
+		final C container,
+		final String networkAlias,
+		final Function<SELF, A> apiCreator)
 	{
 		super(container, networkAlias);
+		this.apiCreator = apiCreator;
 	}
 	
 	@Override
 	public void start(final String containerName)
 	{
 		super.start(containerName);
-		if(this.shouldAddDefaultUser)
+		this.api = this.apiCreator.apply(this.self());
+		if(this.createDefaultUser)
 		{
-			this.addUser(this.getDefaultUserEmail(), this.getDefaultUserName(), this.getDefaultUserPassword());
+			this.addDefaultUser();
 		}
 		
 		// Warm up; Otherwise slow initial response may cause a timeout during tests
 		this.warmUpWellKnownJWKsEndpoint();
 	}
 	
+	protected void addDefaultUser()
+	{
+		this.getApi().addUser(this.getDefaultUserEmail(), this.getDefaultUserName(), this.getDefaultUserPassword());
+	}
+	
+	@Override
+	public void stop()
+	{
+		this.closeAndFreeAPI();
+		
+		super.stop();
+	}
+	
+	protected void closeAndFreeAPI()
+	{
+		if(this.api != null)
+		{
+			if(this.api instanceof final AutoCloseable autoCloseableApi)
+			{
+				try
+				{
+					autoCloseableApi.close();
+				}
+				catch(final Exception ex)
+				{
+					LOG.warn("Failed to close API", ex);
+				}
+			}
+			this.api = null;
+		}
+	}
+	
 	public String getDefaultUserEmail()
 	{
-		return this.defaultUserEmail;
+		return Objects.requireNonNullElse(this.defaultUserEmail, DEFAULT_USER_EMAIL);
 	}
 	
 	public String getDefaultUserName()
 	{
-		return this.defaultUserName;
+		return Objects.requireNonNullElse(this.defaultUserName, DEFAULT_USER_NAME);
 	}
 	
 	public String getDefaultUserPassword()
 	{
-		return this.defaultUserPassword;
+		return Objects.requireNonNullElse(this.defaultUserPassword, DEFAULT_USER_PASSWORD);
 	}
 	
 	public static String getInternalHttpBaseEndPoint(final String networkAlias)
 	{
-		return "http://" + networkAlias + ":" + OIDCServerContainer.PORT;
+		return "http://" + networkAlias + ":" + BaseOIDCServerContainer.PORT;
 	}
 	
 	public String getInternalHttpBaseEndPoint()
@@ -116,13 +148,13 @@ public abstract class BaseOIDCTCI<
 	public void warmUpWellKnownJWKsEndpoint()
 	{
 		final int slownessFactor = EnvironmentPerformance.cpuSlownessFactor();
-		try(final HttpClient httpClient = HttpClient.newBuilder()
+		try(final HttpClient warmUpHttpClient = HttpClient.newBuilder()
 			.connectTimeout(Duration.ofSeconds(1L + slownessFactor))
 			.build())
 		{
 			Unreliables.retryUntilSuccess(
 				5 + slownessFactor,
-				() -> httpClient.send(
+				() -> warmUpHttpClient.send(
 					HttpRequest.newBuilder(URI.create(
 							this.getExternalHttpBaseEndPoint() + "/.well-known/openid-configuration/jwks"))
 						.timeout(Duration.ofSeconds(10L + slownessFactor * 5L))
@@ -132,86 +164,16 @@ public abstract class BaseOIDCTCI<
 		}
 	}
 	
-	public void addUser(
-		final String email,
-		final String name,
-		final String pw)
+	public A getApi()
 	{
-		this.apiAddUser(this.createDefaultBodyForAddUser(email, name, pw));
-	}
-	
-	protected void apiAddUser(final String jsonBody)
-	{
-		try(final CloseableHttpClient client = this.createDefaultHttpClient())
-		{
-			final HttpPost post = new HttpPost(this.getContainer().getExternalHttpBaseEndPoint() + "/api/v1/user");
-			post.setEntity(new StringEntity(jsonBody));
-			post.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
-			post.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-			
-			final ClassicHttpResponse response = client.execute(post, r -> r);
-			if(response.getCode() != HttpStatus.SC_OK)
-			{
-				throw new IllegalStateException("Unable to create user; Expected statuscode 200 but got "
-					+ response.getCode()
-					+ "; Reason: " + response.getReasonPhrase());
-			}
-		}
-		catch(final IOException ioe)
-		{
-			throw new UncheckedIOException(ioe);
-		}
-	}
-	
-	protected String createDefaultBodyForAddUser(
-		final String email,
-		final String name,
-		final String pw)
-	{
-		return """
-			{
-			  "SubjectId":"%s",
-			  "Username":"%s",
-			  "Password":"%s",
-			  "Claims": [
-			    {
-			      "Type": "name",
-			      "Value": "%s",
-			      "ValueType": "string"
-			    },
-			    {
-			      "Type": "email",
-			      "Value": "%s",
-			      "ValueType": "string"
-			    }
-			  ]
-			}
-			""".formatted(
-			UUID.randomUUID().toString(),
-			email,
-			pw,
-			name,
-			email
-		);
-	}
-	
-	protected CloseableHttpClient createDefaultHttpClient()
-	{
-		return HttpClientBuilder.create()
-			.setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
-				.setDefaultConnectionConfig(ConnectionConfig.custom()
-					.setConnectTimeout(Timeout.of(DEFAULT_TIMEOUT))
-					.setSocketTimeout(Timeout.of(DEFAULT_TIMEOUT))
-					.build())
-				.build())
-			.build();
+		return this.api;
 	}
 	
 	// region Configure
 	
-	protected SELF withShouldAddDefaultUser(final boolean shouldAddDefaultUser)
+	protected SELF withCreateDefaultUser(final boolean createDefaultUser)
 	{
-		this.shouldAddDefaultUser = shouldAddDefaultUser;
+		this.createDefaultUser = createDefaultUser;
 		return this.self();
 	}
 	

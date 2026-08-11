@@ -1,3 +1,13 @@
+# 4.2.0
+* `oidc-server-mock`
+  * Updated to `1.3`
+  * Switched to Java's built-in HttpClient
+  * Extracted API into dedicated class
+  * Added support for proper serialization (using Jackson) with dedicated models and builder
+* `image-build`
+  * Add shortcut methods to `BuildImage`
+* `LazyNetworkPool`: Add `shutdown` method
+
 # 4.1.0
 * `selenium`
   * Prevent devs/users from supplying different capabilities for the same browser causing inconsistent behavior

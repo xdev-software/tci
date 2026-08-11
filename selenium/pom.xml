@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci</groupId>
 	<artifactId>selenium</artifactId>
-	<version>4.1.1-SNAPSHOT</version>
+	<version>4.2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>selenium</name>
@@ -65,18 +65,18 @@
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>base</artifactId>
-			<version>4.1.1-SNAPSHOT</version>
+			<version>4.2.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>jul-to-slf4j</artifactId>
-			<version>4.1.1-SNAPSHOT</version>
+			<version>4.2.0-SNAPSHOT</version>
 		</dependency>
 		<!-- Can be removed once SeleniumRecordingExtension is gone -->
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>junit-jupiter-api-support</artifactId>
-			<version>4.1.1-SNAPSHOT</version>
+			<version>4.2.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -130,7 +130,7 @@
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>5.0.0</version>
+				<version>5.1.1</version>
 				<configuration>
 					<properties>
 						<email>${project.organization.url}</email>
@@ -228,7 +228,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>flatten-maven-plugin</artifactId>
-						<version>1.7.3</version>
+						<version>1.8.0</version>
 						<configuration>
 							<flattenMode>ossrh</flattenMode>
 						</configuration>
@@ -296,7 +296,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>13.8.0</version>
+								<version>13.10.0</version>
 							</dependency>
 						</dependencies>
 						<configuration>
