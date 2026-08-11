@@ -18,7 +18,7 @@ package software.xdev.tci.network;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -34,7 +34,7 @@ import software.xdev.tci.factory.prestart.config.PreStartConfig;
 /**
  * Provides a pool of {@link LazyNetwork}
  */
-public class LazyNetworkPool
+public class LazyNetworkPool implements AutoCloseable
 {
 	private static final Logger LOG = LoggerFactory.getLogger(LazyNetworkPool.class);
 	
@@ -48,7 +48,7 @@ public class LazyNetworkPool
 		.withCheckDuplicate(false);
 	
 	protected final LinkedBlockingQueue<LazyNetwork> queue;
-	protected final Executor executor;
+	protected final ExecutorService executor;
 	
 	/**
 	 * Like {@link #LazyNetworkPool(int)} but uses {@link PreStartConfig} to determine the size
@@ -66,7 +66,7 @@ public class LazyNetworkPool
 				"LazyNetworkPool-" + POOL_COUNTER.getAndIncrement()));
 	}
 	
-	public LazyNetworkPool(final int size, final Executor executor)
+	public LazyNetworkPool(final int size, final ExecutorService executor)
 	{
 		this.queue = size > 0 ? new LinkedBlockingQueue<>(size) : null;
 		this.executor = executor;
@@ -123,5 +123,32 @@ public class LazyNetworkPool
 		this.managePoolAsync();
 		
 		return net;
+	}
+	
+	public void shutdown(final boolean drainQueueAndCloseNetworks)
+	{
+		this.executor.shutdown();
+		
+		if(drainQueueAndCloseNetworks && this.queue != null)
+		{
+			for(final LazyNetwork network : this.queue)
+			{
+				try
+				{
+					network.close();
+				}
+				catch(final Exception ex)
+				{
+					LOG.warn("Failed to close network", ex);
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void close()
+	{
+		// false because Networks will be deleted by Testcontainers ryuk anyway
+		this.shutdown(false);
 	}
 }

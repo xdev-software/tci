@@ -1,23 +1,23 @@
-name: Run Mailpit integration tests
+name: Run OIDC Server Mock integration tests
 
 on:
   workflow_dispatch:
   push:
     branches: [ develop ]
     paths: 
-      - 'mailpit/**'
+      - 'oidc-server-mock/**'
   pull_request:
     branches: [ develop ]
     paths: 
-      - 'mailpit/**'
+      - 'oidc-server-mock/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  mailpit:
+  oidc-server-mock:
     uses: ./.github/workflows/run-module-integration-tests.yml
     with:
-      module: mailpit
+      module: oidc-server-mock
     secrets: inherit

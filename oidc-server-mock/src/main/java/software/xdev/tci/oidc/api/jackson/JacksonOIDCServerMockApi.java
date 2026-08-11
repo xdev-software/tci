@@ -73,6 +73,11 @@ public class JacksonOIDCServerMockApi extends HttpClientBasedOIDCServerMockApi
 		return new UserBuilder(this);
 	}
 	
+	public UserBuilder userBuilder(final OIDCMockUser copyFrom)
+	{
+		return this.userBuilder().copyFrom(copyFrom);
+	}
+	
 	public static class UserBuilder
 	{
 		protected final JacksonOIDCServerMockApi api;
@@ -195,6 +200,16 @@ public class JacksonOIDCServerMockApi extends HttpClientBasedOIDCServerMockApi
 		{
 			this.claims.put(claim.type(), claim);
 			return this;
+		}
+		
+		public ClaimsBuilder addEmail(final String email)
+		{
+			return this.addString("email", email);
+		}
+		
+		public ClaimsBuilder addName(final String name)
+		{
+			return this.addString("name", name);
 		}
 		
 		public ClaimsBuilder addString(final String type, final String value)

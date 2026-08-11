@@ -41,7 +41,6 @@ public abstract class BaseOIDCTCI<
 	extends TCI<C>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BaseOIDCTCI.class);
-	protected static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);
 	
 	public static final String CLIENT_ID = BaseOIDCServerContainer.DEFAULT_CLIENT_ID;
 	public static final String CLIENT_SECRET = BaseOIDCServerContainer.DEFAULT_CLIENT_SECRET;
