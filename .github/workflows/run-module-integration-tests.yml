@@ -8,7 +8,7 @@ on:
         type: string
 
 jobs:
-  mailpit:
+  test:
     runs-on: ubuntu-latest
     if: ${{ !(github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/')) }}
     timeout-minutes: 7
