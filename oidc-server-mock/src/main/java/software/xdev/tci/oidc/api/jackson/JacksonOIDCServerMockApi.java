@@ -18,6 +18,7 @@ package software.xdev.tci.oidc.api.jackson;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import software.xdev.tci.oidc.api.HttpClientBasedOIDCServerMockApi;
@@ -79,7 +80,8 @@ public class JacksonOIDCServerMockApi extends HttpClientBasedOIDCServerMockApi
 		protected String subjectId;
 		protected String username;
 		protected String pw;
-		protected LinkedHashMap<String, OIDCMockClaim> claims = new LinkedHashMap<>();
+		// Keep order -> Use LinkedHashMap
+		protected Map<String, OIDCMockClaim> claims = new LinkedHashMap<>();
 		
 		public UserBuilder(final JacksonOIDCServerMockApi api)
 		{
@@ -164,9 +166,9 @@ public class JacksonOIDCServerMockApi extends HttpClientBasedOIDCServerMockApi
 	public static class ClaimsBuilder
 	{
 		protected final JsonMapper jsonMapper;
-		protected final LinkedHashMap<String, OIDCMockClaim> claims;
+		protected final Map<String, OIDCMockClaim> claims;
 		
-		public ClaimsBuilder(final JsonMapper jsonMapper, final LinkedHashMap<String, OIDCMockClaim> claims)
+		public ClaimsBuilder(final JsonMapper jsonMapper, final Map<String, OIDCMockClaim> claims)
 		{
 			this.jsonMapper = jsonMapper;
 			this.claims = claims;
