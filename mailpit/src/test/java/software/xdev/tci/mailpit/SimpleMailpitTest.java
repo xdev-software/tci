@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package software.xdev.mailpit;
+package software.xdev.tci.mailpit;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +38,6 @@ import software.xdev.mailpit.client.ApiClient;
 import software.xdev.mailpit.model.Message;
 import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.factory.registry.TCIFactoryRegistry;
-import software.xdev.tci.mailpit.MailpitTCI;
 import software.xdev.tci.mailpit.containers.MailpitContainer;
 import software.xdev.tci.mailpit.factory.MailpitTCIFactory;
 import software.xdev.tci.network.LazyNetwork;
@@ -141,5 +140,6 @@ class SimpleMailpitTest
 	static void afterAll()
 	{
 		FACTORY.close();
+		LAZY_NETWORK_POOL.close();
 	}
 }
