@@ -10,7 +10,7 @@
 * `oidc-server-mock`
   * Updated to `1.3`
   * Switched to Java's built-in HttpClient
-  * Extracted API into dedicated class
+  * Extracted API into dedicated classes
   * Added support for proper serialization (using Jackson) with dedicated models and builder
 * `image-build`
   * Add shortcut methods to `BuildImage`
