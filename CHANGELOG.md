@@ -1,3 +1,11 @@
+# 4.3.0
+* `selenium`
+  * Selenium 4.47+ is now required
+  * Ported code to work with Selenium 4.47 #726
+    * Patching of capabilities is now no longer needed and was removed
+    * Removed legacy augmentation
+    * Removed `bidi-enabled` as it's always enabled since 4.46
+
 # 4.2.0
 * `oidc-server-mock`
   * Updated to `1.3`

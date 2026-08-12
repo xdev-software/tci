@@ -50,7 +50,9 @@ class ProductTest extends InfraPerCaseTest
 		
 		final WebElement liveResponseTable = this.waitUntil(d -> d.findElement(By.className("live-responses-table")));
 		// First element contains response body
-		final String responseText = liveResponseTable.findElements(By.className("microlight")).get(0).getText();
+		final String responseText = liveResponseTable.findElements(By.className("microlight")).get(0)
+			// getText sometimes does not work with Chrome (Selenium 4.47)
+			.getAttribute("textContent");
 		// Id should be 2 as another product was created before
 		assertEquals(
 			"""

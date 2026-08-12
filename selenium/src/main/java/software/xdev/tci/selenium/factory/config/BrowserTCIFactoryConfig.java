@@ -29,8 +29,6 @@ public interface BrowserTCIFactoryConfig
 	
 	boolean vncEnabled();
 	
-	boolean bidiEnabled();
-	
 	boolean deactivateCdpIfPossible();
 	
 	BrowserTCIFactory.BrowserConsoleLogLevel minBrowserConsoleLogLevel();

@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.tci</groupId>
 	<artifactId>mailpit</artifactId>
-	<version>4.2.1-SNAPSHOT</version>
+	<version>4.3.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>mailpit</name>
@@ -58,7 +58,7 @@
 		<dependency>
 			<groupId>software.xdev.tci</groupId>
 			<artifactId>base</artifactId>
-			<version>4.2.1-SNAPSHOT</version>
+			<version>4.3.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -91,7 +91,7 @@
 		<dependency>
 			<groupId>org.simplejavamail</groupId>
 			<artifactId>simple-java-mail</artifactId>
-			<version>9.2.0</version>
+			<version>9.3.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

@@ -81,7 +81,6 @@ public class BrowserTCIFactory extends PreStartableTCIFactory<SeleniumBrowserWeb
 		final BrowserTCIFactoryConfig config)
 	{
 		return new BrowserTCI(c, networkAlias, capabilities)
-			.withBidiEnabled(config.bidiEnabled())
 			.withDeactivateCDPIfPossible(config.deactivateCdpIfPossible())
 			.withClientConfig(ClientConfig.defaultConfig()
 				.readTimeout(Duration.ofSeconds(60 + cpuSlownessFactor() * 10L)))
