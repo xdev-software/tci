@@ -64,7 +64,6 @@ public class DefaultBrowserTCIFactoryConfig extends DefaultConfig implements Bro
 	public static final String RECORD_MODE = "record-mode";
 	public static final String RECORD_DIR = "record-dir";
 	public static final String VNC_ENABLED = "vnc-enabled";
-	public static final String BIDI_ENABLED = "bidi-enabled";
 	public static final String DEACTIVATE_CDP_IF_POSSIBLE = "deactivate-cdp-if-possible";
 	public static final String MIN_BROWSER_CONSOLE_LOG_LEVEL = "min-browser-console-log-level";
 	
@@ -131,20 +130,6 @@ public class DefaultBrowserTCIFactoryConfig extends DefaultConfig implements Bro
 			LOG.info("VNC enabled={}", this.vncEnabled);
 		}
 		return this.vncEnabled;
-	}
-	
-	@Override
-	public boolean bidiEnabled()
-	{
-		if(this.bidiEnabled == null)
-		{
-			this.bidiEnabled = this.resolveBool(BIDI_ENABLED)
-				.or(() -> this.resolveBool(LEGACY_BIDI_ENABLED)
-					.map(v -> this.reportLegacyConfigOption(LEGACY_BIDI_ENABLED, BIDI_ENABLED, v)))
-				.orElse(true);
-			LOG.info("BiDi enabled={}", this.bidiEnabled);
-		}
-		return this.bidiEnabled;
 	}
 	
 	@Override
