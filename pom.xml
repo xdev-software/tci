@@ -9,37 +9,38 @@
 	<version>4.4.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<modules>
+		<module>src</module>
+		<module>demos</module>
+	</modules>
+
+	<properties>
+		<javaVersion>17</javaVersion>
+		<maven.compiler.release>${javaVersion}</maven.compiler.release>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<scm>
+		<url>https://github.com/xdev-software/template-placeholder</url>
+		<connection>scm:git:https://github.com/xdev-software/template-placeholder.git</connection>
+	</scm>
+
+	<inceptionYear>2023</inceptionYear>
+
 	<organization>
 		<name>XDEV Software</name>
 		<url>https://xdev.software</url>
 	</organization>
 
-	<modules>
-		<module>bom</module>
-		<module>base</module>
-		<module>db-jdbc</module>
-		<module>db-jdbc-spring-orm</module>
-		<module>db-jdbc-spring-orm-eclipselink</module>
-		<module>db-jdbc-spring-orm-hibernate</module>
-		<module>image-build</module>
-		<module>jacoco</module>
-		<module>jul-to-slf4j</module>
-		<module>junit-jupiter-api-support</module>
-		<module>mailpit</module>
-		<module>mockserver</module>
-		<module>oidc-server-mock</module>
-		<module>selenium</module>
-		<module>spring-dao-support</module>
-
-		<!-- Demo -->
-		<module>base-demo</module>
-		<module>advanced-demo</module>
-	</modules>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
+	<developers>
+		<developer>
+			<name>XDEV Software</name>
+			<organization>XDEV Software</organization>
+			<url>https://xdev.software</url>
+		</developer>
+	</developers>
 
 	<licenses>
 		<license>
@@ -54,13 +55,14 @@
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-site-plugin</artifactId>
-					<version>4.0.0-M16</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-project-info-reports-plugin</artifactId>
-					<version>3.9.0</version>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.16.0</version>
+					<configuration>
+						<release>${maven.compiler.release}</release>
+						<compilerArgs>
+							<arg>-proc:none</arg>
+						</compilerArgs>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
