@@ -1,59 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-<<<<<<<< HEAD:jacoco/pom.xml
-	<groupId>software.xdev.tci</groupId>
-	<artifactId>jacoco</artifactId>
-	<version>4.4.2-SNAPSHOT</version>
-	<packaging>jar</packaging>
-
-	<name>jacoco</name>
-	<description>TCI - jacoco</description>
-	<url>https://github.com/xdev-software/tci</url>
-
-	<scm>
-		<url>https://github.com/xdev-software/tci</url>
-		<connection>scm:git:https://github.com/xdev-software/tci.git</connection>
-	</scm>
-
-	<inceptionYear>2025</inceptionYear>
-
-	<organization>
-		<name>XDEV Software</name>
-		<url>https://xdev.software</url>
-	</organization>
-
-	<developers>
-		<developer>
-			<name>XDEV Software</name>
-			<organization>XDEV Software</organization>
-			<url>https://xdev.software</url>
-		</developer>
-	</developers>
-
-	<licenses>
-		<license>
-			<name>Apache-2.0</name>
-			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
-	<properties>
-		<javaVersion>21</javaVersion>
-		<maven.compiler.release>${javaVersion}</maven.compiler.release>
-
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
-========
 	<parent>
-		<groupId>software.xdev</groupId>
+		<groupId>software.xdev.tci</groupId>
 		<artifactId>root</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>4.2.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>src</artifactId>
@@ -62,15 +16,6 @@
 	<modules>
 		<module>template-placeholder</module>
 	</modules>
->>>>>>>> standard-maven-template/v2-structure-rework:src/pom.xml
-
-	<dependencies>
-		<dependency>
-			<groupId>software.xdev.tci</groupId>
-			<artifactId>base</artifactId>
-			<version>4.4.2-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
 
 	<build>
 		<pluginManagement>
@@ -157,20 +102,6 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-<<<<<<<< HEAD:jacoco/pom.xml
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.16.0</version>
-				<configuration>
-					<release>${maven.compiler.release}</release>
-					<compilerArgs>
-						<arg>-proc:none</arg>
-					</compilerArgs>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-========
->>>>>>>> standard-maven-template/v2-structure-rework:src/pom.xml
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<executions>
 					<execution>
@@ -199,32 +130,10 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.6.0</version>
-			</plugin>
 		</plugins>
 	</build>
 	<profiles>
 		<profile>
-<<<<<<<< HEAD:jacoco/pom.xml
-			<id>ignore-service-loading</id>
-			<build>
-				<resources>
-					<resource>
-						<directory>src/main/resources</directory>
-						<excludes>
-							<exclude>META-INF/services/**</exclude>
-						</excludes>
-					</resource>
-				</resources>
-			</build>
-		</profile>
-		<profile>
-			<id>publish</id>
-========
 			<id>do-not-publish-this</id>
 			<activation>
 				<file>
@@ -298,7 +207,6 @@
 				<license.skip>true</license.skip>
 				<skipTests>true</skipTests>
 			</properties>
->>>>>>>> standard-maven-template/v2-structure-rework:src/pom.xml
 			<build>
 				<plugins>
 					<plugin>
