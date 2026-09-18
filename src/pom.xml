@@ -68,6 +68,12 @@
 					<artifactId>central-publishing-maven-plugin</artifactId>
 					<version>0.11.0</version>
 				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.6.0</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -129,6 +135,10 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
