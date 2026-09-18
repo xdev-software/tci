@@ -14,7 +14,21 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>bom</module>
 		<module>base</module>
+		<module>db-jdbc</module>
+		<module>db-jdbc-spring-orm</module>
+		<module>db-jdbc-spring-orm-eclipselink</module>
+		<module>db-jdbc-spring-orm-hibernate</module>
+		<module>image-build</module>
+		<module>jacoco</module>
+		<module>jul-to-slf4j</module>
+		<module>junit-jupiter-api-support</module>
+		<module>mailpit</module>
+		<module>mockserver</module>
+		<module>oidc-server-mock</module>
+		<module>selenium</module>
+		<module>spring-dao-support</module>
 	</modules>
 
 	<build>

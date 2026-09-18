@@ -15,5 +15,6 @@
 
 	<modules>
 		<module>base-demo</module>
+		<module>advanced-demo</module>
 	</modules>
 </project>
