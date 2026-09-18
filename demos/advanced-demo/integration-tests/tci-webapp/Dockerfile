@@ -49,7 +49,7 @@ RUN ./mvnw --version
 # Copy & Cache poms/dependencies
 COPY --parents **/pom.xml ./
 # Resolve jars so that they can be cached and don't need to be downloaded when a Java file changes
-ARG MAVEN_GO_OFFLINE_COMMAND='./mvnw -B dependency:go-offline -pl webapp -am -Pprod,dev-log -DincludeScope=runtime -T2C'
+ARG MAVEN_GO_OFFLINE_COMMAND='./mvnw -B dependency:go-offline -pl demos/advanced-demo/webapp -am -Pprod,dev-log -DincludeScope=runtime -T2C'
 RUN echo "Executing '$MAVEN_GO_OFFLINE_COMMAND'"
 RUN ${MAVEN_GO_OFFLINE_COMMAND}
 
@@ -63,12 +63,12 @@ RUN git config --global user.email "dynamic@build.local" \
   && git add . \
   && git commit -m "Init commit"
 
-ARG MAVEN_BUILD_COMMAND='./mvnw -B package -pl webapp -am -Pprod,dev-log -T2C -Dmaven.test.skip'
+ARG MAVEN_BUILD_COMMAND='./mvnw -B package -pl demos/advanced-demo/webapp -am -Pprod,dev-log -T2C -Dmaven.test.skip'
 RUN echo "Executing '$MAVEN_BUILD_COMMAND'"
 RUN ${MAVEN_BUILD_COMMAND}
 
 # See also https://docs.spring.io/spring-boot/reference/packaging/container-images/dockerfiles.html for further information
-RUN mv webapp/target/webapp.jar app.jar \
+RUN mv demos/advanced-demo/webapp/target/webapp.jar app.jar \
   && java -Djarmode=tools -jar app.jar extract --layers --destination extracted
 
 
