@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>software.xdev</groupId>
+		<groupId>software.xdev.tci</groupId>
 		<artifactId>src</artifactId>
 		<version>4.4.2-SNAPSHOT</version>
 	</parent>
