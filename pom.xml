@@ -15,7 +15,7 @@
 	</modules>
 
 	<properties>
-		<javaVersion>17</javaVersion>
+		<javaVersion>25</javaVersion>
 		<maven.compiler.release>${javaVersion}</maven.compiler.release>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
