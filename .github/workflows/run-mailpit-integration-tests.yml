@@ -5,11 +5,11 @@ on:
   push:
     branches: [ develop ]
     paths: 
-      - 'mailpit/**'
+      - 'src/mailpit/**'
   pull_request:
     branches: [ develop ]
     paths: 
-      - 'mailpit/**'
+      - 'src/mailpit/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
