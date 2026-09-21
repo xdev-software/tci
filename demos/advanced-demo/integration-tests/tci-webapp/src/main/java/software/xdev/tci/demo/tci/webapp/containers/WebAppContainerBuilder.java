@@ -33,7 +33,6 @@ public final class WebAppContainerBuilder
 							// Ignore other unused folders and extensions
 							".github/**",
 							".config/**",
-							".run/**",
 							".idea/**",
 							".run/**",
 							"*.iml",
