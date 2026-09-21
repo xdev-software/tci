@@ -9,7 +9,7 @@
 	<artifactId>root</artifactId>
 	<version>4.5.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<url>https://github.com/xdev-software/template-placeholder</url>
+	<url>https://github.com/xdev-software/tci</url>
 
 	<modules>
 		<module>src</module>
@@ -28,8 +28,8 @@
 		child.scm.connection.inherit.append.path="false"
 		child.scm.developerConnection.inherit.append.path="false"
 		child.scm.url.inherit.append.path="false">
-		<url>https://github.com/xdev-software/template-placeholder</url>
-		<connection>scm:git:https://github.com/xdev-software/template-placeholder.git</connection>
+		<url>https://github.com/xdev-software/tci</url>
+		<connection>scm:git:https://github.com/xdev-software/tci.git</connection>
 	</scm>
 
 	<inceptionYear>2024</inceptionYear>
