@@ -4,6 +4,8 @@
     * Delete cached file after restoring the cache to free up disk space
 * `image-build`
   * Add simple integration for filtering pom.xml modules
+* Restructured internal repository layout
+* Updated dependencies
 
 # 4.4.1
 * Fix type problems with Containers that are unable to reference themselves
