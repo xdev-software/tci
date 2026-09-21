@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>software.xdev.tci</groupId>
 		<artifactId>root</artifactId>
-		<version>4.5.0</version>
+		<version>4.5.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>demos</artifactId>
