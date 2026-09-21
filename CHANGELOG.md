@@ -1,4 +1,4 @@
-# 4.5.1
+# 4.5.2
 * Actions
   * `restore`
     * Delete cached file after restoring the cache to free up disk space
