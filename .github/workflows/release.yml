@@ -127,8 +127,8 @@ jobs:
         distribution: 'temurin'
         java-version: '25'
         server-id: github-central
-        server-password: PACKAGES_CENTRAL_TOKEN
-        gpg-passphrase: MAVEN_GPG_PASSPHRASE
+        server-password-env-var: PACKAGES_CENTRAL_TOKEN
+        gpg-passphrase-env-var: MAVEN_GPG_PASSPHRASE
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Only import once
 
     - name: Publish to GitHub Packages Central
@@ -144,17 +144,17 @@ jobs:
         distribution: 'temurin'
         java-version: '25'
         server-id: sonatype-central-portal
-        server-username: MAVEN_CENTRAL_USERNAME
-        server-password: MAVEN_CENTRAL_TOKEN
-        gpg-passphrase: MAVEN_GPG_PASSPHRASE
+        server-username-env-var: MAVEN_CENTRAL_USERNAME
+        server-password-env-var: MAVEN_CENTRAL_TOKEN
+        gpg-passphrase-env-var: MAVEN_GPG_PASSPHRASE
 
     - name: Publish to Central Portal
       run: ../mvnw -B deploy -P publish,publish-sonatype-central-portal
+      working-directory: src
       env:
         MAVEN_CENTRAL_USERNAME: ${{ secrets.SONATYPE_MAVEN_CENTRAL_PORTAL_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.SONATYPE_MAVEN_CENTRAL_PORTAL_TOKEN }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-      working-directory: src
 
   build-pages:
     runs-on: ubuntu-latest
