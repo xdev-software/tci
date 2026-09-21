@@ -199,7 +199,8 @@ jobs:
       if: ${{ matrix.jacoco && success() }}
       # Important: Also run compile (if not already done) so that we have all class files - otherwise the report will be incomplete
       run: |
-        ./mvnw -B compile jacoco-aggregator:report-aggregate-all -pl "demos/advanced-demo/webapp" -am -T2C
+        ./mvnw -B compile jacoco-aggregator:report-aggregate-all -pl webapp -am -T2C
+      working-directory: demos/advanced-demo
 
     - name: Upload WebApp JaCoCo report
       if: ${{ matrix.jacoco && success() }}
