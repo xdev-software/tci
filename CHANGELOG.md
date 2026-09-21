@@ -1,3 +1,6 @@
+# 4.5.3
+* Fix deployment of docs
+
 # 4.5.2
 * Actions
   * `restore`
