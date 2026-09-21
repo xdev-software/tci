@@ -44,7 +44,7 @@ jobs:
     - name: Test
       run: |
         ./mvnw -B test \
-        -pl "${{ inputs.module }}" -am \
+        -pl "src/${{ inputs.module }}" -am \
         -T2C \
         -P run-it \
         -Dchecks.disable=true \
