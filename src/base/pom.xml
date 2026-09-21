@@ -13,6 +13,9 @@
 	<artifactId>base</artifactId>
 	<packaging>jar</packaging>
 
+	<name>base</name>
+	<description>TCI - base</description>
+
 	<dependencies>
 		<!-- TestContainers -->
 		<dependency>
