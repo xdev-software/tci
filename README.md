@@ -23,7 +23,7 @@ Modules for XDEV's Testcontainer Infrastructure Framework
 * [image-build](./src/image-build/)
   * Contains some shortcuts that help with common build configuration e.g. related to caching
   * Designed to work together with the [`docker-image-cache` actions](./.github/actions/docker-image-cache/)
-* [jacoco](./src/src/jacoco/)
+* [jacoco](./src/jacoco/)
   * Allows for recording of JaCoCo code coverage files with Java containers
 * [jul-to-slf4j](./src/jul-to-slf4j/)
   * Logging Adapter to redirect JUL to SLF4J
