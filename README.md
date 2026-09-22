@@ -8,46 +8,46 @@ Modules for XDEV's Testcontainer Infrastructure Framework
 
 ## Modules
 
-* [base](./base/)
+* [base](./src/base/)
   * Common code for writing TCI
   * Pre-starting
   * Container leak detection
   * and much more
-* [bom](./bom/)
+* [bom](./src/bom/)
   * Bill of Materials for easier version management
-* [db-jdbc](./db-jdbc/)
+* [db-jdbc](./src/db-jdbc/)
   * Common code for db infra, including JDBC
   * Data-generation template
   * Improved JDBC Container wait strategy
-  * Predefined implementations for [Spring-ORM](./db-jdbc-spring-orm/), [Hibernate](./db-jdbc-spring-orm-hibernate/) and [EclipseLink](./db-jdbc-spring-orm-eclipselink/)
-* [image-build](./image-build/)
+  * Predefined implementations for [Spring-ORM](./src/db-jdbc-spring-orm/), [Hibernate](./src/db-jdbc-spring-orm-hibernate/) and [EclipseLink](./src/db-jdbc-spring-orm-eclipselink/)
+* [image-build](./src/image-build/)
   * Contains some shortcuts that help with common build configuration e.g. related to caching
   * Designed to work together with the [`docker-image-cache` actions](./.github/actions/docker-image-cache/)
-* [jacoco](./jacoco/)
+* [jacoco](./src/src/jacoco/)
   * Allows for recording of JaCoCo code coverage files with Java containers
-* [jul-to-slf4j](./jul-to-slf4j/)
+* [jul-to-slf4j](./src/jul-to-slf4j/)
   * Logging Adapter to redirect JUL to SLF4J
-* [junit-jupiter-api-support](./junit-jupiter-api-support/)
+* [junit-jupiter-api-support](./src/junit-jupiter-api-support/)
   * Support for JUnit 5+ (Jupiter) API
-* [mailpit](./mailpit/)
+* [mailpit](./src/mailpit/)
   * Predefined implementation for [Mailpit](https://github.com/axllent/mailpit)
-* [mockserver](./mockserver/)
+* [mockserver](./src/mockserver/)
   * Predefined implementation for [Mockserver](https://github.com/xdev-software/mockserver-neolight)
-* [oidc-server-mock](./oidc-server-mock/)
+* [oidc-server-mock](./src/oidc-server-mock/)
   * Predefined implementation for [OIDC Server Mock](https://github.com/xdev-software/oidc-server-mock)
-* [selenium](./selenium/)
+* [selenium](./src/selenium/)
   * Predefined implementation for [Selenium](https://github.com/SeleniumHQ/selenium)
   * Includes improvements from [xdev-software/testcontainers-selenium](https://github.com/xdev-software/testcontainers-selenium/)
   * Predefined browsers (Firefox, Chromium)
   * NoVNC support (you no longer need a VNC client and can simply use the browser)
   * Enhanced video recording
   * Browser logs
-* [spring-dao-support](./spring-dao-support/)
+* [spring-dao-support](./src/spring-dao-support/)
   * Helper for injecting DAOs using Spring
 
 ## Usage
 
-You may checkout the [advanced demo](./advanced-demo/) - a reference implementation of most features in a realistic project - to get a better feeling how the project can be used.
+You may checkout the [advanced demo](./demos/advanced-demo/) - a reference implementation of most features in a realistic project - to get a better feeling how the project can be used.
 
 You can also have a look at the corresponding modules for usage instructions.
 
