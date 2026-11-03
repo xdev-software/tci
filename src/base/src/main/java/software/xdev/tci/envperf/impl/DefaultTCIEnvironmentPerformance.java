@@ -53,7 +53,7 @@ public class DefaultTCIEnvironmentPerformance implements TCIEnvironmentPerforman
 			.map(v -> {
 				try
 				{
-					return Math.min(Math.max(Integer.parseInt(v), 1), 10);
+					return Math.clamp(Integer.parseInt(v), 1, 10);
 				}
 				catch(final Exception e)
 				{
