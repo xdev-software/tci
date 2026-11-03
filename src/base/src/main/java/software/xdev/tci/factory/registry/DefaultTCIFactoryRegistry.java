@@ -25,10 +25,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import software.xdev.tci.TCI;
+import software.xdev.tci.concurrent.Suppliers;
 import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
+import software.xdev.tci.config.StandaloneGlobalConfigResolver;
 import software.xdev.tci.factory.TCIFactory;
 
 
@@ -37,6 +40,21 @@ public class DefaultTCIFactoryRegistry implements TCIFactoryRegistry
 	protected final Set<TCIFactory<?, ?>> factories = Collections.synchronizedSet(new HashSet<>());
 	protected final Set<TCIFactory<?, ?>> warmedUpFactories =
 		Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
+	
+	protected final Supplier<Integer> warmUpTimeoutMinSupplier;
+	
+	public DefaultTCIFactoryRegistry()
+	{
+		this.warmUpTimeoutMinSupplier = Suppliers.memoize(this::determineWarmUpTimeoutMin);
+	}
+	
+	@SuppressWarnings("checkstyle:MagicNumber")
+	protected int determineWarmUpTimeoutMin()
+	{
+		return StandaloneGlobalConfigResolver.instance().resolveInt("warmup.timeout-min")
+			.map(i -> Math.max(i, 1))
+			.orElse(15);
+	}
 	
 	@Override
 	public void register(final TCIFactory<?, ?> tciFactory)
@@ -59,31 +77,39 @@ public class DefaultTCIFactoryRegistry implements TCIFactoryRegistry
 			this.factories.stream()
 				// Check if the factory was already warmed up
 				.filter(f -> !this.warmedUpFactories.contains(f))
-				.map(this::warmUpFactory)
-				.toList()
+				// Collect first otherwise nothing will be run in parallel
+				.collect(Collectors.toMap(Function.identity(), this::warmUpFactory))
 				.forEach(this::waitForWarmUpCF);
 		}
 	}
 	
-	protected void waitForWarmUpCF(final CompletableFuture<?> cf)
+	protected void waitForWarmUpCF(final TCIFactory<?, ?> factory, final CompletableFuture<?> cf)
 	{
 		try
 		{
-			cf.get(10, TimeUnit.MINUTES);
+			cf.get(this.warmUpTimeoutMinSupplier.get(), TimeUnit.MINUTES);
 		}
 		catch(final TimeoutException ex)
 		{
-			throw new IllegalStateException("Timed out", ex);
+			throw this.factoryWarmUpException("Timed out", factory, ex);
 		}
 		catch(final InterruptedException ex)
 		{
 			Thread.currentThread().interrupt();
-			throw new IllegalStateException("Got interrupted", ex);
+			throw this.factoryWarmUpException("Got interrupted", factory, ex);
 		}
 		catch(final ExecutionException ex)
 		{
-			throw new IllegalStateException("Execution failed", ex);
+			throw this.factoryWarmUpException("Execution failed", factory, ex);
 		}
+	}
+	
+	protected RuntimeException factoryWarmUpException(
+		final String msg,
+		final TCIFactory<?, ?> factory,
+		final Exception underlyingEx)
+	{
+		return new IllegalStateException("WarmUp failed: " + msg + " - " + factory.getFactoryName(), underlyingEx);
 	}
 	
 	protected CompletableFuture<Void> warmUpFactory(final TCIFactory<?, ?> factory)

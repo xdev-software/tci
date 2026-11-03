@@ -76,3 +76,24 @@ _NOTE: Properties marked with `*` can additionally can use the `preStartName` fo
 | `stop-timeout-ms` | `int` | ~`20000` (~20s) actual value depends on cpuSlownessFactor | How long to wait until all infrastructure is stopped after tests have ended |
 
 </details>
+
+### Other
+
+<details><summary>The configuration is dynamically loaded from (sorted by highest priority)</summary>
+
+* Environment variables 
+    * prefixed with `TCI_`
+    * all properties are in UPPERCASE and use `_` instead of `.` or `-`
+* System properties
+    * prefixed with `tci.`
+
+</details>
+
+<details><summary>Full list of configuration options</summary>
+
+| Property | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `slowness.factor` | `int` | `1` | Describes the performance of the underlying environment.<br/>Higher values indicate a slower environment.<br/>Guideline: <ul><li>1 equals a standard developer machine CPU with roughly <code>16T 3GHz</code> or better</li><li>for a Raspberry PI 5 with <code>4T 2.4GHz</code> a value of roughly 3 should be chosen</li></ul>The default value is 1.<br/>Min=1, Max=10 |
+| `warmup.timeout-min` | `int` | `15` | Maximum timeout in minutes when the infrastructure is warmed up (e.g. pulling/building images) in parallel. |
+
+</details>

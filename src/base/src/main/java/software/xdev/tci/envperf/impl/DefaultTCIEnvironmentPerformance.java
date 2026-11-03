@@ -15,21 +15,16 @@
  */
 package software.xdev.tci.envperf.impl;
 
-import java.util.Optional;
-
-import org.slf4j.LoggerFactory;
+import software.xdev.tci.config.StandaloneGlobalConfigResolver;
 
 
 public class DefaultTCIEnvironmentPerformance implements TCIEnvironmentPerformance
 {
-	public static final String ENV_SLOWNESS_FACTOR = "TCI_SLOWNESS_FACTOR";
-	public static final String PROPERTY_SLOWNESS_FACTOR = "tci.slowness.factor";
-	
 	protected Integer slownessFactor;
 	
 	/**
 	 * Describes the performance of the underlying environment.<br/> Higher values indicate a slower environment.<br/>
-	 * Guideline is a follows:
+	 * Guideline:
 	 * <ul>
 	 *     <li>1 equals a standard developer machine CPU with roughly <code>16T 3GHz</code> or better</li>
 	 *     <li>for a Raspberry PI 5 with <code>4T 2.4GHz</code> a value of roughly 3 should be chosen</li>
@@ -48,19 +43,8 @@ public class DefaultTCIEnvironmentPerformance implements TCIEnvironmentPerforman
 	
 	protected synchronized int parseSlownessFactor()
 	{
-		return Optional.ofNullable(System.getenv(ENV_SLOWNESS_FACTOR))
-			.or(() -> Optional.ofNullable(System.getProperty(PROPERTY_SLOWNESS_FACTOR)))
-			.map(v -> {
-				try
-				{
-					return Math.clamp(Integer.parseInt(v), 1, 10);
-				}
-				catch(final Exception e)
-				{
-					LoggerFactory.getLogger(this.getClass()).error("Unable to parse", e);
-					return null;
-				}
-			})
+		return StandaloneGlobalConfigResolver.instance().resolveInt("slowness.factor")
+			.map(i -> Math.clamp(i, 1, 10))
 			.orElse(1);
 	}
 }

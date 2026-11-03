@@ -59,6 +59,12 @@ public abstract class DefaultConfig
 	
 	protected int resolveInt(final String propertyName, final IntSupplier defaultValueSupplier)
 	{
+		return this.resolveInt(propertyName)
+			.orElseGet(defaultValueSupplier::getAsInt);
+	}
+	
+	protected Optional<Integer> resolveInt(final String propertyName)
+	{
 		return this.resolve(propertyName)
 			.map(s -> {
 				try
@@ -67,13 +73,19 @@ public abstract class DefaultConfig
 				}
 				catch(final NumberFormatException nfe)
 				{
+					this.reportParseError(nfe);
 					return null;
 				}
-			})
-			.orElseGet(defaultValueSupplier::getAsInt);
+			});
 	}
 	
 	protected long resolveLong(final String propertyName, final LongSupplier defaultValueSupplier)
+	{
+		return this.resolveLong(propertyName)
+			.orElseGet(defaultValueSupplier::getAsLong);
+	}
+	
+	protected Optional<Long> resolveLong(final String propertyName)
 	{
 		return this.resolve(propertyName)
 			.map(s -> {
@@ -83,10 +95,10 @@ public abstract class DefaultConfig
 				}
 				catch(final NumberFormatException nfe)
 				{
+					this.reportParseError(nfe);
 					return null;
 				}
-			})
-			.orElseGet(defaultValueSupplier::getAsLong);
+			});
 	}
 	
 	protected <T> T reportLegacyConfigOption(final String legacy, final String upToDate, final T value)
@@ -101,5 +113,10 @@ public abstract class DefaultConfig
 			"Detected deprecated config option that will be removed: {} - use {} instead",
 			legacy,
 			upToDate);
+	}
+	
+	protected void reportParseError(final Exception ex)
+	{
+		LoggerFactory.getLogger(this.getClass()).warn("Unable to parse", ex);
 	}
 }
