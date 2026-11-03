@@ -6,20 +6,20 @@ Base for other modules and core components.
 
 | Feature | Why? | Demo |
 | --- | --- | --- |
-| Easily create infrastructure using TCI<sup>[JD](https://javadoc.io/doc/software.xdev.tci/base/latest/software/xdev/tci/TCI.html)</sup> (TestContainer Infrastructure) templating + Factories for that | Makes writing and designing tests easier | [here](../base-demo/src/test/java/software/xdev/tci/dummyinfra/) |
-| [PreStarting mechanism](./src/main/java/software/xdev/tci/factory/prestart/)<sup>[JD](https://javadoc.io/doc/software.xdev.tci/base/latest/software/xdev/tci/factory/prestart/PreStartableTCIFactory.html)</sup> for [additional performance](../PERFORMANCE.md) | Tries to run tests as fast as possible - with a few trade-offs | [here](../base-demo/src/test/java/software/xdev/tci/factory/prestart/) |
-| All started containers have a unique human-readable name | Easier identification when tracing or debugging | [here](../base-demo/src/test/java/software/xdev/tci/safestart/) |
-| An optimized [implementation of Network](./src/main/java/software/xdev/tci/network/)<sup>[JD](https://javadoc.io/doc/software.xdev.tci/base/latest/software/xdev/tci/network/LazyNetwork.html)</sup> | Addresses various problems of the original implementation to speed up tests | [here](../base-demo/src/test/java/software/xdev/tci/network/) |
-| [Safe starting of named containers](./src/main/java/software/xdev/tci/safestart/)<sup>[JD](https://javadoc.io/doc/software.xdev.tci/base/latest/software/xdev/tci/safestart/SafeNamedContainerStarter.html)</sup> | Ensures that a container doesn't enter a crash loop during retried startups | [here](../base-demo/src/test/java/software/xdev/tci/safestart/) |
-| [Container Leak detection](./src/main/java/software/xdev/tci/leakdetection/)¹ | Prevents you from running out of resources | [here](../base-demo/src/test/java/software/xdev/tci/leak/) |
+| Easily create infrastructure using TCI<sup>[JD](https://javadoc.io/doc/software.xdev.tci/base/latest/software/xdev/tci/TCI.html)</sup> (TestContainer Infrastructure) templating + Factories for that | Makes writing and designing tests easier | [here](../../demos/base-demo/src/test/java/software/xdev/tci/dummyinfra/) |
+| [PreStarting mechanism](./src/main/java/software/xdev/tci/factory/prestart/)<sup>[JD](https://javadoc.io/doc/software.xdev.tci/base/latest/software/xdev/tci/factory/prestart/PreStartableTCIFactory.html)</sup> for [additional performance](../../PERFORMANCE.md) | Tries to run tests as fast as possible - with a few trade-offs | [here](../../demos/base-demo/src/test/java/software/xdev/tci/factory/prestart/) |
+| All started containers have a unique human-readable name | Easier identification when tracing or debugging | [here](../../demos/base-demo/src/test/java/software/xdev/tci/safestart/) |
+| An optimized [implementation of Network](./src/main/java/software/xdev/tci/network/)<sup>[JD](https://javadoc.io/doc/software.xdev.tci/base/latest/software/xdev/tci/network/LazyNetwork.html)</sup> | Addresses various problems of the original implementation to speed up tests | [here](../../demos/base-demo/src/test/java/software/xdev/tci/network/) |
+| [Safe starting of named containers](./src/main/java/software/xdev/tci/safestart/)<sup>[JD](https://javadoc.io/doc/software.xdev.tci/base/latest/software/xdev/tci/safestart/SafeNamedContainerStarter.html)</sup> | Ensures that a container doesn't enter a crash loop during retried startups | [here](../../demos/base-demo/src/test/java/software/xdev/tci/safestart/) |
+| [Container Leak detection](./src/main/java/software/xdev/tci/leakdetection/)¹ | Prevents you from running out of resources | [here](../../demos/base-demo/src/test/java/software/xdev/tci/leak/) |
 | [Tracing](./src/main/java/software/xdev/tci/tracing/)¹ | Makes finding bottlenecks and similar problems easier | |
-| [Reporting of fatal (Java) crashes during container startup](./src/main/java/software/xdev/tci/startup/error/java/fatal/) | Easier error diagnosis | [here](../advanced-demo/integration-tests/tci-webapp/src/main/java/software/xdev/tci/demo/tci/webapp/containers/WebAppContainer.java) |
-| [Fail-fast/Abortable wait strategies](./src/main/java/software/xdev/tci/startup/wait/) | Fail fast when a container crashes - don't wait until the timeout | [here](../advanced-demo/integration-tests/tci-webapp/src/main/java/software/xdev/tci/demo/tci/webapp/containers/WebAppContainer.java) |
+| [Reporting of fatal (Java) crashes during container startup](./src/main/java/software/xdev/tci/startup/error/java/fatal/) | Easier error diagnosis | [here](../../demos/advanced-demo/integration-tests/tci-webapp/src/main/java/software/xdev/tci/demo/tci/webapp/containers/WebAppContainer.java) |
+| [Fail-fast/Abortable wait strategies](./src/main/java/software/xdev/tci/startup/wait/) | Fail fast when a container crashes - don't wait until the timeout | [here](../../demos/advanced-demo/integration-tests/tci-webapp/src/main/java/software/xdev/tci/demo/tci/webapp/containers/WebAppContainer.java) |
 
 ¹ = Active by default due to service loading
 
 ## Usage
-Take a look at the [minimalistic demo](../base-demo/) that showcases the components individually.
+Take a look at the [minimalistic demo](../../demos/base-demo/) that showcases the components individually.
 
 ## Config
 
@@ -74,5 +74,26 @@ _NOTE: Properties marked with `*` can additionally can use the `preStartName` fo
 | --- | --- | --- | --- |
 | `enabled` | `bool` | `false` | Should Leak-Detection be enabled? |
 | `stop-timeout-ms` | `int` | ~`20000` (~20s) actual value depends on cpuSlownessFactor | How long to wait until all infrastructure is stopped after tests have ended |
+
+</details>
+
+### Other
+
+<details><summary>The configuration is dynamically loaded from (sorted by highest priority)</summary>
+
+* Environment variables 
+    * prefixed with `TCI_`
+    * all properties are in UPPERCASE and use `_` instead of `.` or `-`
+* System properties
+    * prefixed with `tci.`
+
+</details>
+
+<details><summary>Full list of configuration options</summary>
+
+| Property | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `slowness.factor` | `int` | `1` | Describes the performance of the underlying environment.<br/>Higher values indicate a slower environment.<br/>Guideline: <ul><li>1 equals a standard developer machine CPU with roughly <code>16T 3GHz</code> or better</li><li>for a Raspberry PI 5 with <code>4T 2.4GHz</code> a value of roughly 3 should be chosen</li></ul>The default value is 1.<br/>Min=1, Max=10 |
+| `warmup.timeout-min` | `int` | `15` | Maximum timeout in minutes when the infrastructure is warmed up (e.g. pulling/building images) in parallel. |
 
 </details>

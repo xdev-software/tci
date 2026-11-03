@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>software.xdev.tci.demo.it</groupId>
 		<artifactId>integration-tests</artifactId>
-		<version>4.5.4-SNAPSHOT</version>
+		<version>4.6.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>webapp-it</artifactId>
 
@@ -70,7 +70,7 @@
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>0.8.15</version>
+						<version>0.8.16</version>
 						<executions>
 							<execution>
 								<id>merge-webapp</id>

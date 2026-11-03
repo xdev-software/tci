@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>software.xdev.tci</groupId>
 		<artifactId>demos</artifactId>
-		<version>4.5.4-SNAPSHOT</version>
+		<version>4.6.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>base-demo</artifactId>
@@ -35,7 +35,7 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.6.3</version>
+			<version>1.6.6</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -47,7 +47,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.6.0</version>
+				<version>3.6.1</version>
 				<configuration>
 					<!-- Test need to be executed individually -->
 					<skipTests>true</skipTests>

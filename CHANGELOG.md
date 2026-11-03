@@ -1,3 +1,9 @@
+# 4.6.0
+* Make warmup timeout in `DefaultTCIFactoryRegistry` configurable (`tci.warmup.timeout-min`) #791
+  * Increase default timeout from 10 to 15min
+* Updated dependencies
+* Improved docs
+
 # 4.5.3
 * Fix deployment of docs
 
