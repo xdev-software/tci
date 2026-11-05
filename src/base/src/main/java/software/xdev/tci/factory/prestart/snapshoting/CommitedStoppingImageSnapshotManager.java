@@ -17,6 +17,7 @@ package software.xdev.tci.factory.prestart.snapshoting;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -35,6 +36,20 @@ import software.xdev.tci.containers.HasWaitUntilStartedContainer;
 public class CommitedStoppingImageSnapshotManager<C extends GenericContainer<?>> extends CommitedImageSnapshotManager<C>
 {
 	protected boolean logReflectionWarning = true;
+	
+	public CommitedStoppingImageSnapshotManager()
+	{
+	}
+	
+	public CommitedStoppingImageSnapshotManager(final String... ignoreWarningsVolumePaths)
+	{
+		super(ignoreWarningsVolumePaths);
+	}
+	
+	public CommitedStoppingImageSnapshotManager(final Set<String> ignoreWarningsVolumePaths)
+	{
+		super(ignoreWarningsVolumePaths);
+	}
 	
 	public CommitedStoppingImageSnapshotManager<C> withLogReflectionWarning(final boolean logReflectionWarning)
 	{
