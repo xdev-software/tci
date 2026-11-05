@@ -230,7 +230,7 @@ public abstract class BaseTest implements IntegrationTestDefaults<BaseTest>
 						Stream.of(fAppInfra, fOidcInfra, fDbInfra)
 							.filter(Objects::nonNull)
 							.map(tci -> tci::stop))
-					.map(CompletableFuture::runAsync)
+					.map(r -> CompletableFuture.runAsync(r, TCIExecutorServiceHolder.instance()))
 					.toList() // collect so everything is getting executed async
 					.forEach(CompletableFuture::join);
 				

@@ -1,3 +1,9 @@
+# 4.7.0
+* Improve handling of `WaitAllAbortableStrategy`<br/>
+  _Further improvements will be done in the future as it's currently really difficult to find the root cause of WaitStrategies_
+* `CommitedImageSnapshotManager` is now typed to the corresponding container for better ergonomics
+* Added `CommitedStoppingImageSnapshotManager` that stops the container while doing a snapshot
+
 # 4.6.0
 * Make warmup timeout in `DefaultTCIFactoryRegistry` configurable (`tci.warmup.timeout-min`) #791
   * Increase default timeout from 10 to 15min

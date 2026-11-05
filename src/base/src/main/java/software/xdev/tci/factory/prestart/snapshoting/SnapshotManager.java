@@ -34,11 +34,16 @@ import org.testcontainers.containers.GenericContainer;
  * </ol>
  * </p>
  */
-public interface SnapshotManager
+public interface SnapshotManager<C extends GenericContainer<?>>
 {
 	void tryReuse(GenericContainer<?> container);
 	
-	<C extends GenericContainer<?>> void snapshot(C container);
+	void snapshot(C container);
 	
 	void snapshotFailed(GenericContainer<?> container, Exception ex);
+	
+	default boolean requiresFixatedPorts()
+	{
+		return false;
+	}
 }

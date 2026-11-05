@@ -49,7 +49,7 @@ import software.xdev.tci.pull.policy.NeverPullPolicy;
  * </ul>
  * </p>
  */
-public class CommitedImageSnapshotManager implements SnapshotManager
+public class CommitedImageSnapshotManager<C extends GenericContainer<?>> implements SnapshotManager<C>
 {
 	protected static final Logger LOG = LoggerFactory.getLogger(CommitedImageSnapshotManager.class);
 	
@@ -89,7 +89,7 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 	 * Setting this to {@code null} will disable the warning completely (not recommended).
 	 * </p>
 	 */
-	public CommitedImageSnapshotManager withIgnoreWarningsVolumePaths(final Set<String> ignoreWarningsVolumePaths)
+	public CommitedImageSnapshotManager<C> withIgnoreWarningsVolumePaths(final Set<String> ignoreWarningsVolumePaths)
 	{
 		this.ignoreWarningsVolumePaths = ignoreWarningsVolumePaths;
 		return this;
@@ -134,13 +134,13 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 	 * </ul>
 	 * </p>
 	 */
-	public CommitedImageSnapshotManager withWaitForFirstSnapshot(final boolean waitForFirstSnapshot)
+	public CommitedImageSnapshotManager<C> withWaitForFirstSnapshot(final boolean waitForFirstSnapshot)
 	{
 		this.waitForFirstSnapshot = waitForFirstSnapshot;
 		return this;
 	}
 	
-	public CommitedImageSnapshotManager withCommitedImagePrefix(final String commitedImagePrefix)
+	public CommitedImageSnapshotManager<C> withCommitedImagePrefix(final String commitedImagePrefix)
 	{
 		this.commitedImagePrefix = commitedImagePrefix;
 		return this;
@@ -184,7 +184,7 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 	}
 	
 	@Override
-	public <C extends GenericContainer<?>> void snapshot(final C container)
+	public void snapshot(final C container)
 	{
 		this.commit(container, null, null);
 	}
@@ -192,7 +192,7 @@ public class CommitedImageSnapshotManager implements SnapshotManager
 	// Before and After-Commit can be used to maybe fully stop/start the container
 	// or signal that it should flush everything to disk
 	@SuppressWarnings("java:S2629")
-	protected <C extends GenericContainer<?>> void commit(
+	protected void commit(
 		final C container,
 		final Consumer<C> beforeCommit,
 		final Consumer<C> afterCommit)

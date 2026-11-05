@@ -167,7 +167,7 @@ public class PreStartableTCIFactory<C extends GenericContainer<?>, I extends TCI
 	
 	protected final Timeouts timeouts;
 	
-	protected SnapshotManager snapshotManager;
+	protected SnapshotManager<C> snapshotManager;
 	
 	public PreStartableTCIFactory(
 		final BiFunction<C, String, I> infraBuilder,
@@ -232,7 +232,7 @@ public class PreStartableTCIFactory<C extends GenericContainer<?>, I extends TCI
 	/**
 	 * Should a {@link SnapshotManager} be used?
 	 */
-	public PreStartableTCIFactory<C, I> withSnapshotManager(final SnapshotManager snapshotManager)
+	public PreStartableTCIFactory<C, I> withSnapshotManager(final SnapshotManager<C> snapshotManager)
 	{
 		this.snapshotManager = snapshotManager;
 		return this;
@@ -283,7 +283,8 @@ public class PreStartableTCIFactory<C extends GenericContainer<?>, I extends TCI
 					try
 					{
 						// Fix ports for network attach later
-						if(directAttachNetwork == null && this.fixateExposedPortsIfRequired)
+						if(directAttachNetwork == null && this.fixateExposedPortsIfRequired
+							|| this.snapshotManager != null && this.snapshotManager.requiresFixatedPorts())
 						{
 							org.rnorth.ducttape.timeouts.Timeouts.doWithTimeout(
 								(int)this.timeouts.getMakeExposedPortsFixTimeout().toMillis(),
@@ -318,7 +319,7 @@ public class PreStartableTCIFactory<C extends GenericContainer<?>, I extends TCI
 		}
 	}
 	
-	protected void runIfSnapshotManager(final Consumer<SnapshotManager> snapshotManagerConsumer)
+	protected void runIfSnapshotManager(final Consumer<SnapshotManager<C>> snapshotManagerConsumer)
 	{
 		if(this.snapshotManager != null)
 		{

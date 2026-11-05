@@ -30,7 +30,7 @@ public class DBTCIFactory extends BaseDBTCIFactory<DBContainer, DBTCI>
 			() -> new DBContainer(IMAGE_NAME_SUPPLIER.get())
 				.withDatabaseName(DBTCI.DB_DATABASE)
 				.withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withMemory(ContainerMemory.M512M)));
-		this.withSnapshotManager(new CommitedImageSnapshotManager("/var/lib/mysql"));
+		this.withSnapshotManager(new CommitedImageSnapshotManager<>("/var/lib/mysql"));
 	}
 	
 	@Override

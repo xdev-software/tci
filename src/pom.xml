@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>software.xdev.tci</groupId>
 		<artifactId>root</artifactId>
-		<version>4.6.1-SNAPSHOT</version>
+		<version>4.7.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>src</artifactId>
@@ -16,6 +16,7 @@
 	<modules>
 		<module>bom</module>
 		<module>base</module>
+		<module>base-test</module>
 		<module>db-jdbc</module>
 		<module>db-jdbc-spring-orm</module>
 		<module>db-jdbc-spring-orm-eclipselink</module>
