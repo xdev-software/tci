@@ -53,6 +53,7 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 		this.mode = mode;
 	}
 	
+	@SuppressWarnings("PMD.PreserveStackTrace") // The TimeoutException is rewrapped
 	@Override
 	protected void waitUntilReady(final AbortMonitor abortMonitor)
 	{
