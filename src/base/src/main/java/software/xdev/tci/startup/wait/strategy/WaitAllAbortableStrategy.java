@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.rnorth.ducttape.timeouts.Timeouts;
 import org.slf4j.Logger;
@@ -57,22 +58,34 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 	{
 		if(this.mode == WaitAllStrategy.Mode.WITH_INDIVIDUAL_TIMEOUTS_ONLY)
 		{
-			this.waitUntilNestedStrategiesAreReady(abortMonitor);
+			this.waitUntilNestedStrategiesAreReady(abortMonitor, new AtomicReference<>());
 		}
 		else
 		{
 			final AbortableStrategyValues valuesToPropagate = AbortableStrategyValuesHolder.get();
-			Timeouts.doWithTimeout(
-				(int)this.startupTimeout.toMillis(),
-				TimeUnit.MILLISECONDS,
-				() -> AbortableStrategyValuesHolder.executeWith(
-					() -> this.waitUntilNestedStrategiesAreReady(abortMonitor),
-					valuesToPropagate)
-			);
+			final AtomicReference<WaitStrategy> currentWaitStrategy = new AtomicReference<>();
+			try
+			{
+				Timeouts.doWithTimeout(
+					(int)this.startupTimeout.toMillis(),
+					TimeUnit.MILLISECONDS,
+					() -> AbortableStrategyValuesHolder.executeWith(
+						() -> this.waitUntilNestedStrategiesAreReady(abortMonitor, currentWaitStrategy),
+						valuesToPropagate)
+				);
+			}
+			catch(final org.rnorth.ducttape.TimeoutException te)
+			{
+				throw new org.rnorth.ducttape.TimeoutException(
+					"Timed out waiting for strategies, was waiting for " + currentWaitStrategy.get(),
+					(Exception)te.getCause());
+			}
 		}
 	}
 	
-	private void waitUntilNestedStrategiesAreReady(final AbortMonitor abortMonitor)
+	private void waitUntilNestedStrategiesAreReady(
+		final AbortMonitor abortMonitor,
+		final AtomicReference<WaitStrategy> currentWaitStrategy)
 	{
 		for(final WaitStrategy strategy : this.strategies)
 		{
@@ -81,6 +94,7 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 			final long startMs = System.currentTimeMillis();
 			LOG.debug("Waiting for {}", strategy);
 			
+			currentWaitStrategy.set(strategy);
 			strategy.waitUntilReady(this.waitStrategyTarget);
 			
 			LOG.debug("Finished waiting for {}, took {}ms", strategy, System.currentTimeMillis() - startMs);

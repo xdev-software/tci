@@ -16,6 +16,7 @@
 	<modules>
 		<module>bom</module>
 		<module>base</module>
+		<module>base-test</module>
 		<module>db-jdbc</module>
 		<module>db-jdbc-spring-orm</module>
 		<module>db-jdbc-spring-orm-eclipselink</module>

@@ -27,6 +27,7 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
 
+import software.xdev.tci.containers.HasWaitUntilStartedContainer;
 import software.xdev.tci.envperf.EnvironmentPerformance;
 import software.xdev.tci.startup.wait.AbortMonitor;
 import software.xdev.tci.startup.wait.FastAbortOnContainerDeathWaitStrategy;
@@ -34,7 +35,7 @@ import software.xdev.tci.startup.wait.strategy.AbstractWaitAbortableStrategy;
 import software.xdev.tci.startup.wait.strategy.HostPortWaitAbortableStrategy;
 
 
-public interface WaitableJDBCContainer extends WaitStrategyTarget
+public interface WaitableJDBCContainer extends WaitStrategyTarget, HasWaitUntilStartedContainer
 {
 	@SuppressWarnings("checkstyle:MagicNumber")
 	default WaitStrategy completeJDBCWaitStrategy()
@@ -48,6 +49,7 @@ public interface WaitableJDBCContainer extends WaitStrategyTarget
 	
 	WaitStrategy getWaitStrategy();
 	
+	@Override
 	default void waitUntilContainerStarted()
 	{
 		final WaitStrategy waitStrategy = this.getWaitStrategy();
@@ -110,7 +112,7 @@ public interface WaitableJDBCContainer extends WaitStrategyTarget
 				// If this fails after startupTimeout / 2 (min=3s, max=30s)
 				// it might be possible that the connection is somehow corrupted or broken
 				// -> Build a new connection after that (see waitUntilJDBCValid)
-				Math.min(Math.max((int)this.startupTimeout.getSeconds() / 2, 3), 30),
+				Math.clamp((int)this.startupTimeout.getSeconds() / 2, 3, 30),
 				TimeUnit.SECONDS,
 				() -> validateJDBCRateLimiter.getWhenReady(() -> this.validateJDBCConnection(connection)));
 		}

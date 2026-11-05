@@ -18,6 +18,7 @@ package software.xdev.tci.startup.wait.strategy;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.rnorth.ducttape.unreliables.Unreliables;
 import org.testcontainers.containers.wait.strategy.AbstractWaitStrategy;
@@ -29,9 +30,9 @@ import software.xdev.tci.startup.wait.holder.AbortableStrategyValuesHolder;
 public abstract class AbstractWaitAbortableStrategy<S extends AbstractWaitAbortableStrategy<S>>
 	extends AbstractWaitStrategy
 {
-	protected <T> T startupRetryUntilSuccess(final Callable<T> callable)
+	protected void startupRetryUntilTrue(final Callable<Boolean> callable)
 	{
-		return Unreliables.retryUntilSuccess(
+		Unreliables.retryUntilTrue(
 			(int)this.startupTimeout.getSeconds(),
 			TimeUnit.SECONDS,
 			callable
@@ -42,13 +43,30 @@ public abstract class AbstractWaitAbortableStrategy<S extends AbstractWaitAborta
 		final AbortMonitor abortMonitor,
 		final Runnable runnable)
 	{
-		this.startupRetryUntilSuccess(() -> {
+		final AtomicReference<RuntimeException> lastFail = new AtomicReference<>();
+		
+		this.startupRetryUntilTrue(() -> {
 			if(!abortMonitor.shouldAbort())
 			{
-				this.getRateLimiter().doWhenReady(runnable);
+				try
+				{
+					this.getRateLimiter().doWhenReady(runnable);
+					lastFail.set(null);
+					return true;
+				}
+				catch(final RuntimeException rex)
+				{
+					lastFail.set(rex);
+					return false;
+				}
 			}
 			return true;
 		});
+		
+		if(lastFail.get() != null)
+		{
+			throw lastFail.get();
+		}
 	}
 	
 	@Override
