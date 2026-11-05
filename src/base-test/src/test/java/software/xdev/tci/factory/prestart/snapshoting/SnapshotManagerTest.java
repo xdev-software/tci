@@ -35,7 +35,8 @@ class SnapshotManagerTest
 		
 		container.start();
 		
-		final var snapshotManager = new CommitedStoppingImageSnapshotManager<>();
+		final var snapshotManager = new CommitedStoppingImageSnapshotManager<>(
+			"/var/lib/postgresql");
 		snapshotManager.snapshot(container);
 		
 		container.stop();
