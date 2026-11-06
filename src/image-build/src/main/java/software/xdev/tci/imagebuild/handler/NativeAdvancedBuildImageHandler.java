@@ -39,7 +39,8 @@ public class NativeAdvancedBuildImageHandler extends AbstractBuildImageHandler<N
 		this.logger.info("Starting build of (native) image {}", dockerImage);
 		
 		final NativeAdvancedImageFromDockerfile builder =
-			new NativeAdvancedImageFromDockerfile(dockerImage, config.deleteOnExit());
+			new NativeAdvancedImageFromDockerfile(dockerImage, config.deleteOnExit())
+				.withTimeout(timeout);
 		
 		this.configureAbstract(builder, config, sanitizedDockerImageName);
 		
