@@ -63,7 +63,7 @@ public final class Suppliers
 		protected final ReentrantLock lock = new ReentrantLock();
 		
 		@SuppressWarnings("UnnecessaryLambda") // Must be a fixed singleton object
-		protected static final Supplier<Void> SUCCESSFULLY_COMPUTED =
+		protected static final Supplier<Void> COMPUTED =
 			() -> {
 				throw new IllegalStateException(); // Should never get called.
 			};
@@ -79,21 +79,17 @@ public final class Suppliers
 		}
 		
 		@Override
-		@SuppressWarnings("unchecked") // Cast from Supplier<Void> to Supplier<T> is always valid
 		public T get()
 		{
 			// Because Supplier is read-heavy, we use the "double-checked locking" pattern.
-			if(this.delegate != SUCCESSFULLY_COMPUTED)
+			if(this.delegate != COMPUTED)
 			{
 				this.lock.lock();
 				try
 				{
-					if(this.delegate != SUCCESSFULLY_COMPUTED)
+					if(this.delegate != COMPUTED)
 					{
-						final T t = this.initiallyComputeValue();
-						this.value = t;
-						this.delegate = (Supplier<T>)SUCCESSFULLY_COMPUTED;
-						return t;
+						return this.initiallyComputeValue();
 					}
 				}
 				finally
@@ -107,7 +103,15 @@ public final class Suppliers
 		
 		protected T initiallyComputeValue()
 		{
-			return this.delegate.get();
+			this.value = this.delegate.get();
+			this.setComputed();
+			return this.value;
+		}
+		
+		@SuppressWarnings("unchecked") // Cast from Supplier<Void> to Supplier<T> is always valid
+		protected void setComputed()
+		{
+			this.delegate = (Supplier<T>)COMPUTED;
 		}
 		
 		protected T returnCachedValue()
@@ -120,7 +124,7 @@ public final class Suppliers
 		{
 			final Supplier<T> currentDelegate = this.delegate;
 			return "Suppliers.memoize("
-				+ (currentDelegate == SUCCESSFULLY_COMPUTED
+				+ (currentDelegate == COMPUTED
 				? "<supplier that returned " + this.value + ">"
 				: currentDelegate)
 				+ ")";

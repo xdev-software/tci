@@ -1,5 +1,6 @@
 package software.xdev.tci.concurrent;
 
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -16,18 +17,18 @@ public final class LazyConstantSuppliers
 	 */
 	public static <T> Supplier<T> of(final Supplier<T> delegate)
 	{
-		if(delegate instanceof NonSerializableMemoizingWithExceptionSupplier)
+		if(delegate instanceof LazyConstantSupplier)
 		{
 			return delegate;
 		}
-		return new NonSerializableMemoizingWithExceptionSupplier<>(delegate);
+		return new LazyConstantSupplier<>(delegate);
 	}
 	
-	static class NonSerializableMemoizingWithExceptionSupplier<T> extends Suppliers.NonSerializableMemoizingSupplier<T>
+	static class LazyConstantSupplier<T> extends Suppliers.NonSerializableMemoizingSupplier<T>
 	{
-		protected RuntimeException exception;
+		protected String exceptionType;
 		
-		protected NonSerializableMemoizingWithExceptionSupplier(final Supplier<T> delegate)
+		protected LazyConstantSupplier(final Supplier<T> delegate)
 		{
 			super(delegate);
 		}
@@ -37,23 +38,33 @@ public final class LazyConstantSuppliers
 		{
 			try
 			{
-				return super.initiallyComputeValue();
+				this.value = this.delegate.get();
+				this.setComputed();
+				return this.value;
 			}
 			catch(final RuntimeException rex)
 			{
-				this.exception = rex;
-				return null;
+				this.setComputed();
+				this.exceptionType = rex.getClass().getName();
+				throw unableToAccessConstant(this.exceptionType, rex);
 			}
 		}
 		
 		@Override
 		protected T returnCachedValue()
 		{
-			if(this.exception != null)
+			if(this.exceptionType != null)
 			{
-				throw this.exception;
+				throw unableToAccessConstant(this.exceptionType, null);
 			}
 			return super.returnCachedValue();
+		}
+		
+		static NoSuchElementException unableToAccessConstant(final String exceptionType, final Throwable cause)
+		{
+			return new NoSuchElementException(
+				"Unable to access the constant because " + exceptionType + " was thrown at initial computation",
+				cause);
 		}
 		
 		@Override
@@ -61,8 +72,8 @@ public final class LazyConstantSuppliers
 		{
 			final Supplier<T> currentDelegate = this.delegate;
 			return "LazyConstantSuppliers.of("
-				+ (currentDelegate == SUCCESSFULLY_COMPUTED
-				? "<supplier that returned " + Objects.requireNonNullElse(this.exception, this.value) + ">"
+				+ (currentDelegate == COMPUTED
+				? "<supplier that returned " + Objects.requireNonNullElse(this.exceptionType, this.value) + ">"
 				: currentDelegate)
 				+ ")";
 		}
