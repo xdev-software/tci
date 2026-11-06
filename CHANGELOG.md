@@ -2,6 +2,7 @@
 * Introduce and use `LazyConstantSuppliers` which is an extension of `Suppliers` and a stopgap measure until Java releases lazy constants
 * Image-Build
   * Log build failures by default
+* Fix Multi-Release (Java 25) jar build
 
 # 4.7.0
 * Improve handling of `WaitAllAbortableStrategy`<br/>
