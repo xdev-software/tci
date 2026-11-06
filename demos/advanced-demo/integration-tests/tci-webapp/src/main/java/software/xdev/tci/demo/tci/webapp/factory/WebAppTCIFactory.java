@@ -5,7 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import software.xdev.tci.concurrent.Suppliers;
+import software.xdev.tci.concurrent.LazyConstantSuppliers;
 import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.demo.tci.webapp.WebAppTCI;
 import software.xdev.tci.demo.tci.webapp.containers.WebAppContainer;
@@ -19,7 +19,7 @@ import software.xdev.tci.pull.policy.NeverPullPolicy;
 public class WebAppTCIFactory extends PreStartableTCIFactory<WebAppContainer, WebAppTCI>
 {
 	protected static final Supplier<String> IMAGE_NAME_SUPPLIER =
-		Suppliers.memoize(WebAppContainerBuilder::getImageName);
+		LazyConstantSuppliers.of(WebAppContainerBuilder::getImageName);
 	
 	@SuppressWarnings("checkstyle:MagicNumber")
 	public WebAppTCIFactory(final Consumer<WebAppContainer> additionalContainerBuilder)

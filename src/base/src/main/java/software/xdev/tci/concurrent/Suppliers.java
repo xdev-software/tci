@@ -26,13 +26,13 @@ import java.util.function.Supplier;
  * Guava Supplier
  * </a>
  * and minimized.
+ *
+ * @deprecated It's recommended to use {@link LazyConstantSuppliers} and ultimately - once released - lazy constants
  */
+@Deprecated(since = "4.8.0")
+@SuppressWarnings("java:S1133")
 public final class Suppliers
 {
-	private Suppliers()
-	{
-	}
-	
 	/**
 	 * Returns a supplier which caches the instance retrieved during the first call to {@code get()} and returns that
 	 * value on subsequent calls to {@code get()}. See: <a
@@ -60,20 +60,20 @@ public final class Suppliers
 	@SuppressWarnings("java:S3077")
 	static class NonSerializableMemoizingSupplier<T> implements Supplier<T>
 	{
-		private final ReentrantLock lock = new ReentrantLock();
+		protected final ReentrantLock lock = new ReentrantLock();
 		
 		@SuppressWarnings("UnnecessaryLambda") // Must be a fixed singleton object
-		private static final Supplier<Void> SUCCESSFULLY_COMPUTED =
+		protected static final Supplier<Void> SUCCESSFULLY_COMPUTED =
 			() -> {
 				throw new IllegalStateException(); // Should never get called.
 			};
 		
 		@SuppressWarnings("PMD.AvoidUsingVolatile")
-		private volatile Supplier<T> delegate;
+		protected volatile Supplier<T> delegate;
 		// "value" does not need to be volatile; visibility piggy-backs on volatile read of "delegate".
-		private T value;
+		protected T value;
 		
-		NonSerializableMemoizingSupplier(final Supplier<T> delegate)
+		protected NonSerializableMemoizingSupplier(final Supplier<T> delegate)
 		{
 			this.delegate = Objects.requireNonNull(delegate);
 		}
@@ -90,7 +90,7 @@ public final class Suppliers
 				{
 					if(this.delegate != SUCCESSFULLY_COMPUTED)
 					{
-						final T t = this.delegate.get();
+						final T t = this.initiallyComputeValue();
 						this.value = t;
 						this.delegate = (Supplier<T>)SUCCESSFULLY_COMPUTED;
 						return t;
@@ -102,6 +102,16 @@ public final class Suppliers
 				}
 			}
 			// This is safe because we checked `delegate`.
+			return this.returnCachedValue();
+		}
+		
+		protected T initiallyComputeValue()
+		{
+			return this.delegate.get();
+		}
+		
+		protected T returnCachedValue()
+		{
 			return this.value;
 		}
 		
@@ -115,5 +125,9 @@ public final class Suppliers
 				: currentDelegate)
 				+ ")";
 		}
+	}
+	
+	private Suppliers()
+	{
 	}
 }
