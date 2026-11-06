@@ -40,6 +40,7 @@ public abstract class AbstractBuildImageHandler<I extends AbstractImageFromDocke
 		this.logger = LoggerFactory.getLogger(this.getClass());
 	}
 	
+	@SuppressWarnings("java:S2139")
 	@Override
 	public String build(
 		final String dockerImage,
@@ -47,13 +48,27 @@ public abstract class AbstractBuildImageHandler<I extends AbstractImageFromDocke
 		final Duration timeout,
 		final UnaryOperator<I> configure)
 	{
-		final String sanitizedDockerImageName = this.sanitizeDockerImageName(dockerImage);
-		return this.build(
-			dockerImage,
-			sanitizedDockerImageName,
-			new OverlayBuildImageHandlerConfig(parentConfig, sanitizedDockerImageName),
-			timeout,
-			configure);
+		try
+		{
+			final String sanitizedDockerImageName = this.sanitizeDockerImageName(dockerImage);
+			return this.build(
+				dockerImage,
+				sanitizedDockerImageName,
+				new OverlayBuildImageHandlerConfig(parentConfig, sanitizedDockerImageName),
+				timeout,
+				configure);
+		}
+		catch(final RuntimeException rex)
+		{
+			// Ensure that error is properly reported at least once
+			this.reportBuildFailure(dockerImage, rex);
+			throw rex;
+		}
+	}
+	
+	protected void reportBuildFailure(final String dockerImage, final RuntimeException rex)
+	{
+		this.logger.warn("Failed to build {}", dockerImage, rex);
 	}
 	
 	protected abstract String build(

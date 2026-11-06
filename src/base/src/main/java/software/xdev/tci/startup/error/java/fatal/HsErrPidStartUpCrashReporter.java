@@ -28,7 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.testcontainers.containers.GenericContainer;
 
-import software.xdev.tci.concurrent.Suppliers;
+import software.xdev.tci.concurrent.LazyConstantSuppliers;
 
 
 /**
@@ -41,13 +41,12 @@ public class HsErrPidStartUpCrashReporter
 {
 	protected static final String HS_ERR_PID = "hs_err_pid";
 	protected static final Supplier<Pattern> DEFAULT_HS_ERR_PID_EXTRACTION_PATTERN_SUPPLIER =
-		Suppliers.memoize(() -> Pattern.compile("^# (\\S{1,999}hs_err_pid\\d{1,9}\\.log)$", Pattern.MULTILINE));
+		LazyConstantSuppliers.of(() -> Pattern.compile("^# (\\S{1,999}hs_err_pid\\d{1,9}\\.log)$", Pattern.MULTILINE));
 	
 	protected final GenericContainer<?> container;
 	protected final String hsErrPidSearchKey;
 	protected final Supplier<Pattern> hsErrPidExtractionPattern;
-	protected Supplier<Path> hsErrPidPathSupplier = Suppliers.memoize(
-		() -> Paths.get("target/has_err_pid"));
+	protected Supplier<Path> hsErrPidPathSupplier = LazyConstantSuppliers.of(() -> Paths.get("target/has_err_pid"));
 	
 	protected boolean startedWithoutCrashing;
 	

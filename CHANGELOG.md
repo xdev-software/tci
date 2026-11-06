@@ -1,3 +1,9 @@
+# 4.8.0
+* Introduce and use `LazyConstantSuppliers` which is an extension of `Suppliers` and a stopgap measure until Java releases lazy constants
+* Image-Build
+  * Log build failures by default
+* Fix Multi-Release (Java 25) jar build
+
 # 4.7.0
 * Improve handling of `WaitAllAbortableStrategy`<br/>
   _Further improvements will be done in the future as it's currently really difficult to find the root cause of WaitStrategies_

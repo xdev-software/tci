@@ -3,7 +3,7 @@ package software.xdev.tci.demo.tci.db.factory;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-import software.xdev.tci.concurrent.Suppliers;
+import software.xdev.tci.concurrent.LazyConstantSuppliers;
 import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.db.factory.BaseDBTCIFactory;
 import software.xdev.tci.demo.tci.db.DBTCI;
@@ -15,7 +15,8 @@ import software.xdev.tci.misc.ContainerMemory;
 
 public class DBTCIFactory extends BaseDBTCIFactory<DBContainer, DBTCI>
 {
-	protected static final Supplier<String> IMAGE_NAME_SUPPLIER = Suppliers.memoize(DBContainerBuilder::getImageName);
+	protected static final Supplier<String> IMAGE_NAME_SUPPLIER =
+		LazyConstantSuppliers.of(DBContainerBuilder::getImageName);
 	
 	public DBTCIFactory()
 	{

@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import software.xdev.tci.TCI;
-import software.xdev.tci.concurrent.Suppliers;
+import software.xdev.tci.concurrent.LazyConstantSuppliers;
 import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.config.StandaloneGlobalConfigResolver;
 import software.xdev.tci.factory.TCIFactory;
@@ -45,7 +45,7 @@ public class DefaultTCIFactoryRegistry implements TCIFactoryRegistry
 	
 	public DefaultTCIFactoryRegistry()
 	{
-		this.warmUpTimeoutMinSupplier = Suppliers.memoize(this::determineWarmUpTimeoutMin);
+		this.warmUpTimeoutMinSupplier = LazyConstantSuppliers.of(this::determineWarmUpTimeoutMin);
 	}
 	
 	@SuppressWarnings("checkstyle:MagicNumber")

@@ -26,13 +26,13 @@ import java.util.function.Supplier;
  * Guava Supplier
  * </a>
  * and minimized.
+ *
+ * @deprecated It's recommended to use {@link LazyConstantSuppliers} and ultimately - once released - lazy constants
  */
+@Deprecated(since = "4.8.0")
+@SuppressWarnings("java:S1133")
 public final class Suppliers
 {
-	private Suppliers()
-	{
-	}
-	
 	/**
 	 * Returns a supplier which caches the instance retrieved during the first call to {@code get()} and returns that
 	 * value on subsequent calls to {@code get()}. See: <a
@@ -60,40 +60,36 @@ public final class Suppliers
 	@SuppressWarnings("java:S3077")
 	static class NonSerializableMemoizingSupplier<T> implements Supplier<T>
 	{
-		private final ReentrantLock lock = new ReentrantLock();
+		protected final ReentrantLock lock = new ReentrantLock();
 		
 		@SuppressWarnings("UnnecessaryLambda") // Must be a fixed singleton object
-		private static final Supplier<Void> SUCCESSFULLY_COMPUTED =
+		protected static final Supplier<Void> COMPUTED =
 			() -> {
 				throw new IllegalStateException(); // Should never get called.
 			};
 		
 		@SuppressWarnings("PMD.AvoidUsingVolatile")
-		private volatile Supplier<T> delegate;
+		protected volatile Supplier<T> delegate;
 		// "value" does not need to be volatile; visibility piggy-backs on volatile read of "delegate".
-		private T value;
+		protected T value;
 		
-		NonSerializableMemoizingSupplier(final Supplier<T> delegate)
+		protected NonSerializableMemoizingSupplier(final Supplier<T> delegate)
 		{
 			this.delegate = Objects.requireNonNull(delegate);
 		}
 		
 		@Override
-		@SuppressWarnings("unchecked") // Cast from Supplier<Void> to Supplier<T> is always valid
 		public T get()
 		{
 			// Because Supplier is read-heavy, we use the "double-checked locking" pattern.
-			if(this.delegate != SUCCESSFULLY_COMPUTED)
+			if(this.delegate != COMPUTED)
 			{
 				this.lock.lock();
 				try
 				{
-					if(this.delegate != SUCCESSFULLY_COMPUTED)
+					if(this.delegate != COMPUTED)
 					{
-						final T t = this.delegate.get();
-						this.value = t;
-						this.delegate = (Supplier<T>)SUCCESSFULLY_COMPUTED;
-						return t;
+						return this.initiallyComputeValue();
 					}
 				}
 				finally
@@ -102,6 +98,24 @@ public final class Suppliers
 				}
 			}
 			// This is safe because we checked `delegate`.
+			return this.returnCachedValue();
+		}
+		
+		protected T initiallyComputeValue()
+		{
+			this.value = this.delegate.get();
+			this.setComputed();
+			return this.value;
+		}
+		
+		@SuppressWarnings("unchecked") // Cast from Supplier<Void> to Supplier<T> is always valid
+		protected void setComputed()
+		{
+			this.delegate = (Supplier<T>)COMPUTED;
+		}
+		
+		protected T returnCachedValue()
+		{
 			return this.value;
 		}
 		
@@ -110,10 +124,14 @@ public final class Suppliers
 		{
 			final Supplier<T> currentDelegate = this.delegate;
 			return "Suppliers.memoize("
-				+ (currentDelegate == SUCCESSFULLY_COMPUTED
+				+ (currentDelegate == COMPUTED
 				? "<supplier that returned " + this.value + ">"
 				: currentDelegate)
 				+ ")";
 		}
+	}
+	
+	private Suppliers()
+	{
 	}
 }
