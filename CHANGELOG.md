@@ -1,3 +1,7 @@
+# 4.8.0
+* Image-Build
+  * Log build failures by default
+
 # 4.7.0
 * Improve handling of `WaitAllAbortableStrategy`<br/>
   _Further improvements will be done in the future as it's currently really difficult to find the root cause of WaitStrategies_
