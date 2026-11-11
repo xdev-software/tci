@@ -4,6 +4,7 @@
   * Ported code to work with Selenium 4.50+ #810
 * Improved exception handling of `AbortableStrategy` #808
   * If a strategy times out or fails this is now reported as the cause / add suppressed
+* Renamed and moved `JDBCWaitStrategy` → `JDBCAbortableWaitStrategy`
 * Update dependencies
 
 # 4.8.1
