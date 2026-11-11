@@ -1,3 +1,9 @@
+# 4.9.0
+* `selenium`
+  * Selenium 4.50+ is now required
+  * Ported code to work with Selenium 4.50+ #810
+* Update dependencies
+
 # 4.8.1
 * Correctly configure timeout in `NativeAdvancedBuildImageHandler`
 

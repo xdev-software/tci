@@ -16,13 +16,13 @@
 package software.xdev.tci.selenium;
 
 import java.time.Duration;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.MutableCapabilities;
@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.lifecycle.TestDescription;
 
 import software.xdev.tci.TCI;
+import software.xdev.tci.concurrent.LazyConstantSuppliers;
 import software.xdev.tci.envperf.EnvironmentPerformance;
 import software.xdev.tci.logging.JULtoSLF4JRedirector;
 import software.xdev.tci.selenium.containers.SeleniumBrowserWebDriverContainer;
@@ -48,6 +49,9 @@ import software.xdev.tci.selenium.containers.SeleniumBrowserWebDriverContainer;
 public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BrowserTCI.class);
+	
+	protected static final Supplier<HttpClient.Factory> DEFAULT_HTTP_CLIENT_FACTORY_PROVIDER =
+		LazyConstantSuppliers.of(HttpClient.Factory::createDefault);
 	
 	protected final MutableCapabilities capabilities;
 	
@@ -61,6 +65,7 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 	protected int webDriverRetrySec = 30;
 	protected Consumer<String> browserConsoleLogConsumer;
 	protected Set<LogLevel> browserConsoleLogLevels;
+	protected Supplier<HttpClient.Factory> httpClientFactoryProvider = DEFAULT_HTTP_CLIENT_FACTORY_PROVIDER;
 	
 	protected RemoteWebDriver webDriver;
 	protected LogInspector logInspector;
@@ -107,6 +112,13 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 		return this;
 	}
 	
+	public BrowserTCI withHttpClientFactoryProvider(
+		final Supplier<HttpClient.Factory> httpClientFactoryProvider)
+	{
+		this.httpClientFactoryProvider = httpClientFactoryProvider;
+		return this;
+	}
+	
 	@Override
 	public void start(final String containerName)
 	{
@@ -122,10 +134,11 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 	protected void initWebDriver()
 	{
 		LOG.debug("Initializing WebDriver");
+		final HttpClient.Factory factory = this.httpClientFactoryProvider.get();
 		final AtomicInteger retryCounter = new AtomicInteger(1);
 		this.webDriver = Unreliables.retryUntilSuccess(
 			this.webDriverRetryCount,
-			() -> this.tryCreateWebDriver(retryCounter));
+			() -> this.tryCreateWebDriver(factory, retryCounter));
 		
 		// Default timeout is 5m? -> Single test failure causes up to 10m delays
 		// https://w3c.github.io/webdriver/#timeouts
@@ -138,7 +151,7 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 		this.installBrowserLogInspector();
 	}
 	
-	protected RemoteWebDriver tryCreateWebDriver(final AtomicInteger retryCounter)
+	protected RemoteWebDriver tryCreateWebDriver(final HttpClient.Factory factory, final AtomicInteger retryCounter)
 	{
 		final ClientConfig config =
 			this.clientConfig.baseUri(this.getContainer().getSeleniumAddressURI());
@@ -150,11 +163,10 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 			config,
 			tryCount);
 		
-		final HttpClient.Factory factory = HttpCommandExecutor.getDefaultClientFactory();
 		@SuppressWarnings("java:S2095") // Handled by Selenium when quit is called
 		final HttpClient client = factory.createClient(config);
 		
-		final HttpCommandExecutor commandExecutor = this.createCommandExecutor(config, client);
+		final HttpCommandExecutor commandExecutor = this.createCommandExecutor(client);
 		
 		try
 		{
@@ -168,7 +180,7 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 						this.modifyCapsDisableCDP();
 					}
 					
-					return new RemoteWebDriver(commandExecutor, this.capabilities, config);
+					return new RemoteWebDriver(commandExecutor, this.capabilities, factory, config);
 				});
 		}
 		catch(final RuntimeException rex)
@@ -178,7 +190,6 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 			{
 				LOG.warn("Encounter problem in try #{} - Terminating communication", tryCount, rex);
 				client.close();
-				factory.cleanupIdleClients();
 			}
 			catch(final Exception ex)
 			{
@@ -189,13 +200,11 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 		}
 	}
 	
-	protected HttpCommandExecutor createCommandExecutor(final ClientConfig config, final HttpClient client)
+	protected HttpCommandExecutor createCommandExecutor(final HttpClient client)
 	{
 		return new HttpCommandExecutor(
-			Map.of(),
-			config,
-			// Constructor without factory does not exist...
-			ignored -> client);
+			client,
+			null);
 	}
 	
 	protected void modifyCapsDisableCDP()
