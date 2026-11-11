@@ -2,6 +2,8 @@
 * `selenium`
   * Selenium 4.50+ is now required
   * Ported code to work with Selenium 4.50+ #810
+* Improved exception handling of `AbortableStrategy` #808
+  * If a strategy times out or fails this is now reported as the cause / add suppressed
 * Update dependencies
 
 # 4.8.1

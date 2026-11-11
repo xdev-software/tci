@@ -18,18 +18,20 @@ package software.xdev.tci.startup.wait.strategy;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.rnorth.ducttape.TimeoutException;
 import org.rnorth.ducttape.timeouts.Timeouts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
 
 import software.xdev.tci.startup.wait.AbortMonitor;
-import software.xdev.tci.startup.wait.holder.AbortableStrategyValues;
-import software.xdev.tci.startup.wait.holder.AbortableStrategyValuesHolder;
+import software.xdev.tci.startup.wait.holder.WaitStrategyCurrentState;
 
 
 /**
@@ -41,7 +43,7 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 	
 	protected final WaitAllStrategy.Mode mode;
 	
-	protected final List<WaitStrategy> strategies = new ArrayList<>();
+	protected final List<AbstractWaitAbortableStrategy<?>> strategies = new ArrayList<>();
 	
 	public WaitAllAbortableStrategy()
 	{
@@ -55,40 +57,52 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 	
 	@SuppressWarnings("PMD.PreserveStackTrace") // The TimeoutException is rewrapped
 	@Override
-	protected void waitUntilReady(final AbortMonitor abortMonitor)
+	public void waitUntilReady(
+		final WaitStrategyTarget target,
+		final AbortMonitor abortMonitor,
+		final ExecutorService executor,
+		final WaitStrategyCurrentState sc)
 	{
 		if(this.mode == WaitAllStrategy.Mode.WITH_INDIVIDUAL_TIMEOUTS_ONLY)
 		{
-			this.waitUntilNestedStrategiesAreReady(abortMonitor, new AtomicReference<>());
+			this.waitUntilNestedStrategiesAreReady(new AtomicReference<>(), target, abortMonitor, executor, sc);
+			return;
 		}
-		else
+		
+		final AtomicReference<AbstractWaitAbortableStrategy<?>> currentWaitStrategyRef = new AtomicReference<>();
+		try
 		{
-			final AbortableStrategyValues valuesToPropagate = AbortableStrategyValuesHolder.get();
-			final AtomicReference<WaitStrategy> currentWaitStrategy = new AtomicReference<>();
-			try
-			{
-				Timeouts.doWithTimeout(
-					(int)this.startupTimeout.toMillis(),
-					TimeUnit.MILLISECONDS,
-					() -> AbortableStrategyValuesHolder.executeWith(
-						() -> this.waitUntilNestedStrategiesAreReady(abortMonitor, currentWaitStrategy),
-						valuesToPropagate)
-				);
-			}
-			catch(final org.rnorth.ducttape.TimeoutException te)
-			{
-				throw new org.rnorth.ducttape.TimeoutException(
-					"Timed out waiting for strategies, was waiting for " + currentWaitStrategy.get(),
-					(Exception)te.getCause());
-			}
+			Timeouts.doWithTimeout(
+				(int)this.getStartupTimeout().toMillis(),
+				TimeUnit.MILLISECONDS,
+				() -> this.waitUntilNestedStrategiesAreReady(
+					currentWaitStrategyRef,
+					target,
+					abortMonitor,
+					executor,
+					sc)
+			);
+		}
+		catch(final org.rnorth.ducttape.TimeoutException te)
+		{
+			final WaitStrategy currentWaitStrategy = currentWaitStrategyRef.get();
+			
+			final TimeoutException ex = new TimeoutException(
+				"Timed out waiting for strategies, was waiting for " + currentWaitStrategy,
+				(Exception)te.getCause());
+			sc.exception().ifPresent(ex::addSuppressed);
+			throw ex;
 		}
 	}
 	
 	private void waitUntilNestedStrategiesAreReady(
+		final AtomicReference<AbstractWaitAbortableStrategy<?>> currentWaitStrategy,
+		final WaitStrategyTarget target,
 		final AbortMonitor abortMonitor,
-		final AtomicReference<WaitStrategy> currentWaitStrategy)
+		final ExecutorService executor,
+		final WaitStrategyCurrentState sc)
 	{
-		for(final WaitStrategy strategy : this.strategies)
+		for(final AbstractWaitAbortableStrategy<?> strategy : this.strategies)
 		{
 			abortMonitor.throwIfRequired();
 			
@@ -96,7 +110,12 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 			LOG.debug("Waiting for {}", strategy);
 			
 			currentWaitStrategy.set(strategy);
-			strategy.waitUntilReady(this.waitStrategyTarget);
+			
+			strategy.waitUntilReady(
+				target,
+				abortMonitor,
+				executor,
+				sc.newChild(strategy));
 			
 			LOG.debug("Finished waiting for {}, took {}ms", strategy, System.currentTimeMillis() - startMs);
 		}
@@ -110,7 +129,7 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 	/**
 	 * @apiNote It's recommended to use {@link #withStrategy(AbstractWaitAbortableStrategy)}
 	 */
-	public WaitAllAbortableStrategy withWaitStrategy(final WaitStrategy strategy)
+	public WaitAllAbortableStrategy withWaitStrategy(final AbstractWaitAbortableStrategy<?> strategy)
 	{
 		if(this.mode == WaitAllStrategy.Mode.WITH_OUTER_TIMEOUT)
 		{
@@ -140,8 +159,8 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 		return this.self();
 	}
 	
-	private void applyStartupTimeout(final WaitStrategy childStrategy)
+	private void applyStartupTimeout(final AbstractWaitAbortableStrategy<?> childStrategy)
 	{
-		childStrategy.withStartupTimeout(this.startupTimeout);
+		childStrategy.withStartupTimeout(this.getStartupTimeout());
 	}
 }

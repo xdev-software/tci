@@ -21,27 +21,20 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.rnorth.ducttape.unreliables.Unreliables;
-import org.testcontainers.containers.wait.strategy.AbstractWaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
 
 import software.xdev.tci.startup.wait.AbortMonitor;
-import software.xdev.tci.startup.wait.holder.AbortableStrategyValuesHolder;
+import software.xdev.tci.startup.wait.ImprovedAbstractWaitStrategy;
+import software.xdev.tci.startup.wait.holder.WaitStrategyCurrentState;
 
 
 public abstract class AbstractWaitAbortableStrategy<S extends AbstractWaitAbortableStrategy<S>>
-	extends AbstractWaitStrategy
+	extends ImprovedAbstractWaitStrategy<S>
 {
-	protected void startupRetryUntilTrue(final Callable<Boolean> callable)
-	{
-		Unreliables.retryUntilTrue(
-			(int)this.startupTimeout.getSeconds(),
-			TimeUnit.SECONDS,
-			callable
-		);
-	}
-	
 	protected void startupRetryUntilSuccessWithRateLimitWhenNotAborted(
 		final AbortMonitor abortMonitor,
-		final Runnable runnable)
+		final Runnable runnable,
+		final WaitStrategyCurrentState waitStrategyCurrentStateHolder)
 	{
 		final AtomicReference<RuntimeException> lastFail = new AtomicReference<>();
 		
@@ -52,11 +45,13 @@ public abstract class AbstractWaitAbortableStrategy<S extends AbstractWaitAborta
 				{
 					this.getRateLimiter().doWhenReady(runnable);
 					lastFail.set(null);
+					waitStrategyCurrentStateHolder.successfullyFinished();
 					return true;
 				}
 				catch(final RuntimeException rex)
 				{
 					lastFail.set(rex);
+					waitStrategyCurrentStateHolder.withException(rex);
 					return false;
 				}
 			}
@@ -69,25 +64,27 @@ public abstract class AbstractWaitAbortableStrategy<S extends AbstractWaitAborta
 		}
 	}
 	
-	@Override
-	protected void waitUntilReady()
+	protected void startupRetryUntilTrue(final Callable<Boolean> callable)
 	{
-		this.waitUntilReady(AbortableStrategyValuesHolder.get().abortMonitor());
+		Unreliables.retryUntilTrue(
+			(int)this.getStartupTimeout().getSeconds(),
+			TimeUnit.SECONDS,
+			callable
+		);
 	}
 	
-	protected void waitUntilReady(final AbortMonitor abortMonitor)
+	@Override
+	public void waitUntilReady(final WaitStrategyTarget waitStrategyTarget)
+	{
+		throw new UnsupportedOperationException("Use the (other) waitUntilReady");
+	}
+	
+	public void waitUntilReady(
+		final WaitStrategyTarget target,
+		final AbortMonitor abortMonitor,
+		final ExecutorService executor,
+		final WaitStrategyCurrentState sc)
 	{
 		// NOOP
-	}
-	
-	protected ExecutorService getExecutor()
-	{
-		return AbortableStrategyValuesHolder.get().executor();
-	}
-	
-	@SuppressWarnings("unchecked")
-	protected S self()
-	{
-		return (S)this;
 	}
 }
