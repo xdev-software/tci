@@ -20,7 +20,7 @@ import org.testcontainers.images.RemoteDockerImage;
 import org.testcontainers.utility.DockerImageName;
 
 
-@SuppressWarnings("java:S2068")
+@SuppressWarnings({"java:S2068", "java:S2160"})
 public class RustFSContainer extends GenericContainer<RustFSContainer>
 {
 	public static final DockerImageName DEFAULT_IMAGE = DockerImageName.parse("rustfs/rustfs:1.0.5");
