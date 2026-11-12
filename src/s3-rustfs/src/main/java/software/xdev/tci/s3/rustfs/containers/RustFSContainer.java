@@ -23,7 +23,7 @@ import org.testcontainers.utility.DockerImageName;
 @SuppressWarnings("java:S2068")
 public class RustFSContainer extends GenericContainer<RustFSContainer>
 {
-	public static final DockerImageName DEFAULT_IMAGE = DockerImageName.parse("rustfs/rustfs:1.0.4");
+	public static final DockerImageName DEFAULT_IMAGE = DockerImageName.parse("rustfs/rustfs:1.0.5");
 	
 	public static final int S3_PORT = 9000;
 	
