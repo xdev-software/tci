@@ -24,7 +24,7 @@ import org.testcontainers.utility.DockerImageName;
 
 public class MailpitContainer extends GenericContainer<MailpitContainer>
 {
-	public static final DockerImageName DEFAULT_IMAGE = DockerImageName.parse("axllent/mailpit:v1.33");
+	public static final DockerImageName DEFAULT_IMAGE = DockerImageName.parse("axllent/mailpit:v1.32");
 	
 	public static final int WEB_PORT = 8025;
 	public static final int SMTP_PORT = 1025;
