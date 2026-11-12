@@ -207,24 +207,34 @@ public class HostPortWaitAbortableStrategy extends AbstractWaitAbortableStrategy
 		return this.self();
 	}
 	
-	protected static class InternalCommandPortListeningCheck implements Callable<Boolean>
+	protected abstract static class AbstractCheck implements Callable<Boolean>
+	{
+		protected final WaitStrategyCurrentState ec;
+		
+		protected AbstractCheck(final WaitStrategyCurrentState ec)
+		{
+			this.ec = ec;
+		}
+	}
+	
+	
+	protected static class InternalCommandPortListeningCheck extends AbstractCheck
 	{
 		private static final Logger LOG = LoggerFactory.getLogger(InternalCommandPortListeningCheck.class);
 		
 		protected final WaitStrategyTarget waitStrategyTarget;
 		protected final Set<Integer> internalPorts;
 		protected final String command;
-		protected final WaitStrategyCurrentState ec;
 		
 		protected InternalCommandPortListeningCheck(
 			final WaitStrategyTarget waitStrategyTarget,
 			final Set<Integer> internalPorts,
 			final WaitStrategyCurrentState ec)
 		{
+			super(ec);
 			this.waitStrategyTarget = waitStrategyTarget;
 			this.internalPorts = internalPorts;
 			this.command = this.buildCommand(internalPorts);
-			this.ec = ec;
 		}
 		
 		protected String buildCommand(final Set<Integer> internalPorts)
@@ -283,20 +293,19 @@ public class HostPortWaitAbortableStrategy extends AbstractWaitAbortableStrategy
 	}
 	
 	
-	protected static class ExternalPortListeningCheck implements Callable<Boolean>
+	protected static class ExternalPortListeningCheck extends AbstractCheck
 	{
 		protected final ContainerState containerState;
 		protected final Set<Integer> externalLivenessCheckPorts;
-		protected final WaitStrategyCurrentState ec;
 		
 		protected ExternalPortListeningCheck(
 			final ContainerState containerState,
 			final Set<Integer> externalLivenessCheckPorts,
 			final WaitStrategyCurrentState ec)
 		{
+			super(ec);
 			this.containerState = containerState;
 			this.externalLivenessCheckPorts = externalLivenessCheckPorts;
-			this.ec = ec;
 		}
 		
 		@SuppressWarnings("resource")

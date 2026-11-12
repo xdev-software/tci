@@ -2,8 +2,9 @@
 * `selenium`
   * Selenium 4.50+ is now required
   * Ported code to work with Selenium 4.50+ #810
-* Improved exception handling of `AbortableStrategy` #808
-  * If a strategy times out or fails this is now reported as the cause / add suppressed
+* Improved exception handling of AbortableStrategies #808
+  * The last states/errors of strategies are now stored
+  * If a strategy times out the last state is collected and attached to the corresponding timeout
 * Renamed and moved `JDBCWaitStrategy` → `JDBCAbortableWaitStrategy`
 * Update dependencies
 

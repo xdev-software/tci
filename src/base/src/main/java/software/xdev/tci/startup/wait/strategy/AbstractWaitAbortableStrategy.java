@@ -34,7 +34,7 @@ public abstract class AbstractWaitAbortableStrategy<S extends AbstractWaitAborta
 	protected void startupRetryUntilSuccessWithRateLimitWhenNotAborted(
 		final AbortMonitor abortMonitor,
 		final Runnable runnable,
-		final WaitStrategyCurrentState waitStrategyCurrentStateHolder)
+		final WaitStrategyCurrentState cs)
 	{
 		final AtomicReference<RuntimeException> lastFail = new AtomicReference<>();
 		
@@ -45,13 +45,13 @@ public abstract class AbstractWaitAbortableStrategy<S extends AbstractWaitAborta
 				{
 					this.getRateLimiter().doWhenReady(runnable);
 					lastFail.set(null);
-					waitStrategyCurrentStateHolder.successfullyFinished();
+					cs.successfullyFinished();
 					return true;
 				}
 				catch(final RuntimeException rex)
 				{
 					lastFail.set(rex);
-					waitStrategyCurrentStateHolder.withException(rex);
+					cs.withException(rex);
 					return false;
 				}
 			}
