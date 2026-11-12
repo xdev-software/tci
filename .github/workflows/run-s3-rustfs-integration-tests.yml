@@ -1,0 +1,23 @@
+name: Run S3-RustFS integration tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ develop ]
+    paths: 
+      - 'src/s3-rustfs/**'
+  pull_request:
+    branches: [ develop ]
+    paths: 
+      - 'src/s3-rustfs/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  s3-rustfs:
+    uses: ./.github/workflows/run-module-integration-tests.yml
+    with:
+      module: s3-rustfs
+    secrets: inherit
