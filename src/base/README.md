@@ -14,7 +14,8 @@ Base for other modules and core components.
 | [Container Leak detection](./src/main/java/software/xdev/tci/leakdetection/)¹ | Prevents you from running out of resources | [here](../../demos/base-demo/src/test/java/software/xdev/tci/leak/) |
 | [Tracing](./src/main/java/software/xdev/tci/tracing/)¹ | Makes finding bottlenecks and similar problems easier | |
 | [Reporting of fatal (Java) crashes during container startup](./src/main/java/software/xdev/tci/startup/error/java/fatal/) | Easier error diagnosis | [here](../../demos/advanced-demo/integration-tests/tci-webapp/src/main/java/software/xdev/tci/demo/tci/webapp/containers/WebAppContainer.java) |
-| [Fail-fast/Abortable wait strategies](./src/main/java/software/xdev/tci/startup/wait/) | Fail fast when a container crashes - don't wait until the timeout | [here](../../demos/advanced-demo/integration-tests/tci-webapp/src/main/java/software/xdev/tci/demo/tci/webapp/containers/WebAppContainer.java) |
+| [Fail-fast/Abortable wait strategies](./src/main/java/software/xdev/tci/startup/wait/) | Fail fast when a container crashes - don't wait until the timeout.<br/>They also report their last state/error when a timeout occurs. | [here](../../demos/advanced-demo/integration-tests/tci-webapp/src/main/java/software/xdev/tci/demo/tci/webapp/containers/WebAppContainer.java) |
+| [Commited Containers / Container snapshots](./src/main/java/software/xdev/tci/factory/prestart/snapshoting) | Snapshots the first fully started container / commits an image of it and uses this for subsequent runs. Can massively speed up startup-heavy infrastructure like databases (with migrations). | [here](../../demos/advanced-demo/integration-tests/tci-db/src/main/java/software/xdev/tci/demo/tci/db/factory/DBTCIFactory.java) | 
 
 ¹ = Active by default due to service loading
 

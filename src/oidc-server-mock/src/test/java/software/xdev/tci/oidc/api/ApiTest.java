@@ -15,30 +15,14 @@
  */
 package software.xdev.tci.oidc.api;
 
-import org.junit.jupiter.api.BeforeAll;
-
-import software.xdev.tci.network.LazyNetwork;
-import software.xdev.tci.network.LazyNetworkPool;
 import software.xdev.tci.oidc.BaseOIDCTCI;
 
 
 public abstract class ApiTest<T extends BaseOIDCTCI<T, ?, ?>>
 {
-	private static final LazyNetworkPool LAZY_NETWORK_POOL = new LazyNetworkPool();
-	
-	protected LazyNetwork network;
 	protected T oidcInfra;
 	
-	@BeforeAll
-	static void beforeAll()
-	{
-		LAZY_NETWORK_POOL.managePoolAsync();
-	}
-	
-	protected void beforeEach()
-	{
-		this.network = LAZY_NETWORK_POOL.getNew();
-	}
+	protected abstract void beforeEach();
 	
 	protected void afterEach()
 	{
@@ -46,11 +30,6 @@ public abstract class ApiTest<T extends BaseOIDCTCI<T, ?, ?>>
 		{
 			this.oidcInfra.stop();
 			this.oidcInfra = null;
-		}
-		if(this.network != null)
-		{
-			this.network.close();
-			this.network = null;
 		}
 	}
 }

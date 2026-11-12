@@ -15,12 +15,19 @@
  */
 package software.xdev.tci;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.rnorth.ducttape.unreliables.Unreliables;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 
+import software.xdev.tci.concurrent.LazyConstantSuppliers;
 import software.xdev.tci.safestart.SafeNamedContainerStarter;
 
 
@@ -37,6 +44,10 @@ import software.xdev.tci.safestart.SafeNamedContainerStarter;
 @SuppressWarnings("java:S119")
 public class TCI<C extends GenericContainer<?>>
 {
+	protected static final Map<Class<?>, Logger> LOGGER_CACHE = new ConcurrentHashMap<>();
+	
+	private final Supplier<Logger> loggerSupplier;
+	
 	private C container;
 	private String networkAlias;
 	private Runnable onStopped;
@@ -45,6 +56,12 @@ public class TCI<C extends GenericContainer<?>>
 	{
 		this.container = Objects.requireNonNull(container);
 		this.networkAlias = networkAlias;
+		this.loggerSupplier = LazyConstantSuppliers.of(this::createLogger);
+	}
+	
+	protected Logger createLogger()
+	{
+		return LOGGER_CACHE.computeIfAbsent(this.getClass(), LoggerFactory::getLogger);
 	}
 	
 	public void setOnStopped(final Runnable onStopped)
@@ -103,5 +120,39 @@ public class TCI<C extends GenericContainer<?>>
 	public String getNetworkAlias()
 	{
 		return this.networkAlias;
+	}
+	
+	protected Logger logger()
+	{
+		return this.loggerSupplier.get();
+	}
+	
+	protected void closeAndFree(@Nullable final AutoCloseable closeable, final String name, final Runnable freeUp)
+	{
+		if(closeable != null)
+		{
+			this.closeNonNull(closeable, name);
+			freeUp.run();
+		}
+	}
+	
+	protected void close(@Nullable final AutoCloseable closeable, final String name)
+	{
+		if(closeable != null)
+		{
+			this.closeNonNull(closeable, name);
+		}
+	}
+	
+	protected void closeNonNull(@NonNull final AutoCloseable closeable, final String name)
+	{
+		try
+		{
+			closeable.close();
+		}
+		catch(final Exception ex)
+		{
+			this.logger().warn("Failed to close {}", name, ex);
+		}
 	}
 }

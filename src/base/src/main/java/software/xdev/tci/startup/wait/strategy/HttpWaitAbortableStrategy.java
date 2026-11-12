@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -46,9 +47,11 @@ import org.rnorth.ducttape.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.ContainerLaunchException;
+import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
 import org.testcontainers.shaded.com.google.common.io.BaseEncoding;
 
 import software.xdev.tci.startup.wait.AbortMonitor;
+import software.xdev.tci.startup.wait.holder.WaitStrategyCurrentState;
 
 
 /**
@@ -251,14 +254,18 @@ public class HttpWaitAbortableStrategy extends AbstractWaitAbortableStrategy<Htt
 	// endregion
 	
 	@Override
-	protected void waitUntilReady(final AbortMonitor abortMonitor)
+	public void waitUntilReady(
+		final WaitStrategyTarget target,
+		final AbortMonitor abortMonitor,
+		final ExecutorService executor,
+		final WaitStrategyCurrentState cs)
 	{
-		final String containerName = this.waitStrategyTarget.getContainerInfo().getName();
+		final String containerName = target.getContainerInfo().getName();
 		
 		final Integer livenessCheckPort = this.livenessPort
-			.map(this.waitStrategyTarget::getMappedPort)
+			.map(target::getMappedPort)
 			.orElseGet(() -> {
-				final Set<Integer> livenessCheckPorts = this.getLivenessCheckPorts();
+				final Set<Integer> livenessCheckPorts = target.getLivenessCheckPortNumbers();
 				if(livenessCheckPorts == null || livenessCheckPorts.isEmpty())
 				{
 					LOG.warn("{}: No exposed ports or mapped ports - cannot wait for status", containerName);
@@ -273,22 +280,22 @@ public class HttpWaitAbortableStrategy extends AbstractWaitAbortableStrategy<Htt
 		{
 			return;
 		}
-		final URI rawUri = this.buildLivenessUri(livenessCheckPort);
+		final URI rawUri = this.buildLivenessUri(target, livenessCheckPort);
 		final String uri = rawUri.toString();
 		
 		try
 		{
 			// Un-map the port for logging
-			final int originalPort = this.waitStrategyTarget
+			final int originalPort = target
 				.getExposedPorts()
 				.stream()
-				.filter(exposedPort -> rawUri.getPort() == this.waitStrategyTarget.getMappedPort(exposedPort))
+				.filter(exposedPort -> rawUri.getPort() == target.getMappedPort(exposedPort))
 				.findFirst()
 				.orElseThrow(() -> new IllegalStateException("Target port " + rawUri.getPort() + " is not exposed"));
 			LOG.info(
 				"{}: Waiting for {} seconds for URL: {} (where port {} maps to container port {})",
 				containerName,
-				this.startupTimeout.getSeconds(),
+				this.getStartupTimeout().getSeconds(),
 				uri,
 				rawUri.getPort(),
 				originalPort
@@ -307,7 +314,8 @@ public class HttpWaitAbortableStrategy extends AbstractWaitAbortableStrategy<Htt
 		{
 			this.startupRetryUntilSuccessWithRateLimitWhenNotAborted(
 				abortMonitor,
-				() -> this.connectAndCheck(uri));
+				() -> this.connectAndCheck(uri),
+				cs);
 			abortMonitor.throwIfRequired();
 		}
 		catch(final TimeoutException e)
@@ -405,7 +413,8 @@ public class HttpWaitAbortableStrategy extends AbstractWaitAbortableStrategy<Htt
 		{
 			// Create a trust manager that does not validate certificate chains
 			// and trust all certificates
-			final TrustManager[] trustAllCerts = new TrustManager[]{
+			@SuppressWarnings({"java:S1186", "java:S4830"})
+			final TrustManager[] trustAllCerts = {
 				new X509ExtendedTrustManager()
 				{
 					@Override
@@ -476,15 +485,12 @@ public class HttpWaitAbortableStrategy extends AbstractWaitAbortableStrategy<Htt
 	
 	/**
 	 * Build the URI on which to check if the container is ready.
-	 *
-	 * @param livenessCheckPort the liveness port
-	 * @return the liveness URI
 	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
-	protected URI buildLivenessUri(final int livenessCheckPort)
+	protected URI buildLivenessUri(final WaitStrategyTarget target, final int livenessCheckPort)
 	{
 		final String scheme = (this.tlsEnabled ? "https" : "http") + "://";
-		final String host = this.waitStrategyTarget.getHost();
+		final String host = target.getHost();
 		
 		final String portSuffix =
 			this.tlsEnabled && livenessCheckPort == 443

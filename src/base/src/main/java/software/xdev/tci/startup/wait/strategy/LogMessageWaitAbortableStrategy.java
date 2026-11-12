@@ -17,6 +17,7 @@ package software.xdev.tci.startup.wait.strategy;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
@@ -25,10 +26,12 @@ import org.testcontainers.containers.ContainerLaunchException;
 import org.testcontainers.containers.output.FrameConsumerResultCallback;
 import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.output.WaitingConsumer;
+import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
 
 import com.github.dockerjava.api.command.LogContainerCmd;
 
 import software.xdev.tci.startup.wait.AbortMonitor;
+import software.xdev.tci.startup.wait.holder.WaitStrategyCurrentState;
 
 
 /**
@@ -41,11 +44,15 @@ public class LogMessageWaitAbortableStrategy extends AbstractWaitAbortableStrate
 	protected int times = 1;
 	
 	@Override
-	protected void waitUntilReady(final AbortMonitor abortMonitor)
+	public void waitUntilReady(
+		final WaitStrategyTarget target,
+		final AbortMonitor abortMonitor,
+		final ExecutorService executor,
+		final WaitStrategyCurrentState cs)
 	{
-		try(final LogContainerCmd cmd = this.waitStrategyTarget
+		try(final LogContainerCmd cmd = target
 			.getDockerClient()
-			.logContainerCmd(this.waitStrategyTarget.getContainerId())
+			.logContainerCmd(target.getContainerId())
 			.withFollowStream(true)
 			.withSince(0)
 			.withStdOut(true)
@@ -69,19 +76,20 @@ public class LogMessageWaitAbortableStrategy extends AbstractWaitAbortableStrate
 				{
 					waitingConsumer.waitUntil(
 						waitPredicate,
-						this.startupTimeout.getSeconds(),
+						this.getStartupTimeout().getSeconds(),
 						TimeUnit.SECONDS,
 						this.times);
 				}
 				catch(final TimeoutException e)
 				{
-					throw new ContainerLaunchException(
-						"Timed out waiting for log output matching '" + this.regEx + "'",
-						e);
+					final String msg = "Timed out waiting for log output matching '" + this.regEx + "'";
+					cs.withErrorMessage(msg);
+					throw new ContainerLaunchException(msg, e);
 				}
 			}
 			catch(final IOException ioe)
 			{
+				cs.withException(ioe);
 				throw new UncheckedIOException(ioe);
 			}
 		}

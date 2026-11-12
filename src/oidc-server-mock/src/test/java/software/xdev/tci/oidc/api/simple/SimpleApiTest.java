@@ -34,8 +34,7 @@ class SimpleApiTest extends ApiTest<OIDCTCI>
 	@BeforeEach
 	protected void beforeEach()
 	{
-		super.beforeEach();
-		this.oidcInfra = FACTORY.getNew(this.network);
+		this.oidcInfra = FACTORY.getNew(null);
 	}
 	
 	@Test

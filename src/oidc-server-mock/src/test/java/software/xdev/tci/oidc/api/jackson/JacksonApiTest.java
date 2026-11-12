@@ -32,8 +32,7 @@ class JacksonApiTest extends ApiTest<JacksonOIDCTCI>
 	@BeforeEach
 	protected void beforeEach()
 	{
-		super.beforeEach();
-		this.oidcInfra = FACTORY.getNew(this.network);
+		this.oidcInfra = FACTORY.getNew(null);
 	}
 	
 	@Test

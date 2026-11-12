@@ -1,3 +1,15 @@
+# 4.9.0
+* `selenium`
+  * Selenium 4.50+ is now required
+  * Ported code to work with Selenium 4.50+ #810
+* Improved exception handling of AbortableStrategies #808
+  * The last states/errors of strategies are now stored
+  * If a strategy times out the last state is collected and attached to the corresponding timeout
+* Renamed and moved `JDBCWaitStrategy` → `JDBCAbortableWaitStrategy`
+* Added `s3-rustfs` module #762
+* Update dependencies
+  * Introduce automated updates for default images in Containers
+
 # 4.8.1
 * Correctly configure timeout in `NativeAdvancedBuildImageHandler`
 

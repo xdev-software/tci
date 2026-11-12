@@ -26,12 +26,11 @@ import java.util.function.UnaryOperator;
 
 import org.rnorth.ducttape.ratelimits.RateLimiter;
 import org.rnorth.ducttape.ratelimits.RateLimiterBuilder;
-import org.testcontainers.containers.wait.strategy.AbstractWaitStrategy;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
 
 import software.xdev.tci.concurrent.ExecutorServiceCreatorHolder;
-import software.xdev.tci.startup.wait.holder.AbortableStrategyValues;
-import software.xdev.tci.startup.wait.holder.AbortableStrategyValuesHolder;
+import software.xdev.tci.startup.wait.holder.WaitStrategyCurrentState;
 import software.xdev.tci.startup.wait.strategy.AbstractWaitAbortableStrategy;
 import software.xdev.tci.startup.wait.strategy.WaitAllAbortableStrategy;
 
@@ -43,35 +42,28 @@ import software.xdev.tci.startup.wait.strategy.WaitAllAbortableStrategy;
  * would wait for the timeout to expire which can take up to a few minutes.
  * </p>
  */
-public class FastAbortOnContainerDeathWaitStrategy extends AbstractWaitStrategy
+public class FastAbortOnContainerDeathWaitStrategy
+	extends ImprovedAbstractWaitStrategy<FastAbortOnContainerDeathWaitStrategy>
 {
 	protected static final ExecutorService DEFAULT_EXECUTOR =
 		ExecutorServiceCreatorHolder.instance().createUnlimited("TCI-testcontainers-wait");
 	
 	protected static final RateLimiter DEFAULT_RATE_LIMITER = RateLimiterBuilder
 		.newBuilder()
-		.withRate(10, TimeUnit.MINUTES)
+		.withRate(10, TimeUnit.MINUTES) // all 6s
 		.withConstantThroughput()
 		.build();
 	
-	protected final WaitStrategy waitStrategy;
+	protected final AbstractWaitAbortableStrategy<?> waitStrategy;
 	protected final ExecutorService executor;
 	
 	public FastAbortOnContainerDeathWaitStrategy(final AbstractWaitAbortableStrategy<?> waitStrategy)
-	{
-		this((WaitStrategy)waitStrategy);
-	}
-	
-	/**
-	 * @apiNote It's recommended to use {@link #FastAbortOnContainerDeathWaitStrategy(AbstractWaitAbortableStrategy)}
-	 */
-	public FastAbortOnContainerDeathWaitStrategy(final WaitStrategy waitStrategy)
 	{
 		this(waitStrategy, DEFAULT_EXECUTOR);
 	}
 	
 	protected FastAbortOnContainerDeathWaitStrategy(
-		final WaitStrategy waitStrategy,
+		final AbstractWaitAbortableStrategy<?> waitStrategy,
 		final ExecutorService executor)
 	{
 		this.waitStrategy = waitStrategy;
@@ -81,18 +73,20 @@ public class FastAbortOnContainerDeathWaitStrategy extends AbstractWaitStrategy
 	}
 	
 	@Override
-	protected void waitUntilReady()
+	public void waitUntilReady(final WaitStrategyTarget target)
 	{
 		final AbortMonitor abortMonitor = new AbortMonitor();
 		final CompletableFuture<Void> cfWaitStrategy = CompletableFuture.runAsync(
-			() -> AbortableStrategyValuesHolder.executeWith(
-				() -> this.waitStrategy.waitUntilReady(this.waitStrategyTarget),
-				new AbortableStrategyValues(abortMonitor, this.executor)),
+			() -> this.waitStrategy.waitUntilReady(
+				target,
+				abortMonitor,
+				this.executor,
+				new WaitStrategyCurrentState(this.waitStrategy)),
 			this.executor
 		);
 		
 		final CompletableFuture<Void> cfContainerDeathWatchDog = CompletableFuture.runAsync(
-			() -> this.runCheckIfContainerIsDead(abortMonitor, cfWaitStrategy),
+			() -> this.runCheckIfContainerIsDead(target, abortMonitor, cfWaitStrategy),
 			this.executor
 		);
 		
@@ -108,15 +102,16 @@ public class FastAbortOnContainerDeathWaitStrategy extends AbstractWaitStrategy
 	
 	@SuppressWarnings("java:S5411") // Irrelevant here!
 	protected void runCheckIfContainerIsDead(
+		final WaitStrategyTarget target,
 		final AbortMonitor abortMonitor,
 		final CompletableFuture<?> cfWaitStrategy)
 	{
 		while(!abortMonitor.shouldAbort() && !cfWaitStrategy.isDone())
 		{
-			if(!this.rateLimiterWhenReadyExceptionless(this::isContainerAlive))
+			if(!this.rateLimiterWhenReadyExceptionless(() -> this.isContainerAlive(target)))
 			{
 				final IllegalStateException abortEx = new IllegalStateException(
-					"Container " + this.waitStrategyTarget.getContainerId() + " is dead - Aborting");
+					"Container " + target.getContainerId() + " is dead - Aborting");
 				abortMonitor.trigger(abortEx);
 				throw abortEx;
 			}
@@ -140,9 +135,9 @@ public class FastAbortOnContainerDeathWaitStrategy extends AbstractWaitStrategy
 		}
 	}
 	
-	protected boolean isContainerAlive()
+	protected boolean isContainerAlive(final WaitStrategyTarget target)
 	{
-		return Optional.ofNullable(this.waitStrategyTarget.getCurrentContainerInfo().getState())
+		return Optional.ofNullable(target.getCurrentContainerInfo().getState())
 			.filter(s -> Boolean.TRUE.equals(s.getRunning())
 				|| Boolean.TRUE.equals(s.getPaused()))
 			.isPresent();

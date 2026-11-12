@@ -21,7 +21,6 @@ import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.core5.util.Timeout;
-import org.slf4j.LoggerFactory;
 
 import software.xdev.mailpit.client.ApiClient;
 import software.xdev.tci.TCI;
@@ -39,6 +38,7 @@ public class MailpitTCI extends TCI<MailpitContainer>
 	
 	public String getExternalHTTPEndpoint()
 	{
+		// noinspection HttpUrlsUsage
 		return "http://"
 			+ this.getContainer().getHost()
 			+ ":"
@@ -54,16 +54,15 @@ public class MailpitTCI extends TCI<MailpitContainer>
 		
 		final Duration defaultTimeout = Duration.ofSeconds(30);
 		
-		this.apiClient = new ApiClient();
-		this.apiClient.setHttpClient(HttpClientBuilder.create()
+		this.apiClient = new ApiClient(HttpClientBuilder.create()
 			.setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
 				.setDefaultConnectionConfig(ConnectionConfig.custom()
 					.setConnectTimeout(Timeout.of(defaultTimeout))
 					.setSocketTimeout(Timeout.of(defaultTimeout))
 					.build())
 				.build())
-			.build());
-		this.apiClient.setBasePath(this.getExternalHTTPEndpoint());
+			.build())
+			.setBasePath(this.getExternalHTTPEndpoint());
 		
 		return this.apiClient;
 	}
@@ -73,14 +72,7 @@ public class MailpitTCI extends TCI<MailpitContainer>
 	{
 		if(this.apiClient != null)
 		{
-			try
-			{
-				this.apiClient.getHttpClient().close();
-			}
-			catch(final Exception e)
-			{
-				LoggerFactory.getLogger(this.getClass()).warn("Failed to close API client", e);
-			}
+			this.closeNonNull(this.apiClient.getHttpClient(), "API client");
 		}
 		super.stop();
 	}

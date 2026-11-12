@@ -17,8 +17,6 @@ package software.xdev.tci.db;
 
 import java.sql.Driver;
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -27,8 +25,6 @@ import javax.sql.DataSource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 
 import software.xdev.tci.TCI;
@@ -38,8 +34,6 @@ import software.xdev.tci.db.persistence.EntityManagerControllerFactory;
 
 public abstract class BaseDBTCI<C extends JdbcDatabaseContainer<?>> extends TCI<C>
 {
-	protected static final Map<Class<?>, Logger> LOGGER_CACHE = new ConcurrentHashMap<>();
-	
 	public static final String DEFAULT_DATABASE = "testdb";
 	public static final String DEFAULT_USERNAME = "testuser";
 	@SuppressWarnings("java:S2068") // This is only for tests
@@ -47,7 +41,6 @@ public abstract class BaseDBTCI<C extends JdbcDatabaseContainer<?>> extends TCI<
 	
 	protected final boolean migrateAndInitializeEMC;
 	protected final Supplier<EntityManagerControllerFactory<?, ?>> emcFactorySupplier;
-	protected final Logger logger;
 	
 	protected String database = DEFAULT_DATABASE;
 	protected String username = DEFAULT_USERNAME;
@@ -65,8 +58,6 @@ public abstract class BaseDBTCI<C extends JdbcDatabaseContainer<?>> extends TCI<
 		super(container, networkAlias);
 		this.migrateAndInitializeEMC = migrateAndInitializeEMC;
 		this.emcFactorySupplier = emcFactorySupplier;
-		
-		this.logger = LOGGER_CACHE.computeIfAbsent(this.getClass(), LoggerFactory::getLogger);
 	}
 	
 	@Override
@@ -76,32 +67,21 @@ public abstract class BaseDBTCI<C extends JdbcDatabaseContainer<?>> extends TCI<
 		if(this.migrateAndInitializeEMC)
 		{
 			// Do basic migrations async
-			this.log().debug("Running migration to basic structure");
+			this.logger().debug("Running migration to basic structure");
 			this.execInitialDatabaseMigration();
-			this.log().info("Migration executed");
+			this.logger().info("Migration executed");
 			
 			// Create EMC in background to improve performance (~5s)
-			this.log().debug("Initializing EntityManagerController...");
+			this.logger().debug("Initializing EntityManagerController...");
 			this.getEMC();
-			this.log().info("Initialized EntityManagerController");
+			this.logger().info("Initialized EntityManagerController");
 		}
 	}
 	
 	@Override
 	public void stop()
 	{
-		if(this.emc != null)
-		{
-			try
-			{
-				this.emc.close();
-			}
-			catch(final Exception ex)
-			{
-				this.log().warn("Failed to close EntityManagerController", ex);
-			}
-			this.emc = null;
-		}
+		this.closeAndFree(this.emc, "EntityManagerController", () -> this.emc = null);
 		super.stop();
 	}
 	
@@ -179,11 +159,6 @@ public abstract class BaseDBTCI<C extends JdbcDatabaseContainer<?>> extends TCI<
 	}
 	
 	public abstract void migrateDatabase(final String... locations);
-	
-	protected Logger log()
-	{
-		return this.logger;
-	}
 	
 	// region Configure
 	
