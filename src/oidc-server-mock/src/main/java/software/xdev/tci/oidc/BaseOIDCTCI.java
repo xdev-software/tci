@@ -24,8 +24,6 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import org.rnorth.ducttape.unreliables.Unreliables;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import software.xdev.tci.TCI;
 import software.xdev.tci.envperf.EnvironmentPerformance;
@@ -40,8 +38,6 @@ public abstract class BaseOIDCTCI<
 	A extends OIDCServerMockApi>
 	extends TCI<C>
 {
-	private static final Logger LOG = LoggerFactory.getLogger(BaseOIDCTCI.class);
-	
 	public static final String CLIENT_ID = BaseOIDCServerContainer.DEFAULT_CLIENT_ID;
 	public static final String CLIENT_SECRET = BaseOIDCServerContainer.DEFAULT_CLIENT_SECRET;
 	
@@ -102,14 +98,7 @@ public abstract class BaseOIDCTCI<
 		{
 			if(this.api instanceof final AutoCloseable autoCloseableApi)
 			{
-				try
-				{
-					autoCloseableApi.close();
-				}
-				catch(final Exception ex)
-				{
-					LOG.warn("Failed to close API", ex);
-				}
+				this.closeNonNull(autoCloseableApi, "API");
 			}
 			this.api = null;
 		}

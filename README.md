@@ -35,6 +35,8 @@ Modules for XDEV's Testcontainer Infrastructure Framework
   * Predefined implementation for [Mockserver](https://github.com/xdev-software/mockserver-neolight)
 * [oidc-server-mock](./src/oidc-server-mock/)
   * Predefined implementation for [OIDC Server Mock](https://github.com/xdev-software/oidc-server-mock)
+* [s3-rustfs](./src/s3-rustfs/)
+  * Predefined implementation for using S3 with [RustFS](https://github.com/rustfs/rustfs)
 * [selenium](./src/selenium/)
   * Predefined implementation for [Selenium](https://github.com/SeleniumHQ/selenium)
   * Includes improvements from [xdev-software/testcontainers-selenium](https://github.com/xdev-software/testcontainers-selenium/)

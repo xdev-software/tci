@@ -31,7 +31,12 @@ public class MailpitContainer extends GenericContainer<MailpitContainer>
 	
 	public MailpitContainer()
 	{
-		super(DEFAULT_IMAGE);
+		this(DEFAULT_IMAGE);
+	}
+	
+	public MailpitContainer(final DockerImageName dockerImageName)
+	{
+		super(dockerImageName);
 		
 		// Version check is not needed in tests
 		this.addEnv("MP_DISABLE_VERSION_CHECK", "true");

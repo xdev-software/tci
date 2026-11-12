@@ -6,6 +6,7 @@
   * The last states/errors of strategies are now stored
   * If a strategy times out the last state is collected and attached to the corresponding timeout
 * Renamed and moved `JDBCWaitStrategy` → `JDBCAbortableWaitStrategy`
+* Added `s3-rustfs` module #762
 * Update dependencies
 
 # 4.8.1

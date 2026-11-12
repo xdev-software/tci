@@ -27,11 +27,13 @@ public class WebAppTCI extends TCI<WebAppContainer>
 	
 	public String getInternalHTTPEndpoint()
 	{
+		// noinspection HttpUrlsUsage
 		return "http://" + this.getNetworkAlias() + ":" + WebAppContainer.DEFAULT_HTTP_PORT;
 	}
 	
 	public String getExternalHTTPEndpoint()
 	{
+		// noinspection HttpUrlsUsage
 		return "http://" + this.getContainer().getHost()
 			+ ":" + this.getContainer().getMappedPort(WebAppContainer.DEFAULT_HTTP_PORT);
 	}

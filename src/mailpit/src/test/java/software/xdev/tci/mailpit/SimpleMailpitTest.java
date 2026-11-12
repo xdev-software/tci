@@ -40,8 +40,6 @@ import software.xdev.tci.concurrent.TCIExecutorServiceHolder;
 import software.xdev.tci.factory.registry.TCIFactoryRegistry;
 import software.xdev.tci.mailpit.containers.MailpitContainer;
 import software.xdev.tci.mailpit.factory.MailpitTCIFactory;
-import software.xdev.tci.network.LazyNetwork;
-import software.xdev.tci.network.LazyNetworkPool;
 
 
 class SimpleMailpitTest
@@ -52,16 +50,12 @@ class SimpleMailpitTest
 		container.addExposedPort(MailpitTCIFactory.SMTP_PORT);
 		return container;
 	});
-	protected static final LazyNetworkPool LAZY_NETWORK_POOL = new LazyNetworkPool();
 	
-	protected LazyNetwork network;
 	protected MailpitTCI mailpitInfra;
 	
 	@BeforeAll
 	static void beforeAll()
 	{
-		LAZY_NETWORK_POOL.managePoolAsync();
-		
 		TCIFactoryRegistry.instance().warmUp();
 		
 		// Preload classes
@@ -71,8 +65,7 @@ class SimpleMailpitTest
 	@BeforeEach
 	void beforeEach()
 	{
-		this.network = LAZY_NETWORK_POOL.getNew();
-		this.mailpitInfra = FACTORY.getNew(this.network);
+		this.mailpitInfra = FACTORY.getNew(null);
 	}
 	
 	@Test
@@ -129,17 +122,11 @@ class SimpleMailpitTest
 			this.mailpitInfra.stop();
 			this.mailpitInfra = null;
 		}
-		if(this.network != null)
-		{
-			this.network.close();
-			this.network = null;
-		}
 	}
 	
 	@AfterAll
 	static void afterAll()
 	{
 		FACTORY.close();
-		LAZY_NETWORK_POOL.close();
 	}
 }

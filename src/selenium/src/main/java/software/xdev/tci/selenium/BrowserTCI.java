@@ -35,8 +35,6 @@ import org.openqa.selenium.remote.http.ClientConfig;
 import org.openqa.selenium.remote.http.HttpClient;
 import org.rnorth.ducttape.timeouts.Timeouts;
 import org.rnorth.ducttape.unreliables.Unreliables;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.lifecycle.TestDescription;
 
 import software.xdev.tci.TCI;
@@ -48,8 +46,6 @@ import software.xdev.tci.selenium.containers.SeleniumBrowserWebDriverContainer;
 
 public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 {
-	private static final Logger LOG = LoggerFactory.getLogger(BrowserTCI.class);
-	
 	protected static final Supplier<HttpClient.Factory> DEFAULT_HTTP_CLIENT_FACTORY_PROVIDER =
 		LazyConstantSuppliers.of(HttpClient.Factory::createDefault);
 	
@@ -133,7 +129,7 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 	@SuppressWarnings("checkstyle:MagicNumber")
 	protected void initWebDriver()
 	{
-		LOG.debug("Initializing WebDriver");
+		this.logger().debug("Initializing WebDriver");
 		final HttpClient.Factory factory = this.httpClientFactoryProvider.get();
 		final AtomicInteger retryCounter = new AtomicInteger(1);
 		this.webDriver = Unreliables.retryUntilSuccess(
@@ -156,7 +152,7 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 		final ClientConfig config =
 			this.clientConfig.baseUri(this.getContainer().getSeleniumAddressURI());
 		final int tryCount = retryCounter.getAndIncrement();
-		LOG.info(
+		this.logger().info(
 			"Creating new WebDriver [retryCount={},retrySec={},clientConfig={}] Try #{}",
 			this.webDriverRetryCount,
 			this.webDriverRetrySec,
@@ -188,12 +184,12 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 			// Cancel further communication and abort all connections
 			try
 			{
-				LOG.warn("Encounter problem in try #{} - Terminating communication", tryCount, rex);
+				this.logger().warn("Encounter problem in try #{} - Terminating communication", tryCount, rex);
 				client.close();
 			}
 			catch(final Exception ex)
 			{
-				LOG.warn("Failed to cleanup try #{}", tryCount, ex);
+				this.logger().warn("Failed to cleanup try #{}", tryCount, ex);
 			}
 			
 			throw rex;
@@ -219,7 +215,7 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 			return;
 		}
 		
-		LOG.info("Installing Log Inspector");
+		this.logger().info("Installing Log Inspector");
 		
 		this.logInspector = new LogInspector(this.webDriver);
 		final String name = this.getContainer().getContainerNameCleaned();
@@ -273,18 +269,8 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 		if(this.logInspector != null)
 		{
 			final long startMs = System.currentTimeMillis();
-			try
-			{
-				this.logInspector.close();
-			}
-			catch(final Exception e)
-			{
-				LOG.warn("Failed to stop logInspector", e);
-			}
-			finally
-			{
-				LOG.debug("Stopping logInspector took {}ms", System.currentTimeMillis() - startMs);
-			}
+			this.closeNonNull(this.logInspector, "logInspector");
+			this.logger().debug("Stopping logInspector took {}ms", System.currentTimeMillis() - startMs);
 			this.logInspector = null;
 		}
 		if(this.webDriver != null)
@@ -296,11 +282,11 @@ public class BrowserTCI extends TCI<SeleniumBrowserWebDriverContainer>
 			}
 			catch(final Exception e)
 			{
-				LOG.warn("Failed to quit webdriver", e);
+				this.logger().warn("Failed to quit webdriver", e);
 			}
 			finally
 			{
-				LOG.debug("Quiting driver took {}ms", System.currentTimeMillis() - startMs);
+				this.logger().debug("Quiting driver took {}ms", System.currentTimeMillis() - startMs);
 			}
 			this.webDriver = null;
 		}

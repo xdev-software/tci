@@ -28,6 +28,7 @@
 		<module>mailpit</module>
 		<module>mockserver</module>
 		<module>oidc-server-mock</module>
+		<module>s3-rustfs</module>
 		<module>selenium</module>
 		<module>spring-dao-support</module>
 	</modules>
