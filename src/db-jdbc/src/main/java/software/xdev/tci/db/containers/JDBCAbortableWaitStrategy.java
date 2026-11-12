@@ -50,7 +50,7 @@ public class JDBCAbortableWaitStrategy extends AbstractWaitAbortableStrategy<JDB
 		final WaitStrategyTarget target,
 		final AbortMonitor abortMonitor,
 		final ExecutorService executor,
-		final WaitStrategyCurrentState sc)
+		final WaitStrategyCurrentState cs)
 	{
 		if(!(target instanceof final JdbcDatabaseContainer<?> container))
 		{
@@ -71,7 +71,7 @@ public class JDBCAbortableWaitStrategy extends AbstractWaitAbortableStrategy<JDB
 					throw new IllegalStateException("SQL failed", sqlEx);
 				}
 			},
-			sc
+			cs
 		);
 	}
 	

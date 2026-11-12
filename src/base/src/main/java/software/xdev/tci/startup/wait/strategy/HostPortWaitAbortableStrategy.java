@@ -61,7 +61,7 @@ public class HostPortWaitAbortableStrategy extends AbstractWaitAbortableStrategy
 		final WaitStrategyTarget target,
 		final AbortMonitor abortMonitor,
 		final ExecutorService executor,
-		final WaitStrategyCurrentState sc)
+		final WaitStrategyCurrentState cs)
 	{
 		final Set<Integer> externalLivenessCheckPorts = this.determineExternalLivenessCheckPorts(target);
 		if(externalLivenessCheckPorts == null || externalLivenessCheckPorts.isEmpty())
@@ -82,8 +82,8 @@ public class HostPortWaitAbortableStrategy extends AbstractWaitAbortableStrategy
 			target,
 			externalLivenessCheckPorts);
 		
-		final Callable<Boolean> internalCheck = this.createInternalCheck(target, internalPorts, sc);
-		final Callable<Boolean> externalCheck = this.createExternalCheck(target, externalLivenessCheckPorts, sc);
+		final Callable<Boolean> internalCheck = this.createInternalCheck(target, internalPorts, cs);
+		final Callable<Boolean> externalCheck = this.createExternalCheck(target, externalLivenessCheckPorts, cs);
 		
 		try
 		{
@@ -148,7 +148,7 @@ public class HostPortWaitAbortableStrategy extends AbstractWaitAbortableStrategy
 					+ " should be listening)",
 				e
 			);
-			sc.withException(cle);
+			cs.withException(cle);
 			throw cle;
 		}
 	}

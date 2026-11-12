@@ -48,7 +48,7 @@ public class LogMessageWaitAbortableStrategy extends AbstractWaitAbortableStrate
 		final WaitStrategyTarget target,
 		final AbortMonitor abortMonitor,
 		final ExecutorService executor,
-		final WaitStrategyCurrentState sc)
+		final WaitStrategyCurrentState cs)
 	{
 		try(final LogContainerCmd cmd = target
 			.getDockerClient()
@@ -83,13 +83,13 @@ public class LogMessageWaitAbortableStrategy extends AbstractWaitAbortableStrate
 				catch(final TimeoutException e)
 				{
 					final String msg = "Timed out waiting for log output matching '" + this.regEx + "'";
-					sc.withErrorMessage(msg);
+					cs.withErrorMessage(msg);
 					throw new ContainerLaunchException(msg, e);
 				}
 			}
 			catch(final IOException ioe)
 			{
-				sc.withException(ioe);
+				cs.withException(ioe);
 				throw new UncheckedIOException(ioe);
 			}
 		}

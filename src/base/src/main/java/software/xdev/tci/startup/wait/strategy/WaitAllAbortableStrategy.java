@@ -61,11 +61,11 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 		final WaitStrategyTarget target,
 		final AbortMonitor abortMonitor,
 		final ExecutorService executor,
-		final WaitStrategyCurrentState sc)
+		final WaitStrategyCurrentState cs)
 	{
 		if(this.mode == WaitAllStrategy.Mode.WITH_INDIVIDUAL_TIMEOUTS_ONLY)
 		{
-			this.waitUntilNestedStrategiesAreReady(new AtomicReference<>(), target, abortMonitor, executor, sc);
+			this.waitUntilNestedStrategiesAreReady(new AtomicReference<>(), target, abortMonitor, executor, cs);
 			return;
 		}
 		
@@ -80,7 +80,7 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 					target,
 					abortMonitor,
 					executor,
-					sc)
+					cs)
 			);
 		}
 		catch(final org.rnorth.ducttape.TimeoutException te)
@@ -90,7 +90,7 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 			final TimeoutException ex = new TimeoutException(
 				"Timed out waiting for strategies, was waiting for " + currentWaitStrategy,
 				(Exception)te.getCause());
-			sc.exception().ifPresent(ex::addSuppressed);
+			cs.exception().ifPresent(ex::addSuppressed);
 			throw ex;
 		}
 	}
@@ -100,7 +100,7 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 		final WaitStrategyTarget target,
 		final AbortMonitor abortMonitor,
 		final ExecutorService executor,
-		final WaitStrategyCurrentState sc)
+		final WaitStrategyCurrentState cs)
 	{
 		for(final AbstractWaitAbortableStrategy<?> strategy : this.strategies)
 		{
@@ -115,7 +115,7 @@ public class WaitAllAbortableStrategy extends AbstractWaitAbortableStrategy<Wait
 				target,
 				abortMonitor,
 				executor,
-				sc.newChild(strategy));
+				cs.newChild(strategy));
 			
 			LOG.debug("Finished waiting for {}, took {}ms", strategy, System.currentTimeMillis() - startMs);
 		}

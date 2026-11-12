@@ -258,7 +258,7 @@ public class HttpWaitAbortableStrategy extends AbstractWaitAbortableStrategy<Htt
 		final WaitStrategyTarget target,
 		final AbortMonitor abortMonitor,
 		final ExecutorService executor,
-		final WaitStrategyCurrentState sc)
+		final WaitStrategyCurrentState cs)
 	{
 		final String containerName = target.getContainerInfo().getName();
 		
@@ -315,7 +315,7 @@ public class HttpWaitAbortableStrategy extends AbstractWaitAbortableStrategy<Htt
 			this.startupRetryUntilSuccessWithRateLimitWhenNotAborted(
 				abortMonitor,
 				() -> this.connectAndCheck(uri),
-				sc);
+				cs);
 			abortMonitor.throwIfRequired();
 		}
 		catch(final TimeoutException e)

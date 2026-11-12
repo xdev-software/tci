@@ -79,12 +79,9 @@ public abstract class AbstractWaitAbortableStrategy<S extends AbstractWaitAborta
 		throw new UnsupportedOperationException("Use the (other) waitUntilReady");
 	}
 	
-	public void waitUntilReady(
+	public abstract void waitUntilReady(
 		final WaitStrategyTarget target,
 		final AbortMonitor abortMonitor,
 		final ExecutorService executor,
-		final WaitStrategyCurrentState sc)
-	{
-		// NOOP
-	}
+		final WaitStrategyCurrentState cs);
 }
