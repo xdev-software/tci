@@ -8,6 +8,7 @@
 * Renamed and moved `JDBCWaitStrategy` → `JDBCAbortableWaitStrategy`
 * Added `s3-rustfs` module #762
 * Update dependencies
+  * Introduce automated updates for default images in Containers
 
 # 4.8.1
 * Correctly configure timeout in `NativeAdvancedBuildImageHandler`
